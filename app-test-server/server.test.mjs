@@ -2,6 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from './server.mjs';
 
+function switchResource(overrides = {}) {
+  return { rn: 'bubbleState', cnd: 'org.onem2m.common.moduleclass.binarySwitch', state: false, ...overrides };
+}
 function validResponse(body, options) {
   return new Response(body, { headers: { 'X-M2M-RI': options.headers['X-M2M-RI'], 'X-M2M-RSC': '2000' } });
 }
@@ -17,7 +20,7 @@ test('maps CORE contract and creates independent request identifiers', async () 
   const calls = [];
   await withServer(async (url, options) => {
     calls.push({ url, options });
-    return validResponse(JSON.stringify({ 'pb:binarySwitch': { state: false } }), options);
+    return validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource() }), options);
   }, async base => {
     const first = await (await fetch(`${base}/api/test/bubble-state`)).json();
     const second = await (await fetch(`${base}/api/test/bubble-state`)).json();
@@ -35,10 +38,36 @@ test('preserves bootstrap unobserved label and never infers observation', async 
     ['unobserved', 'unknown'],
     [null, 'unknown'],
   ]) {
-    await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': { state: false, lbl: labels } }), options), async base => {
+    await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource({ lbl: labels }) }), options), async base => {
       const response = await fetch(`${base}/api/test/bubble-state`);
       assert.equal(response.status, 200);
       assert.equal((await response.json()).observation, expected);
+    });
+  }
+});
+test('only forwards valid resource modification timestamps without timezone conversion', async () => {
+  const cases = [
+    ['20261028T102434', '20261028T102434'], ['20240229T235959', '20240229T235959'],
+    ['20230229T000000', null], ['20261301T000000', null], ['20260101T240000', null],
+    ['00000101T000000', null], ['20261028T102434Z', null], ['20261028T102434\n', null],
+    ['', null], [null, null], [123, null], [undefined, null]
+  ];
+  for (const [lt, expected] of cases) {
+    await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource({ lt }) }), options), async base => {
+      const response = await fetch(`${base}/api/test/bubble-state`);
+      assert.equal(response.status, 200);
+      assert.equal((await response.json()).resourceLastModifiedRaw, expected);
+    });
+  }
+});
+test('rejects state from a resource with missing or mismatched contract identity', async () => {
+  for (const change of [{rn: undefined}, {rn: 'another'}, {cnd: undefined}, {cnd: 'other'}, {state: 'false'}]) {
+    await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource(change) }), options), async base => {
+      const response = await fetch(`${base}/api/test/bubble-state`);
+      assert.equal(response.status, 502);
+      const body = await response.json();
+      assert.equal(body.error, 'invalid_mobius_response');
+      assert.equal(body.state, undefined);
     });
   }
 });
@@ -59,7 +88,7 @@ test('rejects wrong or absent oneM2M response identifiers and result codes', asy
       if (scenario === 'wrong-id') headers['X-M2M-RI'] = 'other-request';
       if (scenario === 'missing-code') delete headers['X-M2M-RSC'];
       if (scenario === 'wrong-code') headers['X-M2M-RSC'] = '4000';
-      return new Response(JSON.stringify({ 'pb:binarySwitch': { state: true } }), { headers });
+      return new Response(JSON.stringify({ 'pb:binarySwitch': switchResource({ state: true }) }), { headers });
     }, async base => {
       const response = await fetch(`${base}/api/test/bubble-state`);
       assert.equal(response.status, 502);
@@ -89,7 +118,7 @@ test('reports an unavailable upstream', async () => {
 });
 
 test('bounds HTTP upstream responses, including chunked bodies', async () => {
-  const oversized = JSON.stringify({ 'pb:binarySwitch': { state: true }, padding: 'x'.repeat(65536) });
+  const oversized = JSON.stringify({ 'pb:binarySwitch': switchResource({ state: true }), padding: 'x'.repeat(65536) });
   await withServer(async (_, options) => validResponse(oversized, options), async base => {
     const response = await fetch(`${base}/api/test/bubble-state`);
     assert.equal(response.status, 502);
@@ -128,7 +157,9 @@ test('mTLS verifies the server and presents client credentials; oversized respon
         const code = req.headers['x-m2m-origin'] === 'wrong-code' ? '4000' : '2000';
         res.writeHead(200, { 'Content-Type': 'application/json', 'X-M2M-RI': id, 'X-M2M-RSC': code });
         if (req.headers['x-m2m-origin'] === 'oversized') res.end('x'.repeat(65537));
-        else res.end(JSON.stringify({ 'pb:binarySwitch': { state: true } }));
+        else if (req.headers['x-m2m-origin'] === 'wrong-cnd') res.end(JSON.stringify({ 'pb:binarySwitch': switchResource({ cnd: 'other' }) }));
+        else if (req.headers['x-m2m-origin'] === 'wrong-rn') res.end(JSON.stringify({ 'pb:binarySwitch': switchResource({ rn: 'other' }) }));
+        else res.end(JSON.stringify({ 'pb:binarySwitch': switchResource({ state: true }) }));
       } else res.writeHead(404).end();
     });
     await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
@@ -153,6 +184,10 @@ test('mTLS verifies the server and presents client credentials; oversized respon
     for (const originator of ['wrong-id', 'wrong-code']) {
       const invalidHeaders = await query({ tls: { ca, cert, key }, originator });
       assert.equal(invalidHeaders.status, 502); assert.equal(invalidHeaders.body.error, 'invalid_mobius_headers'); assert.equal(invalidHeaders.body.state, undefined);
+    }
+    for (const originator of ['wrong-cnd', 'wrong-rn']) {
+      const invalidIdentity = await query({ tls: { ca, cert, key }, originator });
+      assert.equal(invalidIdentity.status, 502); assert.equal(invalidIdentity.body.error, 'invalid_mobius_response'); assert.equal(invalidIdentity.body.state, undefined);
     }
     const large = await query({ tls: { ca, cert, key }, originator: 'oversized' });
     assert.equal(large.status, 502); assert.equal(large.body.state, undefined);

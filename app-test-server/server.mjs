@@ -6,6 +6,21 @@ import { pathToFileURL } from 'node:url';
 
 const MAX_RESPONSE_BYTES = 65536;
 
+// Expose only the Mobius timestamp form this test adapter understands. The
+// value has no offset in its wire form, so do not invent a timezone or turn it
+// into a device-observation time. Invalid/unsupported values remain unknown.
+function resourceTimestamp(value) {
+  if (typeof value !== 'string' || value.length !== 15 || !/^\d{8}T\d{6}$/.test(value)) return null;
+  const year = Number(value.slice(0, 4)), month = Number(value.slice(4, 6));
+  const day = Number(value.slice(6, 8)), hour = Number(value.slice(9, 11));
+  const minute = Number(value.slice(11, 13)), second = Number(value.slice(13, 15));
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (year < 1 || month < 1 || month > 12 || day < 1 || day > days[month - 1]
+      || hour > 23 || minute > 59 || second > 59) return null;
+  return value;
+}
+
 async function readBounded(stream) {
   const chunks = [];
   let size = 0;
@@ -71,11 +86,15 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
       catch { return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId }); }
       const resource = data?.['pb:binarySwitch'];
       const state = resource?.state;
-      if (typeof state !== 'boolean') return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId });
+      // A boolean alone is not enough to establish that the returned resource
+      // is the binarySwitch named by the CORE test contract.
+      if (resource?.rn !== 'bubbleState'
+          || resource?.cnd !== 'org.onem2m.common.moduleclass.binarySwitch'
+          || typeof state !== 'boolean') return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId });
       // A label identifying bootstrap data is evidence that it is unobserved;
       // absence of the label is not evidence that a real device observed it.
       const observation = Array.isArray(resource.lbl) && resource.lbl.includes('unobserved') ? 'unobserved' : 'unknown';
-      return send(200, { mode: 'test', state, observation, requestId });
+      return send(200, { mode: 'test', state, observation, resourceLastModifiedRaw: resourceTimestamp(resource.lt), requestId });
     } catch {
       return send(502, { mode: 'test', error: 'mobius_unavailable', requestId });
     }

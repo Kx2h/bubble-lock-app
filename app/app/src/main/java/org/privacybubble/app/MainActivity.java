@@ -146,8 +146,11 @@ public final class MainActivity extends Activity {
                     if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
                     String observation = json.optString("observation", "unknown");
                     String source = "unobserved".equals(observation) ? "초기값 · 장치 관측 전" : "관측 여부 미확인";
+                    String resourceTime = TestResourceTimestamp.rawOrNull(json.opt("resourceLastModifiedRaw"));
                     String checkedAt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date());
                     result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source
+                        + "\nCSE 자원 변경 시각 원문: " + (resourceTime == null ? "확인 불가" : resourceTime + " (시간대 미표기)")
+                        + "\n자원 변경 시각은 기기 관측 시각이 아닙니다."
                         + "\n조회 시각: " + checkedAt + " (기기 시간)\n자동 갱신되지 않습니다."
                         + "\n요청 ID: " + json.optString("requestId", "없음");
                 } catch (InterruptedException e) {
