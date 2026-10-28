@@ -51,9 +51,17 @@ public final class OidcProvider {
     /**
      * Fetch signing keys only from the HTTPS JWKS URI in this validated discovery document,
      * then return a verified subject. Call on a background thread; failures never authenticate.
+     * Expiry and not-before are checked against the system clock after the JWKS fetch.
      */
-    public String verifyIdToken(String jwt, String clientId, String nonce, long nowEpochSeconds) throws Exception {
-        return IdTokenVerifier.verify(jwt, fetch(jwksUri.toString()), issuer, clientId, nonce, nowEpochSeconds);
+    public String verifyIdToken(String jwt, String clientId, String nonce) throws Exception {
+        String keys = fetch(jwksUri.toString());
+        return IdTokenVerifier.verify(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000);
+    }
+
+    /** @deprecated Caller-supplied time is ignored; use the three-argument method. */
+    @Deprecated
+    public String verifyIdToken(String jwt, String clientId, String nonce, long ignoredNowEpochSeconds) throws Exception {
+        return verifyIdToken(jwt, clientId, nonce);
     }
 
     /** Context for rotation is created only from the verified initial ID token. */

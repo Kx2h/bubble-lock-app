@@ -11,10 +11,11 @@ const escape = value => value.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;'
 const text = (v, max = 512) => typeof v === 'string' && v.length > 0 && v.length <= max;
 const required = (params, key) => params.getAll(key).length === 1 ? params.get(key) : null;
 
-export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, refreshIdToken = false, accessHash = 'none', introspectionSecret, testAccessClaims, now = () => Math.floor(Date.now() / 1000) }) {
+export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, refreshIdToken = false, accessHash = 'none', introspectionSecret, testAccessClaims, testNbfOffsetSeconds = 0, now = () => Math.floor(Date.now() / 1000) }) {
   const issuerUrl = new URL(issuer);
   if (issuerUrl.protocol !== 'https:' || issuerUrl.hostname !== 'localhost' || issuerUrl.username || issuerUrl.password || issuerUrl.pathname !== '/' || issuerUrl.search || issuerUrl.hash || !issuerUrl.port) throw Error('Mock issuer must be https://localhost:<port>');
   if (![false, true, 'wrong-sub'].includes(refreshIdToken) || !['none', 'valid', 'wrong-initial', 'wrong-refresh'].includes(accessHash) || !cert || !key || !text(clientId) || redirectUri !== defaultRedirect) throw Error('Invalid mock configuration');
+  if (!Number.isInteger(testNbfOffsetSeconds) || testNbfOffsetSeconds < 0 || testNbfOffsetSeconds > 110) throw Error('Invalid not-before test offset');
   if (introspectionSecret !== undefined && (!text(introspectionSecret, 256) || introspectionSecret.length < 32)) throw Error('Invalid introspection secret');
   if (testAccessClaims !== undefined && (!introspectionSecret || !testAccessClaims || typeof testAccessClaims !== 'object' || Array.isArray(testAccessClaims) || Object.keys(testAccessClaims).some(k=>!['iss','sub','aud','iat','exp','scope'].includes(k)))) throw Error('Invalid access test claims');
   issuer = issuer.replace(/\/$/, '');
@@ -76,7 +77,7 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
     const t = now(), header = b64(JSON.stringify({alg:'RS256',kid:jwk.kid,typ:'JWT'}));
     const wrong = isRefresh ? accessHash === 'wrong-refresh' : accessHash === 'wrong-initial';
     const atHash = accessHash === 'none' ? undefined : createHash('sha256').update(wrong ? 'different-synthetic-token' : access).digest().subarray(0, 16).toString('base64url');
-    const payload = b64(JSON.stringify({iss:issuer,sub:subject,aud:clientId,iat:t,exp:t+120,nonce,at_hash:atHash}));
+    const payload = b64(JSON.stringify({iss:issuer,sub:subject,aud:clientId,iat:t,exp:t+120,...(testNbfOffsetSeconds ? {nbf:t+testNbfOffsetSeconds} : {}),nonce,at_hash:atHash}));
     const message = `${header}.${payload}`;
     return `${message}.${sign('RSA-SHA256', Buffer.from(message), keys.privateKey).toString('base64url')}`;
   }

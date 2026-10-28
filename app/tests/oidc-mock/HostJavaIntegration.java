@@ -63,8 +63,19 @@ public final class HostJavaIntegration {
         finally { tokenResponse.disconnect(); }
         String token = JSONObjectUtils.getString(JSONObjectUtils.parse(json),"id_token");
         long now = System.currentTimeMillis()/1000;
-        if (!"synthetic-test-user".equals(provider.verifyIdToken(token,CLIENT,nonce,now))) throw new AssertionError("Unexpected subject");
-        try { provider.verifyIdToken(token,CLIENT,"incorrect-test-nonce",now); throw new AssertionError("Wrong nonce accepted"); }
+        if (args[1].equals("expired")) {
+            try { provider.verifyIdToken(token,CLIENT,nonce,now - 240); throw new AssertionError("Stale caller time accepted expired ID token"); }
+            catch (IllegalArgumentException expected) { System.out.println("PASS: stale caller time cannot revive expired ID token"); }
+            return;
+        }
+        if (args[1].equals("future-iat") || args[1].equals("future-nbf")) {
+            long future = now + (args[1].equals("future-nbf") ? 90 : 240);
+            try { provider.verifyIdToken(token,CLIENT,nonce,future); throw new AssertionError("Future caller time accepted premature ID token"); }
+            catch (IllegalArgumentException expected) { System.out.println("PASS: future caller time cannot accept premature ID token"); }
+            return;
+        }
+        if (!"synthetic-test-user".equals(provider.verifyIdToken(token,CLIENT,nonce))) throw new AssertionError("Unexpected subject");
+        try { provider.verifyIdToken(token,CLIENT,"incorrect-test-nonce"); throw new AssertionError("Wrong nonce accepted"); }
         catch (IllegalArgumentException expected) { }
         System.out.println("PASS: trusted discovery, mock S256 exchange, Java ID token verification and wrong nonce rejection");
     }

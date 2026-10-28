@@ -69,8 +69,8 @@ public final class ProbeActivity extends Activity {
                 if (total > 65536) throw new IllegalStateException("oversize");
                 String json = new String(bytes, 0, total, StandardCharsets.UTF_8);
                 String idToken = JSONObjectUtils.getString(JSONObjectUtils.parse(json), "id_token");
-                if (!"synthetic-test-user".equals(provider.verifyIdToken(idToken, CLIENT, nonce, System.currentTimeMillis() / 1000))) throw new IllegalStateException("subject");
-                try { provider.verifyIdToken(idToken, CLIENT, "wrong-probe-nonce", System.currentTimeMillis() / 1000); throw new IllegalStateException("wrong nonce accepted"); }
+                if (!"synthetic-test-user".equals(provider.verifyIdToken(idToken, CLIENT, nonce))) throw new IllegalStateException("subject");
+                try { provider.verifyIdToken(idToken, CLIENT, "wrong-probe-nonce"); throw new IllegalStateException("wrong nonce accepted"); }
                 catch (IllegalArgumentException expected) { /* expected */ }
                 result = "PASS: Android TLS, mock PKCE exchange, ID token and wrong nonce rejection. Synthetic account. No browser login.";
             } catch (Exception failure) { result = "FAIL: local TLS/OIDC probe (" + failure.getClass().getSimpleName() + ")"; }

@@ -37,6 +37,18 @@ test('Java OidcProvider and IdTokenVerifier use verified HTTPS for mock code exc
     assert.match(untrusted.stdout,/untrusted TLS rejected/);
     const trusted = await run(resolve(javaHome,'bin/java'), [`-Djavax.net.ssl.trustStore=${resolve(temp,'test.p12')}`,'-Djavax.net.ssl.trustStoreType=PKCS12','-Djavax.net.ssl.trustStorePassword=mock-password','-cp',classpath,main,issuer,'trusted'], {timeout:20000});
     assert.match(trusted.stdout,/Java ID token verification and wrong nonce rejection/);
+    await new Promise(r => server.close(r));
+    server = createMockIdp({issuer,cert,key,now:() => Math.floor(Date.now()/1000) - 240});
+    await new Promise((r,j) => server.once('error',j).listen(port,'127.0.0.1',r));
+    const expired = await run(resolve(javaHome,'bin/java'), [`-Djavax.net.ssl.trustStore=${resolve(temp,'test.p12')}`,'-Djavax.net.ssl.trustStoreType=PKCS12','-Djavax.net.ssl.trustStorePassword=mock-password','-cp',classpath,main,issuer,'expired'], {timeout:20000});
+    assert.match(expired.stdout,/stale caller time cannot revive expired ID token/);
+    for (const mode of ['future-iat', 'future-nbf']) {
+      await new Promise(r => server.close(r));
+      server = createMockIdp({issuer,cert,key,...(mode === 'future-iat' ? {now:() => Math.floor(Date.now()/1000) + 240} : {testNbfOffsetSeconds:90})});
+      await new Promise((r,j) => server.once('error',j).listen(port,'127.0.0.1',r));
+      const result = await run(resolve(javaHome,'bin/java'), [`-Djavax.net.ssl.trustStore=${resolve(temp,'test.p12')}`,'-Djavax.net.ssl.trustStoreType=PKCS12','-Djavax.net.ssl.trustStorePassword=mock-password','-cp',classpath,main,issuer,mode], {timeout:20000});
+      assert.match(result.stdout,/future caller time cannot accept premature ID token/);
+    }
   } finally {
     if (server?.listening) await new Promise(r => server.close(r));
     await rm(temp,{recursive:true,force:true});
