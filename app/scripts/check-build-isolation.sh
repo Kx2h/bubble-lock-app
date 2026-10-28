@@ -18,7 +18,7 @@ release_xml=$("$aapt" dump xmltree "$release" "$release_path")
 [[ $release_xml == *'cleartextTrafficPermitted=(type 0x12)0x0'* && $release_xml != *'domain-config'* && $release_xml != *'0xffffffff'* ]] || { echo 'Release cleartext policy is unsafe.' >&2; exit 1; }
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'net.openid.appauth.RedirectUriReceiverActivity' || { echo 'Debug test redirect receiver is missing.' >&2; exit 1; }
 if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -q 'net.openid.appauth.RedirectUriReceiverActivity'; then echo 'Test redirect receiver is present in release.' >&2; exit 1; fi
-if "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.auth.OidcSyntheticActivity'; then echo 'Synthetic Activity is present in default debug.' >&2; exit 1; fi
+if "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.auth.(OidcSyntheticActivity|AuthenticatedConsentActivity)'; then echo 'Synthetic Activity is present in default debug.' >&2; exit 1; fi
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticConsentActivity' || { echo 'Debug consent test Activity is missing.' >&2; exit 1; }
-if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.(SyntheticConsentActivity|auth.(OidcSyntheticActivity|StateMismatchProbeActivity))'; then echo 'Test Activity is present in release.' >&2; exit 1; fi
+if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.(SyntheticConsentActivity|auth.(OidcSyntheticActivity|AuthenticatedConsentActivity|StateMismatchProbeActivity))'; then echo 'Test Activity is present in release.' >&2; exit 1; fi
 echo 'PASS: default debug excludes synthetic CA and Activity; release rejects cleartext and test Activities'

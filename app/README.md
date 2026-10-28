@@ -47,7 +47,7 @@ node --test app/scripts/device-poc.test.mjs
 "$ADB" -s "$SERIAL" reverse --remove tcp:8787
 ```
 
-OIDC는 아직 로그인 UI나 토큰 교환에 연결되지 않았습니다. 신뢰된 issuer의 HTTPS discovery/JWKS와 RS256 ID 토큰 검증 경계는 [OIDC 검증 준비](docs/OIDC_TRUST_BOUNDARY.md)에 설명되어 있으며 Nimbus JOSE+JWT 9.47이 필요합니다. `:app:testDebugUnitTest`의 JVM 단위시험은 검증 경계에 대한 시험이고 실제 IdP 또는 휴대폰 로그인 시험은 아닙니다.
+OIDC는 아직 운영 로그인 UI나 운영 토큰 교환에 연결되지 않았습니다. 신뢰된 issuer의 HTTPS discovery/JWKS와 RS256 ID 토큰 검증 경계는 [OIDC 검증 준비](docs/OIDC_TRUST_BOUNDARY.md)에 설명되어 있으며 Nimbus JOSE+JWT 9.47이 필요합니다. `:app:testDebugUnitTest`의 JVM 단위시험은 검증 경계에 대한 시험이고 실제 IdP 또는 휴대폰 로그인 시험은 아닙니다.
 
 로컬 테스트 상태 조회는 연결 오류와 HTTP 503·504에서 한 번 재시도합니다. HTTP 403·502와 잘못된 응답은 재시도하지 않습니다. 실제 사용자 인증이나 서버 권한에 적용되는 재시도 정책은 아닙니다. 저장소 루트에서 `app/scripts/test-client.sh`로 JVM 클라이언트 시험을 실행할 수 있습니다.
 
@@ -56,3 +56,5 @@ OIDC는 아직 로그인 UI나 토큰 교환에 연결되지 않았습니다. �
 Debug·release APK를 모두 빌드한 다음 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 패키지된 네트워크 정책과 테스트 redirect receiver의 빌드별 분리를 확인할 수 있습니다.
 
 Debug 빌드의 `합성 동의 시험`은 인증 없는 고정 가상 요청에 한정한 PoC입니다. 시작·기기 포트 연결과 종료 방법은 [합성 consent 서버](tests/consent-mock/README.md)를 참고하세요. 요청 전 고정된 합성 본문·중복 방지 키·서버 인스턴스를 앱 전용 저장소에 동기 저장합니다. 응답이 유실되거나 프로세스가 종료되면 동일 서버 인스턴스에서 사용자가 같은 요청을 재전송할 수 있습니다. 서버가 재시작됐거나 보류 기록이 손상되면 재전송을 차단합니다. 그때 확인 후 차단된 합성 보류 기록만 삭제할 수 있으며, 삭제해도 이전 요청의 결과는 알 수 없습니다. 이 기능은 운영 동의·grant·ACP나 실제 사용자 권한을 만들지 않습니다.
+
+별도 opt-in debug 빌드의 인증된 합성 동의 연결은 [시험 범위와 미확정 표시](docs/AUTHENTICATED_CONSENT_POC.md), [HTTPS mock 서버 실행](tests/auth-consent-mock/README.md)을 참고하세요. 실제 운영 인증이나 권한 부여 기능은 아닙니다.

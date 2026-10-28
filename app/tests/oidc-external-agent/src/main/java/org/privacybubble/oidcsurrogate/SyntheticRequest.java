@@ -19,7 +19,8 @@ final class SyntheticRequest {
         String scope = values.get("scope");
         String prompt = values.get("prompt");
         return ("openid".equals(scope) && prompt == null)
-                || ("openid offline_access".equals(scope) && "consent".equals(prompt));
+                || ("openid offline_access".equals(scope) && "consent".equals(prompt))
+                || ("openid offline_access test.consent.read test.consent.write".equals(scope) && "consent".equals(prompt));
     }
     static URI validate(String value) {
         try {

@@ -61,4 +61,18 @@ public class RotatingSessionTest {
         RotatingSession s = new RotatingSession("synthetic", "a1", "r1", 2000, now::get, old -> { now.set(62000); return ok("a2", "r2"); });
         assertThrows(IOException.class, s::refresh); assertThrows(IllegalStateException.class, s::accessToken);
     }
+    @Test public void syntheticConsentScopeCannotExpandOrDropOnRefresh() throws Exception {
+        String approved = "openid offline_access test.consent.read test.consent.write";
+        assertTrue(RotatingSession.syntheticScope(approved, true));
+        assertFalse(RotatingSession.syntheticScope(approved, false));
+        assertFalse(RotatingSession.syntheticScope("openid offline_access test.consent.read", true));
+        assertFalse(RotatingSession.syntheticScope(approved + " admin", true));
+        RotatingSession good = new RotatingSession("synthetic", "a1", "r1", 2000, () -> 1000,
+                old -> new RotatingSession.Response("a2", "r2", "bearer", 60, approved, false), true);
+        good.refresh(); assertEquals("a2", good.accessToken());
+        RotatingSession bad = new RotatingSession("synthetic", "a1", "r1", 2000, () -> 1000,
+                old -> new RotatingSession.Response("a2", "r2", "bearer", 60, approved + " admin", false), true);
+        assertThrows(IOException.class, bad::refresh);
+        assertThrows(IllegalStateException.class, bad::accessToken);
+    }
 }

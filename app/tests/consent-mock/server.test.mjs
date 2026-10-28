@@ -132,3 +132,18 @@ test('same-address restart does not replay an uncertain mutation into an empty l
     assert.equal((await (await fetch(`${url}/grant`,{headers:{Connection:'close'}})).json()).status,'none');
   } finally { await new Promise(resolve => second.close(resolve)); }
 });
+
+test('unexpected authorization decisions fail closed and do not mutate', async () => {
+  for (const result of [undefined, 0, '200', 500, null]) {
+    let authorized = false;
+    const server = createConsentMock({authorize:()=>authorized ? 200 : result});
+    await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
+    const url=`http://127.0.0.1:${server.address().port}${basePath}`;
+    try {
+      const refused=await fetch(`${url}/grant`);
+      assert.equal(refused.status,503); assert.equal((await refused.json()).error,'auth_unavailable');
+      authorized = true;
+      assert.equal((await (await fetch(`${url}/grant`)).json()).status,'none');
+    } finally { await new Promise(resolve=>server.close(resolve)); }
+  }
+});

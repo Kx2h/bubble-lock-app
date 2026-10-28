@@ -39,6 +39,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
     private final String clientId;
     private final Callback callback;
     private final BrowserMatcher browserMatcher;
+    private final boolean consentScope;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private AuthorizationService service;
@@ -59,11 +60,11 @@ public final class OidcBrowserFlow implements AutoCloseable {
         private String accessToken;
         private final long expiresAtElapsed;
         private RotatingSession rotating;
-        private Session(IdTokenVerifier.Identity identity, String accessToken, long expiresAtElapsed, OidcProvider provider, String clientId, String refreshToken) {
+        private Session(IdTokenVerifier.Identity identity, String accessToken, long expiresAtElapsed, OidcProvider provider, String clientId, String refreshToken, boolean consentScope) {
             this.expiresAtElapsed = expiresAtElapsed;
             if (refreshToken == null) { this.subject = identity.subject(); this.accessToken = accessToken; }
             else { this.rotating = new RotatingSession(identity.subject(), accessToken, refreshToken, expiresAtElapsed,
-                    SystemClock::elapsedRealtime, previous -> rotate(provider, clientId, previous, identity)); }
+                    SystemClock::elapsedRealtime, previous -> rotate(provider, clientId, previous, identity), consentScope); }
         }
         public synchronized String subject() {
             if (rotating != null) return rotating.subject();
@@ -89,18 +90,28 @@ public final class OidcBrowserFlow implements AutoCloseable {
 
     /** provider MUST originate from pre-provisioned trusted issuer discovery, never a redirect. */
     public OidcBrowserFlow(Activity activity, OidcProvider provider, String clientId, Callback callback) {
-        this(activity, provider, clientId, callback, null);
+        this(activity, provider, clientId, callback, null, false);
     }
 
-    private OidcBrowserFlow(Activity activity, OidcProvider provider, String clientId, Callback callback, BrowserMatcher browserMatcher) {
+    private OidcBrowserFlow(Activity activity, OidcProvider provider, String clientId, Callback callback, BrowserMatcher browserMatcher, boolean consentScope) {
         if (activity == null || provider == null || callback == null || clientId == null || clientId.isEmpty() || clientId.length() > 512 || !clientId.equals(clientId.trim())) throw new IllegalArgumentException("Invalid configuration");
         this.activity = activity; this.provider = provider; this.clientId = clientId; this.callback = callback;
-        this.browserMatcher = browserMatcher;
+        this.browserMatcher = browserMatcher; this.consentScope = consentScope;
     }
 
     /** Debug opt-in synthetic provider only; never select a surrogate for real credentials. */
     @SuppressWarnings("deprecation")
     public static OidcBrowserFlow forSyntheticTest(Activity activity, OidcProvider provider, String clientId, Callback callback) {
+        return synthetic(activity, provider, clientId, callback, false);
+    }
+
+    /** Opt-in synthetic API scopes only; unavailable in production builds. */
+    public static OidcBrowserFlow forSyntheticConsentTest(Activity activity, OidcProvider provider, String clientId, Callback callback) {
+        return synthetic(activity, provider, clientId, callback, true);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static OidcBrowserFlow synthetic(Activity activity, OidcProvider provider, String clientId, Callback callback, boolean consentScope) {
         if (!BuildConfig.DEBUG || !BuildConfig.OIDC_TEST_ENABLED || activity == null || provider == null
                 || !"https://localhost:18443".equals(provider.issuer)
                 || !"privacy-bubble-android-test".equals(clientId)) throw new IllegalStateException("Synthetic test unavailable");
@@ -110,7 +121,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
             java.util.Set<String> expected = BrowserDescriptor.generateSignatureHashes(signatures);
             BrowserMatcher matcher = descriptor -> "org.privacybubble.oidcsurrogate".equals(descriptor.packageName)
                     && expected.equals(descriptor.signatureHashes) && !descriptor.useCustomTab;
-            return new OidcBrowserFlow(activity, provider, clientId, callback, matcher);
+            return new OidcBrowserFlow(activity, provider, clientId, callback, matcher, consentScope);
         } catch (PackageManager.NameNotFoundException e) { throw new IllegalStateException("App signature unavailable"); }
     }
 
@@ -124,7 +135,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
             AuthorizationServiceConfiguration config = new AuthorizationServiceConfiguration(
                     Uri.parse(provider.authorizationEndpoint.toString()), Uri.parse(provider.tokenEndpoint.toString()));
             AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(config, clientId, ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT));
-            if (browserMatcher != null) builder.setScope("openid offline_access").setPrompt("consent");
+            if (browserMatcher != null) builder.setScope(consentScope ? "openid offline_access test.consent.read test.consent.write" : "openid offline_access").setPrompt("consent");
             else builder.setScope("openid");
             request = builder.build();
             if (request.state == null || request.nonce == null || request.codeVerifier == null
@@ -166,14 +177,14 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 final String refreshToken;
                 if (browserMatcher != null) {
                     Object refreshValue = token.opt("refresh_token");
-                    if (!(refreshValue instanceof String) || (scope != null && !RotatingSession.syntheticScope((String) scope))) throw new IllegalArgumentException();
+                    if (!(refreshValue instanceof String) || (scope != null && !RotatingSession.syntheticScope((String) scope, consentScope))) throw new IllegalArgumentException();
                     refreshToken = (String) refreshValue;
                 } else refreshToken = null;
                 // Conservatively begin the lifetime before JWKS fetching, which may take time.
                 long expiresAtElapsed = exchangeStarted + (long) seconds * 1000;
                 IdTokenVerifier.Identity identity = provider.verifyIdentityToken(idToken, clientId, request.nonce);
                 if (SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalArgumentException();
-                Session session = new Session(identity, access, expiresAtElapsed, provider, clientId, refreshToken);
+                Session session = new Session(identity, access, expiresAtElapsed, provider, clientId, refreshToken, consentScope);
                 if (!main.post(() -> {
                     if (closed) { session.close(); return; }
                     // The main queue can be delayed past expiry after verification completed.

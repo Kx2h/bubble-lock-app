@@ -12,7 +12,7 @@ const stable = object => JSON.stringify(object, (_key, value) => {
   return Object.fromEntries(Object.keys(value).sort().map(key => [key, value[key]]));
 });
 
-export function createConsentMock({ now = () => Date.now(), dropFirstMutationResponse = false } = {}) {
+export function createConsentMock({ now = () => Date.now(), dropFirstMutationResponse = false, authorize, serverFactory = http.createServer } = {}) {
   // A restarted process has lost its idempotency ledger. Never replay a request
   // against a different process and accidentally create a second grant.
   const serverInstanceId = randomUUID();
@@ -31,9 +31,15 @@ export function createConsentMock({ now = () => Date.now(), dropFirstMutationRes
     const text = Buffer.concat(chunks).toString('utf8');
     return JSON.parse(text);
   }
-  return http.createServer(async (req, res) => {
+  return serverFactory(async (req, res) => {
     res.setHeader('Content-Type','application/json; charset=utf-8');
     res.setHeader('Cache-Control','no-store');
+    if (authorize) {
+      let decision;
+      try { decision = await authorize(req); } catch { decision = 503; }
+      if (![200, 401, 403, 503].includes(decision)) decision = 503;
+      if (decision !== 200) return response(res, decision, error(decision === 403 ? 'forbidden' : decision === 503 ? 'auth_unavailable' : 'unauthorized'));
+    }
     if (req.method === 'GET' && req.url === `${BASE}/request`) return response(res, 200, {mode:'synthetic',request:REQUEST});
     if (req.method === 'GET' && req.url === `${BASE}/grant`) { refreshExpiry(); return response(res, 200, {mode:'synthetic',status,grant}); }
     if (req.method !== 'POST' || ![`${BASE}/approve`,`${BASE}/revoke`].includes(req.url)) return response(res,404,error('not_found'));

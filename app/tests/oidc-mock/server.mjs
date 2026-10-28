@@ -11,10 +11,12 @@ const escape = value => value.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;'
 const text = (v, max = 512) => typeof v === 'string' && v.length > 0 && v.length <= max;
 const required = (params, key) => params.getAll(key).length === 1 ? params.get(key) : null;
 
-export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, refreshIdToken = false, now = () => Math.floor(Date.now() / 1000) }) {
+export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, refreshIdToken = false, introspectionSecret, testAccessClaims, now = () => Math.floor(Date.now() / 1000) }) {
   const issuerUrl = new URL(issuer);
   if (issuerUrl.protocol !== 'https:' || issuerUrl.hostname !== 'localhost' || issuerUrl.username || issuerUrl.password || issuerUrl.pathname !== '/' || issuerUrl.search || issuerUrl.hash || !issuerUrl.port) throw Error('Mock issuer must be https://localhost:<port>');
   if (![false, true, 'wrong-sub'].includes(refreshIdToken) || !cert || !key || !text(clientId) || redirectUri !== defaultRedirect) throw Error('Invalid mock configuration');
+  if (introspectionSecret !== undefined && (!text(introspectionSecret, 256) || introspectionSecret.length < 32)) throw Error('Invalid introspection secret');
+  if (testAccessClaims !== undefined && (!introspectionSecret || !testAccessClaims || typeof testAccessClaims !== 'object' || Array.isArray(testAccessClaims) || Object.keys(testAccessClaims).some(k=>!['iss','sub','aud','iat','exp','scope'].includes(k)))) throw Error('Invalid access test claims');
   issuer = issuer.replace(/\/$/, '');
   const keys = generateKeyPairSync('rsa', { modulusLength: 2048 });
   const jwk = { ...keys.publicKey.export({ format: 'jwk' }), kid: 'mock-signing-key', alg: 'RS256', use: 'sig' };
@@ -22,8 +24,24 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
   // Synthetic-only memory state. No tokens survive a restart or reach a log.
   const families = new Set();
   const refreshTokens = new Map();
+  const accessTokens = new Map();
+  const consentScope = 'openid offline_access test.consent.read test.consent.write';
+  function pruneAccess() { for (const [token, item] of accessTokens) if (item.exp <= now()) accessTokens.delete(token); }
+  function issueAccess(scope, family) {
+    if (scope !== consentScope) return randomBytes(32).toString('base64url');
+    pruneAccess();
+    if (accessTokens.size >= 1000) throw Error('access capacity');
+    const time = now();
+    const head = b64(JSON.stringify({alg:'RS256',kid:jwk.kid,typ:'at+jwt'}));
+    const claims = b64(JSON.stringify({iss:issuer,sub:'synthetic-test-user',aud:'consent-test-api',iat:time,exp:time+120,scope:'test.consent.read test.consent.write',jti:randomBytes(16).toString('base64url'),...testAccessClaims}));
+    const message = `${head}.${claims}`;
+    const token = `${message}.${sign('RSA-SHA256',Buffer.from(message),keys.privateKey).toString('base64url')}`;
+    accessTokens.set(token, {exp:time+120,family});
+    return token;
+  }
   function discardFamily(family) {
     for (const token of family.tokens) refreshTokens.delete(token);
+    for (const [token, item] of accessTokens) if (item.family === family) accessTokens.delete(token);
     families.delete(family);
   }
   function pruneFamilies() {
@@ -43,10 +61,10 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
     const scope = required(p, 'scope'), state = required(p, 'state'), nonce = required(p, 'nonce');
     const challenge = required(p, 'code_challenge'), method = required(p, 'code_challenge_method');
     if (responseType !== 'code' || client !== clientId || redirect !== redirectUri || !text(scope) || !scope.split(' ').includes('openid') || !text(state) || state.length < 16 || !text(nonce) || nonce.length < 16 || method !== 'S256' || !/^[A-Za-z0-9_-]{43}$/.test(challenge ?? '')) return null;
-    if (scope !== 'openid' && scope !== 'openid offline_access') return null;
-    const offlineAccess = scope === 'openid offline_access';
+    if (scope !== 'openid' && scope !== 'openid offline_access' && !(introspectionSecret && scope === consentScope)) return null;
+    const offlineAccess = scope !== 'openid';
     if ((offlineAccess && required(p, 'prompt') !== 'consent') || (!offlineAccess && p.has('prompt'))) return null;
-    return { state, nonce, challenge, offlineAccess };
+    return { state, nonce, challenge, offlineAccess, scope };
   }
   async function form(req) {
     let size = 0; const chunks = [];
@@ -67,6 +85,20 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
       const u = new URL(req.url, issuer);
       if (u.pathname === '/.well-known/openid-configuration' && req.method === 'GET') return json(res, 200, { issuer, authorization_endpoint:`${issuer}/authorize`, token_endpoint:`${issuer}/token`, jwks_uri:`${issuer}/jwks`, response_types_supported:['code'], code_challenge_methods_supported:['S256'], id_token_signing_alg_values_supported:['RS256'], subject_types_supported:['public'], grant_types_supported:['authorization_code','refresh_token'], authorization_response_iss_parameter_supported:true });
       if (u.pathname === '/jwks' && req.method === 'GET') return json(res, 200, {keys:[jwk]});
+      if (u.pathname === '/introspect' && req.method === 'POST') {
+        const secret = req.headers['x-mock-introspection-key'];
+        if (!introspectionSecret || typeof secret !== 'string' || Buffer.byteLength(secret) !== Buffer.byteLength(introspectionSecret) || !timingSafeEqual(Buffer.from(secret),Buffer.from(introspectionSecret))) return json(res,403,{active:false});
+        const p = await form(req), value = required(p,'token');
+        pruneFamilies(); pruneAccess();
+        return json(res,200,{active:typeof value === 'string' && accessTokens.has(value)});
+      }
+      if (u.pathname === '/revoke' && req.method === 'POST') {
+        if (!introspectionSecret) return fail(res);
+        const p=await form(req), value=required(p,'token');
+        if (required(p,'client_id') !== clientId || !text(value,16384)) return fail(res);
+        const item=accessTokens.get(value); if (item?.family) discardFamily(item.family); else accessTokens.delete(value);
+        return json(res,200,{});
+      }
       if (u.pathname === '/authorize' && req.method === 'GET') {
         const auth = validate(u.searchParams); if (!auth) return fail(res);
         const fields = ['response_type','client_id','redirect_uri','scope','state','nonce','code_challenge','code_challenge_method', ...(auth.offlineAccess ? ['prompt'] : [])];
@@ -91,15 +123,15 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
           if (required(p,'redirect_uri') !== redirectUri || !grant || grant.expires <= now() || !/^[A-Za-z0-9._~-]{43,128}$/.test(verifier ?? '')) return json(res, 400, {error:'invalid_grant'});
           const actual = createHash('sha256').update(verifier).digest(), expected = Buffer.from(grant.challenge, 'base64url');
           if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return json(res, 400, {error:'invalid_grant'});
-          let refresh;
+          let refresh, family;
           if (grant.offlineAccess) {
             pruneFamilies();
             if (families.size >= 100) return json(res, 503, {error:'temporarily_unavailable'});
-            const family = {expires:now()+1800, tokens:new Set()};
+            family = {expires:now()+1800, tokens:new Set(), scope:grant.scope};
             families.add(family);
             refresh = addRefresh(family);
           }
-          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), id_token:issueToken(grant.nonce), ...(refresh ? {refresh_token:refresh} : {})});
+          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:issueAccess(grant.scope, family), id_token:issueToken(grant.nonce), ...(refresh ? {refresh_token:refresh} : {})});
         }
         if (grantType === 'refresh_token') {
           if (p.has('scope')) return json(res, 400, {error:'invalid_scope'});
@@ -114,7 +146,7 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
           }
           entry.used = true;
           const next = addRefresh(entry.family);
-          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), refresh_token:next, ...(refreshIdToken ? {id_token:issueToken(undefined, refreshIdToken === 'wrong-sub' ? 'synthetic-other' : 'synthetic-test-user')} : {})});
+          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:issueAccess(entry.family.scope, entry.family), refresh_token:next, ...(refreshIdToken ? {id_token:issueToken(undefined, refreshIdToken === 'wrong-sub' ? 'synthetic-other' : 'synthetic-test-user')} : {})});
         }
         return json(res, 400, {error:'unsupported_grant_type'});
       }
@@ -126,5 +158,5 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.MOCK_OIDC_PORT || 18443);
   if (!Number.isInteger(port) || port < 1024 || port > 65535 || !process.env.MOCK_OIDC_CERT || !process.env.MOCK_OIDC_KEY) throw Error('Set MOCK_OIDC_CERT and MOCK_OIDC_KEY; use a valid unprivileged port');
-  createMockIdp({issuer:`https://localhost:${port}`, cert:readFileSync(process.env.MOCK_OIDC_CERT), key:readFileSync(process.env.MOCK_OIDC_KEY), refreshIdToken:process.env.MOCK_REFRESH_ID_TOKEN === 'wrong-sub' ? 'wrong-sub' : process.env.MOCK_REFRESH_ID_TOKEN === '1'}).listen(port, '127.0.0.1', () => console.log(`Synthetic local IdP listening on 127.0.0.1:${port}`));
+  createMockIdp({issuer:`https://localhost:${port}`, cert:readFileSync(process.env.MOCK_OIDC_CERT), key:readFileSync(process.env.MOCK_OIDC_KEY), refreshIdToken:process.env.MOCK_REFRESH_ID_TOKEN === 'wrong-sub' ? 'wrong-sub' : process.env.MOCK_REFRESH_ID_TOKEN === '1', introspectionSecret:process.env.MOCK_INTROSPECTION_SECRET}).listen(port, '127.0.0.1', () => console.log(`Synthetic local IdP listening on 127.0.0.1:${port}`));
 }

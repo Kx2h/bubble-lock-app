@@ -1,0 +1,13 @@
+# Synthetic authenticated consent device check
+
+Date: 2026-10-28 (Asia/Seoul). Android 14 spare phone, Android user 0. This is a synthetic integration test: the external agent, identity, authorization server, consent service and requested scope are test fixtures. It does not demonstrate a real browser login, account, consent or permission. TLS test CA trust was scoped to the opt-in test applications; the device-wide trust store and default browser were not changed.
+
+The opt-in app SHA-256 was `317d0df1cc88e739548ae9168dd07336cf2b3b087c9bc8c657b4640fc69bf6e4`; the synthetic external agent SHA-256 was `b6f38f01db845eaa51a2ef700b87109a4e88b0106a251eafe7f8c472dda08b7c`. Both matched the installed package hashes. Host-side unauthenticated GET and approve POST returned 401.
+
+- Before login, status, approval and revocation controls were disabled ([screen](auth-consent-unauth.png)). The synthetic agent showed that no real account or password was requested ([screen](auth-consent-agent.png)).
+- After synthetic authentication, the app displayed `none` ([screen](auth-consent-none.png)), `active` after explicit approval ([screen](auth-consent-active.png)), then `revoked` after explicit revocation ([screen](auth-consent-revoked.png)).
+- After the synthetic issuer was stopped, status could not be confirmed and the change controls were disabled ([screen](auth-consent-issuer-down.png)). This observes application behavior; it does not establish a particular HTTP failure code.
+- In a new synthetic session, the consent server was started with `--drop-first-response`. Approval produced an uncertain result without automatic retry ([screen](auth-consent-uncertain.png)). After force-stop and relaunch, the app still displayed an unresolved prior request and blocked new changes ([screen](auth-consent-marker-restored.png)). This persistent marker is only a boolean: it does not preserve the prior request or establish its outcome or enable replay after process restart.
+- The test marker alone was removed through the app's explicit confirmation; the UI stated that the previous result remained unknown. A further force-stop and relaunch displayed the pre-authentication state. No app-wide data clear was performed.
+
+Cleanup: the two temporary servers were stopped, their `18443` and `18788` ADB reverse mappings removed, and the synthetic agent uninstalled. The existing `8787` reverse mapping was retained. The main app was restored in place with the matching signer and debug APK SHA-256 `bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24`; the installed hash matched. Tokens, keys, state, request bodies and authorization codes were not recorded in this evidence.
