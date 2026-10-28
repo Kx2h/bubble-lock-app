@@ -173,11 +173,11 @@ public final class OidcBrowserFlow implements AutoCloseable {
                         || !"bearer".equalsIgnoreCase((String) typeValue) || seconds < 1 || seconds > 604800 || seconds != Math.rint(seconds)) throw new IllegalArgumentException();
                 for (int i = 0; i < access.length(); i++) if (access.charAt(i) < 33 || access.charAt(i) > 126) throw new IllegalArgumentException();
                 Object scope = token.opt("scope");
-                if (scope != null && (!(scope instanceof String) || !java.util.Arrays.asList(((String) scope).split(" +")).contains("openid"))) throw new IllegalArgumentException();
+                if (!OidcScopes.matchesInitial(scope, browserMatcher != null, consentScope)) throw new IllegalArgumentException();
                 final String refreshToken;
                 if (browserMatcher != null) {
                     Object refreshValue = token.opt("refresh_token");
-                    if (!(refreshValue instanceof String) || (scope != null && !RotatingSession.syntheticScope((String) scope, consentScope))) throw new IllegalArgumentException();
+                    if (!(refreshValue instanceof String)) throw new IllegalArgumentException();
                     refreshToken = (String) refreshValue;
                 } else refreshToken = null;
                 // Conservatively begin the lifetime before JWKS fetching, which may take time.

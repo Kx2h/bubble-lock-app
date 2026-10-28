@@ -20,6 +20,8 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
 각 거래의 state·nonce·PKCE verifier는 AppAuth가 생성하며 S256만 허용한다. 결과 URI는 정확한 scheme/path, 중복 없는 state·code 및 요청과 같은 `iss`를 요구한다. 이 보수적인 구현은 RFC 9207의 응답 issuer를 생략하는 공급자를 거부한다. 코드는 리다이렉트를 따르지 않는 HTTPS POST로 한 번 교환하며 응답은 64 KiB, 토큰 수명은 `expires_in` 1초~7일로 제한한다. 서명·issuer·audience·nonce가 검증되기 전에는 세션을 반환하지 않는다. 세션은 메모리에만 있으며 만료 후 접근을 거부하고 `close()`로 참조를 폐기한다. 합성 opt-in 시험에서만 메모리 refresh 회전을 수행하며 revoke·권한 매핑 및 영속 저장은 없다.
 
+초기 토큰 응답의 `scope`가 있으면 요청한 범위와 정확히 일치해야 한다. 일반 흐름은 `openid`만 허용하고 합성 흐름은 각 시험 범위와 일치해야 하며, 범위의 추가·누락·중복과 잘못된 타입을 거부한다. `scope` 생략은 요청 범위와 동일하다는 OAuth 토큰 응답 의미로 취급한다. 이 검사는 access token의 실제 권한을 검증하지 않으며 API 서버 인가는 별도로 필요하다.
+
 초기 또는 갱신 응답의 ID 토큰에 `at_hash`가 있으면 RS256의 SHA-256 절반값으로 해당 응답의 access token을 대조하고, 누락된 access token·잘못된 타입·불일치를 거부한다. 이 검사는 access token 자체의 서명이나 서버 권한을 검증하지 않는다. access token을 받지 않는 공개 `verifyIdToken(...)` 경로는 `at_hash`가 포함된 ID 토큰을 확인할 수 없어 거부한다.
 
 호출자는 결과를 받은 뒤 또는 Activity 파괴 시 `close()`해야 한다. 화면 회전이나 프로세스 종료 후 거래 상태를 복구하지 않고 취소하므로 새 거래가 필요하다. 오류는 민감한 내용을 반환하지 않는다. 원본 AppAuth 0.11.1은 state 불일치 시 값을 WARN 로그에 출력할 수 있어, 고정된 소스 모듈의 해당 로그 인자를 제거하고 합성 기기 시험으로 확인했다. 다른 로그 전체의 안전성을 보증하지 않는다. 실서비스 연결 전 검증된 redirect와 신뢰 issuer 등록 정책을 해결해야 한다. [패치 근거](APPAUTH_STATE_LOG_ASSESSMENT.md). 합성 Android 시험의 결과와 한계는 별도 evidence에 기록하며, 실제 외부 브라우저·실제 IdP 또는 운영 인증을 뜻하지 않는다.
