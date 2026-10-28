@@ -182,7 +182,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 } else refreshToken = null;
                 // Conservatively begin the lifetime before JWKS fetching, which may take time.
                 long expiresAtElapsed = exchangeStarted + (long) seconds * 1000;
-                IdTokenVerifier.Identity identity = provider.verifyIdentityToken(idToken, clientId, request.nonce);
+                IdTokenVerifier.Identity identity = provider.verifyIdentityToken(idToken, clientId, request.nonce, access);
                 if (SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalArgumentException();
                 Session session = new Session(identity, access, expiresAtElapsed, provider, clientId, refreshToken, consentScope);
                 if (!main.post(() -> {
@@ -213,7 +213,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
         if (token.has("id_token")) {
             Object refreshedId = token.opt("id_token");
             if (!(refreshedId instanceof String) || ((String) refreshedId).isEmpty()) throw new IllegalArgumentException();
-            provider.verifyRefreshIdToken((String) refreshedId, identity, clientId, started);
+            provider.verifyRefreshIdToken((String) refreshedId, identity, clientId, started, (String) access);
         }
         // The optional ID token was verified above; failures close the rotating session without retry.
         return new RotatingSession.Response((String) access, (String) refresh, (String) type, (long) seconds, (String) scope, false);

@@ -113,6 +113,29 @@ public class IdTokenVerifierTest {
         String jwt = sign(value, key, "key-1");
         assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(jwt, jwks(key.toPublicJWK()), identity, NOW, NOW));
     }
+    @Test public void accessTokenHashBindsInitialAndRefreshedResponses() throws Exception {
+        // Independently calculated SHA-256 left half for ASCII "access-123".
+        String hash = "p8W_jVG3TsPtAC2vLCgoSQ";
+        String jwks = jwks(key.toPublicJWK());
+        String initialJwt = sign(claims().claim("at_hash", hash).build(), key, "key-1");
+        IdTokenVerifier.Identity initial = IdTokenVerifier.verifyInitial(initialJwt, jwks, ISSUER, CLIENT, NONCE, NOW, "access-123");
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyInitial(initialJwt, jwks, ISSUER, CLIENT, NONCE, NOW, "other"));
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyInitial(initialJwt, jwks, ISSUER, CLIENT, NONCE, NOW));
+        String refreshedJwt = sign(refreshed().claim("at_hash", hash).build(), key, "key-1");
+        IdTokenVerifier.verifyRefresh(refreshedJwt, jwks, initial, NOW, NOW, "access-123");
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(refreshedJwt, jwks, initial, NOW, NOW, "other"));
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(refreshedJwt, jwks, initial, NOW, NOW));
+        for (Object bad : new Object[]{42, "", hash + "=", "wrong"}) {
+            String jwt = sign(claims().claim("at_hash", bad).build(), key, "key-1");
+            assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyInitial(jwt, jwks, ISSUER, CLIENT, NONCE, NOW, "access-123"));
+        }
+        String payload = "{\"iss\":\"" + ISSUER + "\",\"sub\":\"person-1\",\"aud\":\"" + CLIENT
+                + "\",\"iat\":" + NOW + ",\"exp\":" + (NOW + 120) + ",\"nonce\":\"" + NONCE + "\",\"at_hash\":null}";
+        com.nimbusds.jose.JWSObject jws = new com.nimbusds.jose.JWSObject(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("key-1").build(), new com.nimbusds.jose.Payload(payload));
+        jws.sign(new RSASSASigner(key));
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyInitial(jws.serialize(), jwks, ISSUER, CLIENT, NONCE, NOW, "access-123"));
+    }
     @Test public void refreshIdTokenAcceptsOmittedAndMatchingNonce() throws Exception {
         IdTokenVerifier.Identity initial = identity(claims().build());
         verifyRefresh(refreshed().build(), initial);

@@ -14,7 +14,7 @@ async function listenPort() {
   const s = net.createServer(); await new Promise(r => s.listen(0, '127.0.0.1', r));
   const port = s.address().port; await new Promise(r => s.close(r)); return port;
 }
-async function fixture(run, {refreshIdToken = false} = {}) {
+async function fixture(run, {refreshIdToken = false, accessHash = 'none'} = {}) {
   await mkdir(resolve(appRoot, 'build'), {recursive:true});
   const dir = await mkdtemp(resolve(appRoot, 'build/oidc-mock-'));
   let server;
@@ -23,7 +23,7 @@ async function fixture(run, {refreshIdToken = false} = {}) {
     const [cert,key] = await Promise.all(['server.pem','server.key'].map(p => readFile(resolve(dir,p))));
     const port = await listenPort(), issuer = `https://localhost:${port}`;
     let clock = 1800000000;
-    server = createMockIdp({issuer, cert, key, refreshIdToken, now:() => clock});
+    server = createMockIdp({issuer, cert, key, refreshIdToken, accessHash, now:() => clock});
     await new Promise((r,j) => server.once('error',j).listen(port,'127.0.0.1',r));
     const request = (path, {method='GET', body, trust=true}={}) => new Promise((done, reject) => {
       const req = https.request({hostname:'127.0.0.1', servername:'localhost', port, path, method, ...(trust ? {ca:cert} : {}), headers:body ? {'Content-Type':'application/x-www-form-urlencoded'} : {}}, res => {
@@ -89,6 +89,23 @@ async function offlineGrant(request, issuer) {
   const body = JSON.parse(result.body);
   assert.equal(typeof body.refresh_token, 'string');
   return body;
+}
+
+for (const mode of ['valid', 'wrong-initial', 'wrong-refresh']) {
+  test(`synthetic at_hash fixture ${mode} binds only the intended response`, async () => fixture(async ({request, issuer}) => {
+    const initial = await offlineGrant(request, issuer);
+    const response = await request('/token', {method:'POST', body:refreshForm(initial.refresh_token).toString()});
+    assert.equal(response.status, 200);
+    const rotated = JSON.parse(response.body);
+    for (const [value, shouldMatch] of [[initial, mode !== 'wrong-initial'], [rotated, mode !== 'wrong-refresh']]) {
+      const [header, payload, signature] = value.id_token.split('.');
+      const claims = JSON.parse(Buffer.from(payload, 'base64url'));
+      const key = createPublicKey({key:JSON.parse((await request('/jwks')).body).keys[0], format:'jwk'});
+      assert.ok(verify('RSA-SHA256', Buffer.from(`${header}.${payload}`), key, Buffer.from(signature,'base64url')));
+      const expected = createHash('sha256').update(value.access_token).digest().subarray(0, 16).toString('base64url');
+      assert.equal(claims.at_hash === expected, shouldMatch);
+    }
+  }, {refreshIdToken:true, accessHash:mode}));
 }
 
 test('offline access requires explicit synthetic consent and only registered scope', async () => fixture(async ({request,issuer}) => {

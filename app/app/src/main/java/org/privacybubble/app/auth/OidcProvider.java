@@ -57,16 +57,16 @@ public final class OidcProvider {
     }
 
     /** Context for rotation is created only from the verified initial ID token. */
-    IdTokenVerifier.Identity verifyIdentityToken(String jwt, String clientId, String nonce) throws Exception {
+    IdTokenVerifier.Identity verifyIdentityToken(String jwt, String clientId, String nonce, String accessToken) throws Exception {
         String keys = fetch(jwksUri.toString());
-        return IdTokenVerifier.verifyInitial(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000);
+        return IdTokenVerifier.verifyInitial(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000, accessToken);
     }
 
     /** Verify a refreshed ID token using the same trusted provider and initial transaction. */
-    void verifyRefreshIdToken(String jwt, IdTokenVerifier.Identity initial, String clientId, long started) throws Exception {
+    void verifyRefreshIdToken(String jwt, IdTokenVerifier.Identity initial, String clientId, long started, String accessToken) throws Exception {
         if (initial == null || !initial.matches(issuer, clientId)) throw new IllegalArgumentException("ID token validation failed");
         String keys = fetch(jwksUri.toString());
-        IdTokenVerifier.verifyRefresh(jwt, keys, initial, started, System.currentTimeMillis() / 1000);
+        IdTokenVerifier.verifyRefresh(jwt, keys, initial, started, System.currentTimeMillis() / 1000, accessToken);
     }
 
     private static void requireCapability(Map<String, Object> doc, String key, String expected) throws Exception {

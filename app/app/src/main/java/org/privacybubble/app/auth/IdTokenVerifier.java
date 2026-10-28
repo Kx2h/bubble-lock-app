@@ -15,6 +15,8 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.Base64;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -57,9 +59,15 @@ public final class IdTokenVerifier {
 
     static Identity verifyInitial(String jwt, String jwksJson, String expectedIssuer,
                                   String clientId, String nonce, long nowEpochSeconds) {
+        return verifyInitial(jwt, jwksJson, expectedIssuer, clientId, nonce, nowEpochSeconds, null);
+    }
+
+    static Identity verifyInitial(String jwt, String jwksJson, String expectedIssuer,
+                                  String clientId, String nonce, long nowEpochSeconds, String accessToken) {
         try {
             requireText(nonce, 512);
             JWTClaimsSet claims = validateSigned(jwt, jwksJson, expectedIssuer, clientId, nowEpochSeconds);
+            verifyAccessTokenHash(claims, accessToken);
             Object suppliedNonce = claims.getClaim("nonce");
             if (!(suppliedNonce instanceof String) || !sameNonce(nonce, (String) suppliedNonce)) fail();
             Object azp = claims.getClaim("azp");
@@ -75,10 +83,16 @@ public final class IdTokenVerifier {
     /** Refresh tokens may omit nonce and auth_time; if supplied they must bind to the initial token. */
     static void verifyRefresh(String jwt, String jwksJson, Identity initial,
                               long requestStartedEpochSeconds, long nowEpochSeconds) {
+        verifyRefresh(jwt, jwksJson, initial, requestStartedEpochSeconds, nowEpochSeconds, null);
+    }
+
+    static void verifyRefresh(String jwt, String jwksJson, Identity initial,
+                              long requestStartedEpochSeconds, long nowEpochSeconds, String accessToken) {
         try {
             if (initial == null || requestStartedEpochSeconds <= 0 || requestStartedEpochSeconds > nowEpochSeconds
                     || nowEpochSeconds > Long.MAX_VALUE / 1000 - 60) fail();
             JWTClaimsSet claims = validateSigned(jwt, jwksJson, initial.issuer, initial.clientId, nowEpochSeconds);
+            verifyAccessTokenHash(claims, accessToken);
             if (MessageDigest.isEqual(initial.initialTokenDigest, digest(jwt)) || !initial.subject.equals(claims.getSubject())) fail();
             Object nonce = claims.getClaim("nonce");
             if (claims.getClaims().containsKey("nonce") && (!(nonce instanceof String) || !sameNonce(initial.nonce, (String) nonce))) fail();
@@ -94,6 +108,17 @@ public final class IdTokenVerifier {
 
     private static byte[] digest(String token) throws Exception {
         return MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** RS256 uses the left half of SHA-256, encoded as unpadded base64url. */
+    private static void verifyAccessTokenHash(JWTClaimsSet claims, String accessToken) throws Exception {
+        if (!claims.getClaims().containsKey("at_hash")) return;
+        Object supplied = claims.getClaim("at_hash");
+        if (!(supplied instanceof String) || accessToken == null || accessToken.isEmpty() || accessToken.length() > MAX_TOKEN_LENGTH) fail();
+        for (int i = 0; i < accessToken.length(); i++) if (accessToken.charAt(i) < 33 || accessToken.charAt(i) > 126) fail();
+        byte[] hash = MessageDigest.getInstance("SHA-256").digest(accessToken.getBytes(StandardCharsets.US_ASCII));
+        String expected = Base64.getUrlEncoder().withoutPadding().encodeToString(Arrays.copyOf(hash, hash.length / 2));
+        if (!sameNonce(expected, (String) supplied)) fail();
     }
 
     private static boolean sameNonce(String expected, String actual) {
