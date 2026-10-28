@@ -27,7 +27,7 @@
 - 공통 기준 문서: 저장소 루트의 `PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md`
 - 기준 문서 개정은 `DOC-REV` 값을 커밋 메시지와 Pull Request에 기록한다.
 - 저장소의 기존 README와 커밋 이력은 프로젝트 출발점으로 보존하며, 모든 구현은 이 문서의 Rubric·프로토콜·gate 기준에 연결한다.
-- 현재 공통 문서 기준: `DOC-REV 1.0.0` on `codex/project-plan`
+- 현재 공통 문서 기준: `DOC-REV 1.1.0` on `codex/project-plan`
 - 원격 반영은 팀 통합 승인과 Red 검증을 거친 뒤 진행한다.
 
 ### 다섯 에이전트의 역할 선언
