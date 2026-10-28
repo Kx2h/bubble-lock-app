@@ -41,3 +41,19 @@ Bootstrap은 KEYRING 시험 구성의 AE와 ty=28 `pb:binarySwitch`를 생성하
 ```
 
 기본 주소가 아닌 격리 CSE는 `APP_CORE_TEST_CSE_URL=http://127.0.0.1:<port>/Mobius`로 지정한다. HTTP loopback만 허용한다. 스크립트는 AE 생성 요청 직전에 고유 이름을 출력한다. 생성 응답이 유실되거나 신원이 맞지 않으면 `cleanup: manual-review`를 출력하고 자동 삭제하지 않는다. 강제 종료 시에도 자동 삭제를 보장하지 않으므로 출력의 AE 이름과 CSE 상태를 직접 확인하고, 소유권이 확정되지 않으면 다른 자원을 삭제하지 않는다. `--phone`은 기존 reverse를 생성·삭제하지 않으며 이미 사용 중인 8787 포트를 덮어쓰지 않는다. 실패 시 종료 코드는 0이 아니고 `cleanup` 결과를 확인해야 한다. 실기기 결과는 [APP 증거](../../app/evidence/core-bridge-cse-app.md)에 별도 기록한다.
+
+### 로컬 MQTT 전달 경로
+
+다음 옵션은 작업 폴더에 설치한 Aedes 1.2.0 broker를 임시 loopback 포트로 열고, `mqtt` 5.16.1 클라이언트로 MQTT 3.1.1 QoS 1 telemetry를 전송한다. 실제 CORE `GatewayBridge.start()`의 구독과 수신을 거쳐 위의 격리 CSE HTTP UPDATE 및 APP 중계 조회까지 확인한다. 같은 `deviceId`·`sequence`로 다시 전송해 CORE의 `DUPLICATE`와 단일 UPDATE도 확인한다. 종료 시 broker와 그 클라이언트를 닫고 소유 확인된 시험 AE만 삭제한다. 기본 실행은 기존의 직접 호출 경로를 유지한다.
+
+```sh
+export PATH="$WORKSPACE/.local/node/bin:$PATH"
+export npm_config_cache="$WORKSPACE/.local/npm-cache"
+npm ci --prefix app-test-server/native/mqtt --ignore-scripts --no-audit --no-fund
+node --test app-test-server/native/core-app-bridge-check.test.mjs
+node app-test-server/native/core-app-bridge-check.mjs --mqtt
+# 공기계 시험: 이미 연결된 reverse를 유지하고 빈 8787 포트에서만 실행
+node app-test-server/native/core-app-bridge-check.mjs --mqtt --phone
+```
+
+broker는 TCP loopback의 임의 포트에만 바인딩하며 인증·TLS·ACL·영속 저장을 사용하지 않는 시험용이다. 합성 송신자가 실제 MQTT 프로토콜을 사용하지만 물리 Pi·BLE·키링, 외부 broker, TLS/MQTT ACL 및 운영 API를 검증하지 않는다. `APPLIED`만으로 성공을 추정하지 않고 별도의 HTTP RSC·요청 ID와 CSE readback을 확인한다. Node와 의존성·캐시는 작업 폴더 아래에만 둔다. 설치한 `node_modules`는 Git에 포함하지 않는다.

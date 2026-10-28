@@ -2,8 +2,9 @@ import { randomUUID } from 'node:crypto';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => arg !== '--phone') || process.argv.slice(2).length > 1) throw Error('Usage: node core-app-bridge-check.mjs [--phone]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt]');
 const phone = process.argv.includes('--phone');
+const useMqtt = process.argv.includes('--mqtt');
 const cse = new URL(process.env.APP_CORE_TEST_CSE_URL ?? 'http://127.0.0.1:50545/Mobius');
 if (cse.protocol !== 'http:' || cse.hostname !== '127.0.0.1' || !cse.port || cse.pathname !== '/Mobius'
     || cse.username || cse.password || cse.search || cse.hash) throw Error('Test CSE must be HTTP loopback with an explicit port and /Mobius path');
@@ -41,15 +42,21 @@ try {
   const before = await req('GET', `${resource}/bubbleState`, aeId);
   ok(before,200,'2000');
   if (before.parsed?.['pb:binarySwitch']?.state !== false) throw Error('Unexpected initial state');
-  const mqttClient = {async subscribe(){},async publish(){},on(){}};
-  const updates = [];
-  const bridge = new GatewayBridge({mqttClient,baseUrl:cse.origin,originator:aeId,resourcePath:`/Mobius/${aeName}/bubbleState`,gatewayId:'app-isolated',fetchImpl:async (url, options) => {
-    const response = await fetch(url, {...options, signal:AbortSignal.timeout(8000), redirect:'error'});
-    updates.push({status:response.status,rsc:response.headers.get('x-m2m-rsc'),correlated:response.headers.get('x-m2m-ri') === options.headers['X-M2M-RI']});
-    return response;
-  }});
   const telemetry = {deviceId:'synthetic-keyring',sequence:1,timestamp:new Date().toISOString(),state:true,batteryPct:90,rssiDbm:-50,schemaVersion:'1.0.0'};
-  const receipt = await bridge.handleTelemetry(telemetry);
+  let receipt, updates, mqttEvidence;
+  if (useMqtt) {
+    const { runMqttUpdate } = await import('./mqtt/run.mjs');
+    ({receipt, updates, ...mqttEvidence} = await runMqttUpdate({origin:cse.origin,aeId,aeName,telemetry}));
+  } else {
+    const mqttClient = {async subscribe(){},async publish(){},on(){}};
+    updates = [];
+    const bridge = new GatewayBridge({mqttClient,baseUrl:cse.origin,originator:aeId,resourcePath:`/Mobius/${aeName}/bubbleState`,gatewayId:'app-isolated',fetchImpl:async (url, options) => {
+      const response = await fetch(url, {...options, signal:AbortSignal.timeout(8000), redirect:'error'});
+      updates.push({status:response.status,rsc:response.headers.get('x-m2m-rsc'),correlated:response.headers.get('x-m2m-ri') === options.headers['X-M2M-RI']});
+      return response;
+    }});
+    receipt = await bridge.handleTelemetry(telemetry);
+  }
   if (receipt.status !== 'APPLIED' || updates.length !== 1 || updates[0].status !== 200 || updates[0].rsc !== '2004' || !updates[0].correlated) throw Error('Bridge update not independently verified');
   const after = await req('GET', `${resource}/bubbleState`, aeId);
   ok(after,200,'2000');
@@ -59,7 +66,7 @@ try {
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
   if (answer.status !== 200 || value.state !== true || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
-  results.push({bridge:receipt.status, update:updates[0], stateAfter:true, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status});
+  results.push({bridge:receipt.status, update:updates[0], stateAfter:true, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {})});
   if (phone) {
     console.log(JSON.stringify({ready:true, aeName, port:8787, note:'Press Enter to clean up the test AE.'}));
     await new Promise(resolve=>process.stdin.once('data',resolve));

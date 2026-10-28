@@ -1,0 +1,10 @@
+{
+  "name": "privacy-bubble-app-mqtt-integration",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "aedes": "1.2.0",
+    "mqtt": "5.16.1"
+  }
+}

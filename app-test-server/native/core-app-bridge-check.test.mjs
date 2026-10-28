@@ -31,3 +31,48 @@ for (const mode of ['lost-response', 'wrong-identity']) {
     } finally { await new Promise(resolve => cse.close(resolve)); }
   });
 }
+
+for (const mode of ['direct', 'mqtt']) {
+  test(`${mode} mode updates only its isolated resource and cleans it up`, async () => {
+    let aeName, state = false, removed = false, puts = 0;
+    const cse = http.createServer(async (req, res) => {
+      const reply = (status, rsc, data) => {
+        res.writeHead(status, {'Content-Type':'application/json','X-M2M-RSC':rsc,'X-M2M-RI':req.headers['x-m2m-ri']});
+        res.end(JSON.stringify(data));
+      };
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const body = chunks.length ? JSON.parse(Buffer.concat(chunks)) : null;
+      if (req.method === 'POST' && req.url === '/Mobius') {
+        aeName = body['m2m:ae'].rn;
+        return reply(201, '2001', {'m2m:ae':{rn:aeName,ri:'Cabc123',aei:'Cabc123'}});
+      }
+      if (req.url === `/Mobius/${aeName}` && req.method === 'POST') return reply(201,'2001',{});
+      if (req.url === `/Mobius/${aeName}` && req.method === 'DELETE') { removed = true; return reply(200,'2002',{}); }
+      if (req.url === `/Mobius/${aeName}` && req.method === 'GET') return removed ? reply(404,'4004',{}) : reply(200,'2000',{'m2m:ae':{rn:aeName,ri:'Cabc123'}});
+      if (req.url === `/Mobius/${aeName}/bubbleState` && req.method === 'PUT') { puts++; state = body['pb:binarySwitch'].state; return reply(200,'2004',{}); }
+      if (req.url === `/Mobius/${aeName}/bubbleState` && req.method === 'GET') return reply(200,'2000',{'pb:binarySwitch':{rn:'bubbleState',cnd:'org.onem2m.common.moduleclass.binarySwitch',state,lbl:['unobserved']}});
+      reply(404,'4004',{});
+    });
+    await new Promise(resolve => cse.listen(0, '127.0.0.1', resolve));
+    try {
+      const args = mode === 'mqtt' ? [script, '--mqtt'] : [script];
+      const child = spawn(process.execPath, args, {env:{...process.env,APP_CORE_TEST_CSE_URL:`http://127.0.0.1:${cse.address().port}/Mobius`}});
+      let output = '';
+      child.stdout.on('data', chunk => { output += chunk; });
+      child.stderr.on('data', chunk => { output += chunk; });
+      const exit = await new Promise((resolve,reject) => { child.once('error',reject); child.once('close',resolve); });
+      assert.equal(exit,0,output);
+      const result = output.trim().split('\n').map(JSON.parse).at(-1);
+      const summary = result.results.find(x => x.bridge);
+      assert.equal(summary.update.rsc,'2004');
+      assert.equal(summary.stateAfter,true);
+      assert.equal(summary.observation,'unknown');
+      assert.equal(puts,1);
+      assert.equal(removed,true);
+      assert.ok(result.results.some(x => x.cleanup === 'verified'));
+      if (mode === 'mqtt') assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:1});
+      else assert.equal(summary.mqtt,undefined);
+    } finally { await new Promise(resolve => cse.close(resolve)); }
+  });
+}
