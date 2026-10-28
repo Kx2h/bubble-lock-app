@@ -1,0 +1,5 @@
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Scope the local CA to this debug-only probe APK, never a system trust store. -->
+    <debug-overrides><trust-anchors><certificates src="@raw/oidc_test_ca" /></trust-anchors></debug-overrides>
+</network-security-config>

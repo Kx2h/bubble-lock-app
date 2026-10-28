@@ -101,10 +101,12 @@ public final class MainActivity extends Activity {
                 settings.edit().putString("api_base", value).apply(); feedback.setText("저장됨 · 아직 연결되지 않음");
             } catch (Exception e) { feedback.setText("사용자 정보, 쿼리, 프래그먼트가 없는 HTTPS 주소를 입력하세요."); }
         }));
-        section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
-        testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
-        testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);
-        renderTestState();
+        if (BuildConfig.DEBUG) {
+            section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
+            testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
+            testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);
+            renderTestState();
+        }
     }
     private void renderTestState() {
         if (testStatus != null && testButton != null) {
