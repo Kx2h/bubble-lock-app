@@ -28,5 +28,7 @@ POST `/api/mock-consent/v1/approve`의 JSON은 `{requestId, revision, purpose, s
 
 같은 key와 같은 요청은 최초 결과를 그대로 반환하고, 같은 key를 다른 내용이나 경로에 쓰면 `409 idempotency_conflict`로 거절한다. **재전송 영수증은 과거 결과**이므로 앱은 결과 수신 후 GET `/grant`로 현재 상태를 확인한다. 요청 응답이 유실되면 앱은 성공을 추정하지 않고 확인 필요 상태를 표시해야 한다. `--drop-first-response`는 서버에서 mutation을 처리한 후 연결을 끊는 방식으로 이를 재현한다. 실제 API의 인가, 권한 철회, hash, 원자성이나 장애 복구는 이 서버의 동작으로 증명되지 않는다.
 
+앱은 instance 사전 조회 후 mutation 전송 직전에 화면 종료와 worker interrupt를 재확인한다. 이 검사는 종료와 전송 사이의 경합을 원자적으로 막지 않으며, 이미 전송된 요청이 서버에서 처리되는 것을 취소하지 않는다. 미확정 요청 기록은 유지되므로 재실행 후 같은 서버 인스턴스에 사용자가 직접 재전송할 수 있다. 조회가 진행되는 동안 종료되는 사례는 `app/tests/consent-client/test.sh`의 호스트 시험으로 확인한다.
+
 
 서버는 POST의 instance가 잘못된 형식이면 400 `invalid_instance`, 현재 프로세스의 값과 다르면 409 `instance_mismatch`를 반환한다. 이 판정은 본문 처리·idempotency 기록 조회·상태 만료 처리·mutation보다 먼저 이뤄진다. 재시작 후 같은 주소에 새로운 프로세스가 뜨더라도 이전 요청은 재실행되지 않는다. 클라이언트는 기존 요청을 새 instance의 새 key로 자동 변환하거나 재전송하지 않아야 한다. 응답의 ID는 진단용 테스트 fence일 뿐 인증이나 운영 권한 증명이 아니며, 서버 재시작 후 기존 요청의 실제 결과를 복구하지 않는다.

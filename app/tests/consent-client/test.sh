@@ -8,7 +8,10 @@ trap 'rm -rf -- "$tmp"' EXIT
 "${JAVA_HOME:+$JAVA_HOME/bin/}javac" -d "$tmp" \
   "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticConsentValidator.java" \
   "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticPending.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticMutationDispatch.java" \
   "$here/SyntheticConsentValidatorTest.java" \
-  "$here/SyntheticPendingTest.java"
+  "$here/SyntheticPendingTest.java" \
+  "$here/SyntheticMutationDispatchTest.java"
 "${JAVA_HOME:+$JAVA_HOME/bin/}java" -cp "$tmp" org.privacybubble.app.SyntheticConsentValidatorTest
 "${JAVA_HOME:+$JAVA_HOME/bin/}java" -cp "$tmp" org.privacybubble.app.SyntheticPendingTest
+"${JAVA_HOME:+$JAVA_HOME/bin/}java" -cp "$tmp" org.privacybubble.app.SyntheticMutationDispatchTest

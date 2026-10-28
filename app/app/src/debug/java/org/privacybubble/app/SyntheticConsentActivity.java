@@ -90,7 +90,8 @@ public final class SyntheticConsentActivity extends Activity {
         private final Handler main = new Handler(Looper.getMainLooper());
         private static final String PENDING_KEY = "pending_v1";
         private final SharedPreferences preferences;
-        private boolean busy, closed, known, active, storageFault, epochMismatch;
+        private boolean busy, known, active, storageFault, epochMismatch;
+        private volatile boolean closed;
         private int grantRevision;
         private String serverInstance;
         private SyntheticPending pending;
@@ -172,9 +173,10 @@ public final class SyntheticConsentActivity extends Activity {
                 Snapshot snapshot = null;
                 boolean differentInstance = false;
                 try {
-                    Snapshot before = parseGrant(call("grant", null));
-                    if (!operation.instance.equals(before.instance)) throw new EpochMismatch();
-                    JSONObject reply = call(operation.endpoint, operation);
+                    JSONObject reply = SyntheticMutationDispatch.run(() -> {
+                        Snapshot before = parseGrant(call("grant", null));
+                        if (!operation.instance.equals(before.instance)) throw new EpochMismatch();
+                    }, () -> call(operation.endpoint, operation), () -> closed);
                     Snapshot acknowledged = parseGrant(reply);
                     if (!operation.instance.equals(acknowledged.instance)) throw new EpochMismatch();
                     if (!(reply.opt("correlationId") instanceof String) || !operation.correlation.equals(reply.opt("correlationId"))
