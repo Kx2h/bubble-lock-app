@@ -20,6 +20,7 @@ import net.openid.appauth.ResponseTypeValues;
 
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -57,16 +58,32 @@ public final class OidcBrowserFlow implements AutoCloseable {
         private String subject;
         private String accessToken;
         private final long expiresAtElapsed;
-        private Session(String subject, String accessToken, long expiresAtElapsed) { this.subject = subject; this.accessToken = accessToken; this.expiresAtElapsed = expiresAtElapsed; }
+        private RotatingSession rotating;
+        private Session(String subject, String accessToken, long expiresAtElapsed, OidcProvider provider, String clientId, String refreshToken) {
+            this.expiresAtElapsed = expiresAtElapsed;
+            if (refreshToken == null) { this.subject = subject; this.accessToken = accessToken; }
+            else { this.rotating = new RotatingSession(subject, accessToken, refreshToken, expiresAtElapsed,
+                    SystemClock::elapsedRealtime, previous -> rotate(provider, clientId, previous)); }
+        }
         public synchronized String subject() {
+            if (rotating != null) return rotating.subject();
             if (accessToken == null || SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalStateException("Session expired");
             return subject;
         }
         public synchronized String accessToken() {
+            if (rotating != null) return rotating.accessToken();
             if (accessToken == null || SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalStateException("Session expired");
             return accessToken;
         }
-        @Override public synchronized void close() { subject = null; accessToken = null; }
+        /** Blocking network operation; synthetic test flow only. Never call on the main thread. */
+        public void refresh() throws IOException {
+            if (Looper.myLooper() == Looper.getMainLooper()) throw new IllegalStateException("Refresh on UI thread");
+            final RotatingSession current;
+            synchronized (this) { current = rotating; }
+            if (current == null) throw new IllegalStateException("Refresh unavailable");
+            current.refresh();
+        }
+        @Override public synchronized void close() { if (rotating != null) rotating.close(); rotating = null; subject = null; accessToken = null; }
         @Override public String toString() { return "OidcSession[redacted]"; }
     }
 
@@ -106,8 +123,10 @@ public final class OidcBrowserFlow implements AutoCloseable {
         try {
             AuthorizationServiceConfiguration config = new AuthorizationServiceConfiguration(
                     Uri.parse(provider.authorizationEndpoint.toString()), Uri.parse(provider.tokenEndpoint.toString()));
-            request = new AuthorizationRequest.Builder(config, clientId, ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT))
-                    .setScope("openid").build();
+            AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(config, clientId, ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT));
+            if (browserMatcher != null) builder.setScope("openid offline_access").setPrompt("consent");
+            else builder.setScope("openid");
+            request = builder.build();
             if (request.state == null || request.nonce == null || request.codeVerifier == null
                     || !"S256".equals(request.codeVerifierChallengeMethod)) throw new IllegalStateException("PKCE unavailable");
             service = browserMatcher == null ? new AuthorizationService(activity)
@@ -144,11 +163,23 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 for (int i = 0; i < access.length(); i++) if (access.charAt(i) < 33 || access.charAt(i) > 126) throw new IllegalArgumentException();
                 Object scope = token.opt("scope");
                 if (scope != null && (!(scope instanceof String) || !java.util.Arrays.asList(((String) scope).split(" +")).contains("openid"))) throw new IllegalArgumentException();
+                final String refreshToken;
+                if (browserMatcher != null) {
+                    Object refreshValue = token.opt("refresh_token");
+                    if (!(refreshValue instanceof String) || (scope != null && !RotatingSession.syntheticScope((String) scope))) throw new IllegalArgumentException();
+                    refreshToken = (String) refreshValue;
+                } else refreshToken = null;
                 // Conservatively begin the lifetime before JWKS fetching, which may take time.
                 long expiresAtElapsed = exchangeStarted + (long) seconds * 1000;
                 String subject = provider.verifyIdToken(idToken, clientId, request.nonce, System.currentTimeMillis() / 1000);
                 if (SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalArgumentException();
-                main.post(() -> { if (!closed) { close(); callback.onAuthenticated(new Session(subject, access, expiresAtElapsed)); } });
+                Session session = new Session(subject, access, expiresAtElapsed, provider, clientId, refreshToken);
+                if (!main.post(() -> {
+                    if (closed) { session.close(); return; }
+                    // The main queue can be delayed past expiry after verification completed.
+                    try { session.subject(); } catch (IllegalStateException expired) { session.close(); fail(); return; }
+                    close(); callback.onAuthenticated(session);
+                })) session.close();
             } catch (Exception e) { main.post(() -> { if (!closed) fail(); }); }
         });
         return true;
@@ -157,9 +188,22 @@ public final class OidcBrowserFlow implements AutoCloseable {
     private JSONObject exchange(String code) throws Exception {
         String form = "grant_type=authorization_code&code=" + enc(code) + "&client_id=" + enc(clientId)
                 + "&redirect_uri=" + enc(OidcRedirect.REDIRECT) + "&code_verifier=" + enc(request.codeVerifier);
+        return postForm(provider.tokenEndpoint, form);
+    }
+    private static RotatingSession.Response rotate(OidcProvider provider, String clientId, String refreshToken) throws Exception {
+        JSONObject token = postForm(provider.tokenEndpoint, "grant_type=refresh_token&client_id=" + enc(clientId) + "&refresh_token=" + enc(refreshToken));
+        Object access = token.opt("access_token"), refresh = token.opt("refresh_token"), type = token.opt("token_type"), duration = token.opt("expires_in");
+        Object scope = token.opt("scope");
+        if (!(access instanceof String) || !(refresh instanceof String) || !(type instanceof String) || !(duration instanceof Number)
+                || (token.has("scope") && !(scope instanceof String))) throw new IllegalArgumentException();
+        double seconds = ((Number) duration).doubleValue();
+        if (!Double.isFinite(seconds) || seconds != Math.rint(seconds) || seconds < 1 || seconds > 604800) throw new IllegalArgumentException();
+        return new RotatingSession.Response((String) access, (String) refresh, (String) type, (long) seconds, (String) scope, token.has("id_token"));
+    }
+    private static JSONObject postForm(java.net.URI endpoint, String form) throws Exception {
         byte[] body = form.getBytes(StandardCharsets.UTF_8);
         final long deadline = System.nanoTime() + 10_000_000_000L;
-        HttpsURLConnection conn = (HttpsURLConnection) provider.tokenEndpoint.toURL().openConnection();
+        HttpsURLConnection conn = (HttpsURLConnection) endpoint.toURL().openConnection();
         conn.setInstanceFollowRedirects(false); conn.setConnectTimeout(5000); conn.setReadTimeout(5000);
         conn.setRequestMethod("POST"); conn.setDoOutput(true); conn.setUseCaches(false);
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

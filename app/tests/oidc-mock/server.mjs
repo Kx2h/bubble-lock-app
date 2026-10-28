@@ -19,6 +19,23 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
   const keys = generateKeyPairSync('rsa', { modulusLength: 2048 });
   const jwk = { ...keys.publicKey.export({ format: 'jwk' }), kid: 'mock-signing-key', alg: 'RS256', use: 'sig' };
   const codes = new Map();
+  // Synthetic-only memory state. No tokens survive a restart or reach a log.
+  const families = new Set();
+  const refreshTokens = new Map();
+  function discardFamily(family) {
+    for (const token of family.tokens) refreshTokens.delete(token);
+    families.delete(family);
+  }
+  function pruneFamilies() {
+    for (const family of families) if (family.expires <= now()) discardFamily(family);
+  }
+  function addRefresh(family) {
+    let token;
+    do { token = randomBytes(32).toString('base64url'); } while (refreshTokens.has(token));
+    family.tokens.add(token);
+    refreshTokens.set(token, {family, used:false});
+    return token;
+  }
   const json = (res, status, data) => { res.writeHead(status, {'Content-Type':'application/json'}); res.end(JSON.stringify(data)); };
   const fail = res => json(res, 400, { error: 'invalid_request' });
   function validate(p) {
@@ -26,7 +43,10 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
     const scope = required(p, 'scope'), state = required(p, 'state'), nonce = required(p, 'nonce');
     const challenge = required(p, 'code_challenge'), method = required(p, 'code_challenge_method');
     if (responseType !== 'code' || client !== clientId || redirect !== redirectUri || !text(scope) || !scope.split(' ').includes('openid') || !text(state) || state.length < 16 || !text(nonce) || nonce.length < 16 || method !== 'S256' || !/^[A-Za-z0-9_-]{43}$/.test(challenge ?? '')) return null;
-    return { state, nonce, challenge };
+    if (scope !== 'openid' && scope !== 'openid offline_access') return null;
+    const offlineAccess = scope === 'openid offline_access';
+    if ((offlineAccess && required(p, 'prompt') !== 'consent') || (!offlineAccess && p.has('prompt'))) return null;
+    return { state, nonce, challenge, offlineAccess };
   }
   async function form(req) {
     let size = 0; const chunks = [];
@@ -45,14 +65,14 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
     res.setHeader('X-Content-Type-Options', 'nosniff');
     try {
       const u = new URL(req.url, issuer);
-      if (u.pathname === '/.well-known/openid-configuration' && req.method === 'GET') return json(res, 200, { issuer, authorization_endpoint:`${issuer}/authorize`, token_endpoint:`${issuer}/token`, jwks_uri:`${issuer}/jwks`, response_types_supported:['code'], code_challenge_methods_supported:['S256'], id_token_signing_alg_values_supported:['RS256'], subject_types_supported:['public'], grant_types_supported:['authorization_code'], authorization_response_iss_parameter_supported:true });
+      if (u.pathname === '/.well-known/openid-configuration' && req.method === 'GET') return json(res, 200, { issuer, authorization_endpoint:`${issuer}/authorize`, token_endpoint:`${issuer}/token`, jwks_uri:`${issuer}/jwks`, response_types_supported:['code'], code_challenge_methods_supported:['S256'], id_token_signing_alg_values_supported:['RS256'], subject_types_supported:['public'], grant_types_supported:['authorization_code','refresh_token'], authorization_response_iss_parameter_supported:true });
       if (u.pathname === '/jwks' && req.method === 'GET') return json(res, 200, {keys:[jwk]});
       if (u.pathname === '/authorize' && req.method === 'GET') {
         const auth = validate(u.searchParams); if (!auth) return fail(res);
-        const fields = ['response_type','client_id','redirect_uri','scope','state','nonce','code_challenge','code_challenge_method'];
+        const fields = ['response_type','client_id','redirect_uri','scope','state','nonce','code_challenge','code_challenge_method', ...(auth.offlineAccess ? ['prompt'] : [])];
         const hidden = fields.map(name => `<input type="hidden" name="${name}" value="${escape(required(u.searchParams,name))}">`).join('');
         res.writeHead(200, {'Content-Type':'text/html; charset=utf-8', 'Content-Security-Policy':"default-src 'none'; form-action 'self'; base-uri 'none'"});
-        return res.end(`<!doctype html><html lang="en"><title>Local mock sign-in</title><h1>Local test identity</h1><p>This is a synthetic account. Do not enter a password or personal information.</p><form method="post" action="/authorize">${hidden}<button type="submit">Continue with test identity</button></form></html>`);
+        return res.end(`<!doctype html><html lang="en"><title>Local mock sign-in</title><h1>Local test identity</h1><p>This is a synthetic account. Do not enter a password or personal information.</p><p>Continuing grants consent for this synthetic test only.</p><form method="post" action="/authorize">${hidden}<button type="submit">Continue with test identity</button></form></html>`);
       }
       if (u.pathname === '/authorize' && req.method === 'POST') {
         const p = await form(req), auth = validate(p); if (!auth) return fail(res);
@@ -63,12 +83,40 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
         res.writeHead(303, {Location:callback.href}); return res.end();
       }
       if (u.pathname === '/token' && req.method === 'POST') {
-        const p = await form(req), code = required(p,'code'), verifier = required(p,'code_verifier');
-        const grant = codes.get(code); if (code) codes.delete(code);
-        if (required(p,'grant_type') !== 'authorization_code' || required(p,'client_id') !== clientId || required(p,'redirect_uri') !== redirectUri || !grant || grant.expires <= now() || !/^[A-Za-z0-9._~-]{43,128}$/.test(verifier ?? '')) return json(res, 400, {error:'invalid_grant'});
-        const actual = createHash('sha256').update(verifier).digest(), expected = Buffer.from(grant.challenge, 'base64url');
-        if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return json(res, 400, {error:'invalid_grant'});
-        return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), id_token:issueToken(grant.nonce)});
+        const p = await form(req), grantType = required(p, 'grant_type');
+        if (required(p, 'client_id') !== clientId) return json(res, 400, {error:'invalid_grant'});
+        if (grantType === 'authorization_code') {
+          const code = required(p,'code'), verifier = required(p,'code_verifier');
+          const grant = codes.get(code); if (code) codes.delete(code);
+          if (required(p,'redirect_uri') !== redirectUri || !grant || grant.expires <= now() || !/^[A-Za-z0-9._~-]{43,128}$/.test(verifier ?? '')) return json(res, 400, {error:'invalid_grant'});
+          const actual = createHash('sha256').update(verifier).digest(), expected = Buffer.from(grant.challenge, 'base64url');
+          if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return json(res, 400, {error:'invalid_grant'});
+          let refresh;
+          if (grant.offlineAccess) {
+            pruneFamilies();
+            if (families.size >= 100) return json(res, 503, {error:'temporarily_unavailable'});
+            const family = {expires:now()+1800, tokens:new Set()};
+            families.add(family);
+            refresh = addRefresh(family);
+          }
+          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), id_token:issueToken(grant.nonce), ...(refresh ? {refresh_token:refresh} : {})});
+        }
+        if (grantType === 'refresh_token') {
+          if (p.has('scope')) return json(res, 400, {error:'invalid_scope'});
+          const value = required(p, 'refresh_token');
+          pruneFamilies();
+          const entry = refreshTokens.get(value);
+          if (!entry) return json(res, 400, {error:'invalid_grant'});
+          // Replay of an old token revokes every still-live token in its family.
+          if (entry.used || entry.family.tokens.size >= 64) {
+            discardFamily(entry.family);
+            return json(res, 400, {error:'invalid_grant'});
+          }
+          entry.used = true;
+          const next = addRefresh(entry.family);
+          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), refresh_token:next});
+        }
+        return json(res, 400, {error:'unsupported_grant_type'});
       }
       return json(res, 404, {error:'not_found'});
     } catch { if (!res.headersSent) return fail(res); res.destroy(); }

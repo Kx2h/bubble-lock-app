@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
-이 코드는 향후 인증 연결을 위한 검증 경계와 비활성 브라우저 흐름이며 로그인 UI, 토큰 갱신 또는 서버 권한 검증에 연결되어 있지 않다. 따라서 현재 앱에서 로그인 성공이나 Guardian/Visitor 권한을 표시하지 않는다. PC-MOBIUS-INTEGRATION이 issuer·client ID·redirect URI·scope·principal/originator binding 및 grant 계약을 제공해야 실제 연동할 수 있다.
+이 코드는 향후 인증 연결을 위한 검증 경계와 비활성 브라우저 흐름이며 실제 로그인 UI, 운영 토큰 갱신 또는 서버 권한 검증에 연결되어 있지 않다. 따라서 현재 앱에서 로그인 성공이나 Guardian/Visitor 권한을 표시하지 않는다. PC-MOBIUS-INTEGRATION이 issuer·client ID·redirect URI·scope·principal/originator binding 및 grant 계약을 제공해야 실제 연동할 수 있다.
 
 `OidcProvider.discover(trustedIssuer)`는 사전에 신뢰한 HTTPS issuer만 사용하여 discovery를 읽고 문서의 issuer가 정확히 같은지 확인한다. 인증 endpoint, token endpoint, JWKS URI는 HTTPS여야 하며 redirect를 따라가지 않는다. 현재 보수적인 호환 범위는 응답 타입 `code`, ID 토큰 `RS256`, PKCE `S256`를 명시적으로 광고하는 provider와 쿼리 없는 endpoint이다. 응답은 64 KiB로 제한하며 네트워크 작업은 호출자가 백그라운드 스레드에서 수행해야 한다. 개발자가 issuer를 사용자의 임의 입력이나 리다이렉트에서 받아서는 안 된다.
 
@@ -16,10 +16,19 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
 `OidcBrowserFlow`는 AppAuth 0.11.1의 외부 브라우저 호출과 code/S256 PKCE를 사용한다. 신뢰된 issuer의 discovery 결과와 사전 등록된 client ID를 코드로 제공한 호출자가 `start(requestCode)`를 호출하고 `onActivityResult(requestCode, resultCode, data)`를 전달해야 한다. 운영 UI에는 호출자가 없으며 임의 주소나 계정으로 시작할 수 없다. 별도 opt-in debug 빌드의 합성 시험 Activity만 localhost 테스트 공급자에 이 흐름을 호출한다. 시험용 redirect는 `org.privacybubble.app:/oauth2redirect`다. 디버그 빌드에만 이 redirect receiver가 등록되며 release 빌드에서는 제거하고 흐름 시작도 거부한다. 이 URI는 운영 등록값이 아니고, custom scheme은 운영체제가 소유권을 검증하지 않으므로 운영에서는 공급자 계약과 검증된 App Links 등을 결정해야 한다.
 
-각 거래의 state·nonce·PKCE verifier는 AppAuth가 생성하며 S256만 허용한다. 결과 URI는 정확한 scheme/path, 중복 없는 state·code 및 요청과 같은 `iss`를 요구한다. 이 보수적인 구현은 RFC 9207의 응답 issuer를 생략하는 공급자를 거부한다. 코드는 리다이렉트를 따르지 않는 HTTPS POST로 한 번 교환하며 응답은 64 KiB, 토큰 수명은 `expires_in` 1초~7일로 제한한다. 서명·issuer·audience·nonce가 검증되기 전에는 세션을 반환하지 않는다. 세션은 메모리에만 있으며 만료 후 접근을 거부하고 `close()`로 참조를 폐기한다. refresh·revoke·권한 매핑 및 영속 저장은 없다.
+각 거래의 state·nonce·PKCE verifier는 AppAuth가 생성하며 S256만 허용한다. 결과 URI는 정확한 scheme/path, 중복 없는 state·code 및 요청과 같은 `iss`를 요구한다. 이 보수적인 구현은 RFC 9207의 응답 issuer를 생략하는 공급자를 거부한다. 코드는 리다이렉트를 따르지 않는 HTTPS POST로 한 번 교환하며 응답은 64 KiB, 토큰 수명은 `expires_in` 1초~7일로 제한한다. 서명·issuer·audience·nonce가 검증되기 전에는 세션을 반환하지 않는다. 세션은 메모리에만 있으며 만료 후 접근을 거부하고 `close()`로 참조를 폐기한다. 합성 opt-in 시험에서만 메모리 refresh 회전을 수행하며 revoke·권한 매핑 및 영속 저장은 없다.
 
 호출자는 결과를 받은 뒤 또는 Activity 파괴 시 `close()`해야 한다. 화면 회전이나 프로세스 종료 후 거래 상태를 복구하지 않고 취소하므로 새 거래가 필요하다. 오류는 민감한 내용을 반환하지 않는다. 원본 AppAuth 0.11.1은 state 불일치 시 값을 WARN 로그에 출력할 수 있어, 고정된 소스 모듈의 해당 로그 인자를 제거하고 합성 기기 시험으로 확인했다. 다른 로그 전체의 안전성을 보증하지 않는다. 실서비스 연결 전 검증된 redirect와 신뢰 issuer 등록 정책을 해결해야 한다. [패치 근거](APPAUTH_STATE_LOG_ASSESSMENT.md). 합성 Android 시험의 결과와 한계는 별도 evidence에 기록하며, 실제 외부 브라우저·실제 IdP 또는 운영 인증을 뜻하지 않는다.
 
 ### Opt-in 합성 시험 빌드
 
 `-PoidcTestCa=<workspace>/.local/oidc-mock/ca.pem`을 명시한 debug 빌드에만 localhost 전용 테스트 CA와 `OidcSyntheticActivity`가 포함된다. 앱은 이 시험에서 고정된 합성 issuer·client만 사용하고, 별도 UID의 `org.privacybubble.oidcsurrogate` 패키지를 앱과 동일한 서명 인증서인 경우에만 선택한다. 이는 합성 테스트 에이전트로, 일반 브라우저나 실제 사용자 인증의 증거가 아니다. 입력된 CA 경로는 작업 폴더의 고정 파일과 일치해야 한다. 기본 debug에는 이 CA와 Activity가 없고, release는 opt-in 설정 여부와 관계없이 테스트 Activity와 CA를 포함하지 않으며 `OIDC_TEST_ENABLED=false`다. 기존 네트워크 정책의 debug 전용 127.0.0.1 HTTP 예외는 유지한다. 시험 후 CA 포함 APK를 기본 debug APK로 교체하고 임시 에이전트와 18443 포트를 정리한다.
+
+
+### 합성 세션 갱신 경계
+
+합성 opt-in 거래만 `openid offline_access`와 `prompt=consent`를 요청한다. 초기 ID 토큰의 서명·issuer·audience·nonce로 확인한 subject를 세션에 연결하고, 갱신은 같은 discovery에서 얻은 HTTPS token endpoint와 client ID로만 보낸다. ID 토큰이 없는 갱신 응답의 subject 연속성은 합성 서버가 같은 grant에 refresh token을 묶는다는 전제에 의존하며, 클라이언트가 새 subject를 독립적으로 검증한 것은 아니다. 현재 갱신 응답에 ID 토큰이 포함되면 OIDC refresh ID 토큰 검증 규칙이 아직 구현되지 않아 거부한다.
+
+이 공개 클라이언트 시험은 매 갱신에서 새로운 refresh token을 요구하며, 동일 토큰·누락·변조 응답, 통신 실패나 시간 초과 등 결과가 불확실한 경우 기존 access/refresh 참조를 모두 폐기한다. 예전 refresh token은 재시도하지 않는다. 한 세션의 동시 갱신은 거부하고, 종료 중 도착한 결과는 사용하지 않는다. access token이 만료된 뒤에도 서버가 살아 있는 refresh grant를 승인하면 갱신할 수 있다. 토큰과 subject는 메모리에만 두고 로그·Intent·파일에 저장하지 않는다. `close()`는 결과 전달과 참조를 폐기하지만 이미 전송된 네트워크 요청을 서버에서 취소하거나 토큰을 revoke하지 않으며, JVM의 immutable 문자열 메모리를 즉시 지울 수 있다고 보장하지 않는다.
+
+이 정책은 합성 회전 서버와 [RFC 9700 §4.14](https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14)의 공개 클라이언트 재사용 탐지 모델에 맞춘 제한적인 시험 구현이다. 실제 공급자의 sender-constrained 토큰, 범위 축소, ID 토큰 갱신, refresh 만료·revoke, OS 보호 저장, 프로세스 복원, 운영 UI는 구현하거나 검증하지 않았다. issuer·scope·grant·보관 계약이 확정될 때까지 실제 사용자 인증에는 연결하지 않는다.

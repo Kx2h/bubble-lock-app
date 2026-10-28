@@ -54,7 +54,7 @@ test('HTTPS discovery, synthetic consent, S256 exchange and signed ID token', as
   assert.equal(page.status,200); assert.match(page.body,/synthetic account/i); assert.match(page.body,/Continue with test identity/);
   const code = await codeFor(request,p,issuer);
   const response = await request('/token',{method:'POST',body:tokenForm(code)});
-  assert.equal(response.status,200); const token = JSON.parse(response.body).id_token;
+  assert.equal(response.status,200); const initial = JSON.parse(response.body); assert.equal(initial.refresh_token, undefined); const token = initial.id_token;
   const [header,payload,signature] = token.split('.');
   const claims = JSON.parse(Buffer.from(payload,'base64url'));
   assert.equal(claims.iss,issuer); assert.equal(claims.aud,'privacy-bubble-android-test'); assert.equal(claims.nonce,p.get('nonce')); assert.equal(claims.sub,'synthetic-test-user');
@@ -73,4 +73,84 @@ test('rejects incorrect verifier, replay, expired code and unregistered redirect
   assert.equal((await request('/token',{method:'POST',body:tokenForm(bad)})).status,400);
   const expired = await codeFor(request,params(),issuer); advance(120);
   assert.equal((await request('/token',{method:'POST',body:tokenForm(expired)})).status,400);
+}));
+
+
+function offlineParams() {
+  const p = params(); p.set('scope', 'openid offline_access'); p.set('prompt', 'consent'); return p;
+}
+function refreshForm(token, clientId = 'privacy-bubble-android-test') {
+  return new URLSearchParams({grant_type:'refresh_token',client_id:clientId,refresh_token:token});
+}
+async function offlineGrant(request, issuer) {
+  const code = await codeFor(request, offlineParams(), issuer);
+  const result = await request('/token', {method:'POST', body:tokenForm(code)});
+  assert.equal(result.status, 200);
+  const body = JSON.parse(result.body);
+  assert.equal(typeof body.refresh_token, 'string');
+  return body;
+}
+
+test('offline access requires explicit synthetic consent and only registered scope', async () => fixture(async ({request,issuer}) => {
+  const absent = offlineParams(); absent.delete('prompt');
+  assert.equal((await request(`/authorize?${absent}`)).status, 400);
+  assert.equal((await request('/authorize', {method:'POST', body:absent.toString()})).status, 400);
+  const duplicate = offlineParams(); duplicate.append('prompt','consent');
+  assert.equal((await request(`/authorize?${duplicate}`)).status, 400);
+  const extra = offlineParams(); extra.set('scope', 'openid offline_access profile');
+  assert.equal((await request(`/authorize?${extra}`)).status, 400);
+  const duplicated = offlineParams(); duplicated.set('scope', 'openid openid offline_access');
+  assert.equal((await request(`/authorize?${duplicated}`)).status, 400);
+  const unexpectedPrompt = params(); unexpectedPrompt.set('prompt','consent');
+  assert.equal((await request(`/authorize?${unexpectedPrompt}`)).status, 400);
+  const valid = offlineParams();
+  const page = await request(`/authorize?${valid}`);
+  assert.equal(page.status, 200); assert.match(page.body, /consent for this synthetic test only/i);
+  assert.match(page.body, /name="prompt" value="consent"/);
+  await offlineGrant(request,issuer);
+}));
+
+test('refresh rotates once and replay revokes that entire token family', async () => fixture(async ({request,issuer}) => {
+  const first = await offlineGrant(request,issuer);
+  const other = await offlineGrant(request,issuer);
+  const wrongClient = await request('/token',{method:'POST',body:refreshForm(first.refresh_token,'other-client').toString()});
+  assert.equal(wrongClient.status,400);
+  const scoped = refreshForm(first.refresh_token); scoped.set('scope','openid');
+  const wrongScope = await request('/token',{method:'POST',body:scoped.toString()});
+  assert.equal(wrongScope.status,400); assert.equal(JSON.parse(wrongScope.body).error,'invalid_scope');
+  const rotated = await request('/token',{method:'POST',body:refreshForm(first.refresh_token).toString()});
+  assert.equal(rotated.status,200);
+  const second = JSON.parse(rotated.body);
+  assert.equal(second.token_type,'Bearer'); assert.equal(second.expires_in,120);
+  assert.equal(typeof second.access_token,'string'); assert.equal(typeof second.refresh_token,'string');
+  assert.ok(second.refresh_token !== first.refresh_token, 'rotation must issue a different refresh token'); assert.equal(second.id_token,undefined);
+  const replay = await request('/token',{method:'POST',body:refreshForm(first.refresh_token).toString()});
+  assert.equal(replay.status,400); assert.equal(JSON.parse(replay.body).error,'invalid_grant');
+  const revoked = await request('/token',{method:'POST',body:refreshForm(second.refresh_token).toString()});
+  assert.equal(revoked.status,400); assert.equal(JSON.parse(revoked.body).error,'invalid_grant');
+  assert.equal((await request('/token',{method:'POST',body:refreshForm(other.refresh_token).toString()})).status,200);
+}));
+
+test('concurrent replay and family expiry fail closed', async () => fixture(async ({request,issuer,advance}) => {
+  const first = await offlineGrant(request,issuer);
+  const [a,b] = await Promise.all([
+    request('/token',{method:'POST',body:refreshForm(first.refresh_token).toString()}),
+    request('/token',{method:'POST',body:refreshForm(first.refresh_token).toString()})
+  ]);
+  assert.deepEqual([a.status,b.status].sort(),[200,400]);
+  const next = JSON.parse((a.status === 200 ? a : b).body).refresh_token;
+  assert.equal((await request('/token',{method:'POST',body:refreshForm(next).toString()})).status,400);
+  const expires = await offlineGrant(request,issuer); advance(1800);
+  assert.equal((await request('/token',{method:'POST',body:refreshForm(expires.refresh_token).toString()})).status,400);
+}));
+
+test('rotation limit revokes the family rather than retaining a usable token', async () => fixture(async ({request,issuer}) => {
+  let current = (await offlineGrant(request,issuer)).refresh_token;
+  for (let i = 0; i < 63; i++) {
+    const result = await request('/token',{method:'POST',body:refreshForm(current).toString()});
+    assert.equal(result.status,200); current = JSON.parse(result.body).refresh_token;
+  }
+  const limited = await request('/token',{method:'POST',body:refreshForm(current).toString()});
+  assert.equal(limited.status,400); assert.equal(JSON.parse(limited.body).error,'invalid_grant');
+  assert.equal((await request('/token',{method:'POST',body:refreshForm(current).toString()})).status,400);
 }));

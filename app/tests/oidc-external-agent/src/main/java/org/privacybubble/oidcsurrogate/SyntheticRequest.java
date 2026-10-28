@@ -10,9 +10,17 @@ import java.util.Set;
 
 /** Restricts the surrogate to the local synthetic OIDC fixture and no account data. */
 final class SyntheticRequest {
-    private static final Set<String> FIELDS = new HashSet<>(Arrays.asList(
+    private static final Set<String> REQUIRED = new HashSet<>(Arrays.asList(
         "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method"));
+    private static final Set<String> FIELDS = new HashSet<>(REQUIRED);
+    static { FIELDS.add("prompt"); }
     private SyntheticRequest() { }
+    private static boolean validScopeAndPrompt(Map<String,String> values) {
+        String scope = values.get("scope");
+        String prompt = values.get("prompt");
+        return ("openid".equals(scope) && prompt == null)
+                || ("openid offline_access".equals(scope) && "consent".equals(prompt));
+    }
     static URI validate(String value) {
         try {
             if (value == null || value.length() > 8192) throw new IllegalArgumentException();
@@ -26,10 +34,10 @@ final class SyntheticRequest {
                 String item = URLDecoder.decode(part.substring(separator + 1), "UTF-8");
                 if (!FIELDS.contains(key) || values.put(key, item) != null) throw new IllegalArgumentException();
             }
-            if (values.size() != FIELDS.size() || !"code".equals(values.get("response_type"))
+            if (!values.keySet().containsAll(REQUIRED) || !"code".equals(values.get("response_type"))
                     || !"privacy-bubble-android-test".equals(values.get("client_id"))
                     || !"org.privacybubble.app:/oauth2redirect".equals(values.get("redirect_uri"))
-                    || !"openid".equals(values.get("scope")) || !"S256".equals(values.get("code_challenge_method"))
+                    || !validScopeAndPrompt(values) || !"S256".equals(values.get("code_challenge_method"))
                     || !values.get("state").matches("[A-Za-z0-9_-]{16,512}")
                     || !values.get("nonce").matches("[A-Za-z0-9_-]{16,512}")
                     || !values.get("code_challenge").matches("[A-Za-z0-9_-]{43}")) throw new IllegalArgumentException();

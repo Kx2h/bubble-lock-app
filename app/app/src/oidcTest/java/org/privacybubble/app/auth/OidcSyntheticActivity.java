@@ -16,6 +16,7 @@ public final class OidcSyntheticActivity extends Activity {
     private static final int AUTH_REQUEST = 3270;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private OidcBrowserFlow flow;
+    private OidcBrowserFlow.Session activeSession;
     private TextView status;
     private Button startButton;
     private boolean destroyed;
@@ -51,15 +52,24 @@ public final class OidcSyntheticActivity extends Activity {
                     try {
                         flow = OidcBrowserFlow.forSyntheticTest(this, provider, CLIENT_ID, new OidcBrowserFlow.Callback() {
                             @Override public void onAuthenticated(OidcBrowserFlow.Session session) {
-                                try {
-                                    boolean expected = "synthetic-test-user".equals(session.subject());
-                                    status.setText(expected ? "PASS: 합성 계정 검증 완료 · 실제 권한 없음" : "FAIL: 예상하지 못한 합성 계정");
-                                } catch (RuntimeException error) {
-                                    status.setText("FAIL: 합성 세션 만료");
-                                } finally {
-                                    session.close();
-                                    startButton.setEnabled(true);
-                                }
+                                activeSession = session;
+                                status.setText("합성 계정 확인 · 갱신 시험 중…");
+                                worker.execute(() -> {
+                                    boolean ok = false;
+                                    try {
+                                        String before = session.accessToken();
+                                        session.refresh();
+                                        ok = "synthetic-test-user".equals(session.subject()) && !before.equals(session.accessToken());
+                                    } catch (Exception ignored) { /* generic test result only */ }
+                                    finally { session.close(); }
+                                    final boolean passed = ok;
+                                    runOnUiThread(() -> {
+                                        if (destroyed || isFinishing()) return;
+                                        activeSession = null;
+                                        status.setText(passed ? "PASS: 합성 인증 및 토큰 갱신 · 실제 권한 없음" : "FAIL: 합성 인증 또는 갱신 실패");
+                                        startButton.setEnabled(true);
+                                    });
+                                });
                             }
                             @Override public void onFailure() {
                                 status.setText("FAIL: 합성 인증이 취소되었거나 검증에 실패했습니다.");
@@ -94,6 +104,7 @@ public final class OidcSyntheticActivity extends Activity {
     @Override protected void onDestroy() {
         destroyed = true;
         if (flow != null) flow.close();
+        if (activeSession != null) activeSession.close();
         worker.shutdownNow();
         super.onDestroy();
     }
