@@ -32,13 +32,27 @@ public final class MainActivity extends Activity {
     private Button testAutoButton;
     private String role = "Guardian";
     private SharedPreferences settings;
+    private EditText endpoint;
+    private TextView endpointFeedback;
+    private String endpointDraft;
+    private String endpointMessage = "";
+    private int endpointSelectionStart;
+    private int endpointSelectionEnd;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         Object retained = getLastNonConfigurationInstance();
         testState = retained instanceof TestState ? (TestState) retained : new TestState();
         settings = getSharedPreferences("connection", MODE_PRIVATE);
-        if (state != null) role = state.getString("role", "Guardian");
+        endpointDraft = settings.getString("api_base", "");
+        endpointSelectionStart = endpointSelectionEnd = endpointDraft.length();
+        if (state != null) {
+            role = state.getString("role", "Guardian");
+            endpointDraft = state.getString("endpointDraft", endpointDraft);
+            endpointSelectionStart = state.getInt("endpointSelectionStart", endpointDraft.length());
+            endpointSelectionEnd = state.getInt("endpointSelectionEnd", endpointDraft.length());
+            endpointMessage = state.getString("endpointMessage", "");
+        }
         render();
         testState.listener = this::renderTestState;
         renderTestState();
@@ -53,7 +67,12 @@ public final class MainActivity extends Activity {
         super.onStop();
     }
     @Override protected void onSaveInstanceState(Bundle state) {
+        captureEndpointDraft();
         state.putString("role", role);
+        state.putString("endpointDraft", endpointDraft);
+        state.putInt("endpointSelectionStart", endpointSelectionStart);
+        state.putInt("endpointSelectionEnd", endpointSelectionEnd);
+        state.putString("endpointMessage", endpointMessage);
         super.onSaveInstanceState(state);
     }
     @Override protected void onDestroy() {
@@ -76,7 +95,16 @@ public final class MainActivity extends Activity {
     private Button button(String label, View.OnClickListener listener) {
         Button b = new Button(this); b.setText(label); b.setAllCaps(false); b.setOnClickListener(listener); return b;
     }
+    /** Keep edits in Activity state; only the explicit save action writes settings. */
+    private void captureEndpointDraft() {
+        if (endpoint == null) return;
+        endpointDraft = endpoint.getText().toString();
+        endpointSelectionStart = endpoint.getSelectionStart();
+        endpointSelectionEnd = endpoint.getSelectionEnd();
+        endpointMessage = endpointFeedback.getText().toString();
+    }
     private void render() {
+        captureEndpointDraft();
         ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true);
         body = new LinearLayout(this); body.setOrientation(LinearLayout.VERTICAL); body.setPadding(dp(20), dp(24), dp(20), dp(32));
         body.setBackgroundColor(Color.rgb(247, 249, 252)); scroll.addView(body); setContentView(scroll);
@@ -98,17 +126,20 @@ public final class MainActivity extends Activity {
         }
         section("상태와 알림", "기기 · Gateway · 위치 · handover · FL · 알림: 서버 계약 대기 중");
         section("서버 설정", "추후 사용할 HTTPS API 주소만 저장합니다. 현재 인증이나 API 연결에는 사용되지 않습니다.");
-        EditText endpoint = new EditText(this); endpoint.setSingleLine(true); endpoint.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        endpoint.setHint("https://example.org"); endpoint.setText(settings.getString("api_base", "")); body.addView(endpoint);
-        TextView feedback = text("", 15, Color.DKGRAY); body.addView(feedback);
+        endpoint = new EditText(this); endpoint.setSingleLine(true); endpoint.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        endpoint.setHint("https://example.org"); endpoint.setText(endpointDraft);
+        endpoint.setSelection(Math.max(0, Math.min(endpointSelectionStart, endpointDraft.length())),
+                Math.max(0, Math.min(endpointSelectionEnd, endpointDraft.length())));
+        body.addView(endpoint);
+        endpointFeedback = text(endpointMessage, 15, Color.DKGRAY); body.addView(endpointFeedback);
         body.addView(button("주소 저장", v -> {
             String value = endpoint.getText().toString().trim();
-            if (value.isEmpty()) { settings.edit().remove("api_base").apply(); feedback.setText("주소를 삭제했습니다."); return; }
+            if (value.isEmpty()) { settings.edit().remove("api_base").apply(); endpointFeedback.setText("주소를 삭제했습니다."); return; }
             try {
                 URI uri = new URI(value);
                 if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null || uri.getQuery() != null || uri.getFragment() != null) throw new IllegalArgumentException();
-                settings.edit().putString("api_base", value).apply(); feedback.setText("저장됨 · 아직 연결되지 않음");
-            } catch (Exception e) { feedback.setText("사용자 정보, 쿼리, 프래그먼트가 없는 HTTPS 주소를 입력하세요."); }
+                settings.edit().putString("api_base", value).apply(); endpointFeedback.setText("저장됨 · 아직 연결되지 않음");
+            } catch (Exception e) { endpointFeedback.setText("사용자 정보, 쿼리, 프래그먼트가 없는 HTTPS 주소를 입력하세요."); }
         }));
         if (BuildConfig.DEBUG) {
             section("합성 동의 시험", "실제 사용자나 권한에 영향을 주지 않는 로컬 모의 시험입니다.");
