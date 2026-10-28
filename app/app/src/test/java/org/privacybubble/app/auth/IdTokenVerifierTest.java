@@ -78,6 +78,23 @@ public class IdTokenVerifierTest {
         reject(claims().issueTime(new Date((NOW + 61) * 1000)).build());
         reject(claims().notBeforeTime(new Date((NOW + 1) * 1000)).build());
     }
+    @Test public void rejectsExplicitNullNotBeforeOnInitialAndRefresh() throws Exception {
+        IdTokenVerifier.Identity initial = identity(claims().build());
+        for (boolean initialToken : new boolean[]{true, false}) {
+            String payload = "{\"iss\":\"" + ISSUER + "\",\"sub\":\"person-1\",\"aud\":\"" + CLIENT
+                    + "\",\"iat\":" + NOW + ",\"exp\":" + (NOW + 120)
+                    + (initialToken ? ",\"nonce\":\"" + NONCE + "\"" : "") + ",\"nbf\":null}";
+            com.nimbusds.jose.JWSObject jws = new com.nimbusds.jose.JWSObject(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("key-1").build(), new com.nimbusds.jose.Payload(payload));
+            jws.sign(new RSASSASigner(key));
+            String signed = jws.serialize(), keys = jwks(key.toPublicJWK());
+            if (initialToken) assertThrows(IllegalArgumentException.class, () -> verify(signed, keys));
+            else assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(signed, keys, initial, NOW, NOW));
+        }
+        // The optional claim may still be omitted or contain a valid past time.
+        assertEquals("person-1", verify(sign(claims().build(), key, "key-1"), jwks(key.toPublicJWK())));
+        assertEquals("person-1", verify(sign(claims().notBeforeTime(new Date((NOW - 1) * 1000)).build(), key, "key-1"), jwks(key.toPublicJWK())));
+    }
     @Test public void rejectsWrongSignatureMissingOrDuplicateKeys() throws Exception {
         String jwt = sign(claims().build(), key, "key-1");
         assertThrows(IllegalArgumentException.class, () -> verify(jwt, jwks(other.toPublicJWK())));

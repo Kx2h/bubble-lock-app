@@ -174,6 +174,7 @@ public final class IdTokenVerifier {
         Date exp = claims.getExpirationTime(), issued = claims.getIssueTime(), notBefore = claims.getNotBeforeTime();
         long nowMillis = nowEpochSeconds * 1000;
         if (exp == null || issued == null || exp.getTime() <= nowMillis
+                || (claims.getClaims().containsKey("nbf") && notBefore == null)
                 || issued.getTime() > (nowEpochSeconds + FUTURE_IAT_SKEW_SECONDS) * 1000
                 || issued.getTime() > exp.getTime()
                 || (notBefore != null && notBefore.getTime() > nowMillis)) fail();
