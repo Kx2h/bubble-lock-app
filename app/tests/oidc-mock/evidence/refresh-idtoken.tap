@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: HTTPS discovery, synthetic consent, S256 exchange and signed ID token
+ok 1 - HTTPS discovery, synthetic consent, S256 exchange and signed ID token
+  ---
+  duration_ms: 274.40842
+  type: 'test'
+  ...
+# Subtest: rejects incorrect verifier, replay, expired code and unregistered redirects
+ok 2 - rejects incorrect verifier, replay, expired code and unregistered redirects
+  ---
+  duration_ms: 103.647617
+  type: 'test'
+  ...
+# Subtest: offline access requires explicit synthetic consent and only registered scope
+ok 3 - offline access requires explicit synthetic consent and only registered scope
+  ---
+  duration_ms: 178.35935
+  type: 'test'
+  ...
+# Subtest: refresh rotates once and replay revokes that entire token family
+ok 4 - refresh rotates once and replay revokes that entire token family
+  ---
+  duration_ms: 197.849157
+  type: 'test'
+  ...
+# Subtest: concurrent replay and family expiry fail closed
+ok 5 - concurrent replay and family expiry fail closed
+  ---
+  duration_ms: 81.310994
+  type: 'test'
+  ...
+# Subtest: rotation limit revokes the family rather than retaining a usable token
+ok 6 - rotation limit revokes the family rather than retaining a usable token
+  ---
+  duration_ms: 321.605998
+  type: 'test'
+  ...
+# Subtest: optional refresh ID token is signed and preserves identity without nonce
+ok 7 - optional refresh ID token is signed and preserves identity without nonce
+  ---
+  duration_ms: 136.495307
+  type: 'test'
+  ...
+# Subtest: fault mode emits a signed refresh ID token with the wrong subject
+ok 8 - fault mode emits a signed refresh ID token with the wrong subject
+  ---
+  duration_ms: 193.969238
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1522.76064

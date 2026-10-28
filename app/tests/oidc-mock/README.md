@@ -52,3 +52,7 @@ REFRESH_TRACE_FILE="$WORKSPACE/.local/oidc-mock/device-refresh-trace.txt" \
 ```
 
 The fixture is local and synthetic. A pair of `POST /token` lines corresponds to two token requests in the controlled test; the trace alone does not prove the response payload or a production authentication outcome. See the Android result and its limitations in `app/evidence/oidc-refresh-device.md`.
+
+For a separate test of refresh responses that include an ID token, set `MOCK_REFRESH_ID_TOKEN=1` when starting `server.mjs` or `device-refresh-trace.mjs`. The synthetic provider then signs an ID token without nonce on each refresh, retaining the initial issuer, subject and audience. Without that option the refresh response omits the ID token. This switch is a mock fixture, not a production provider contract.
+
+`MOCK_REFRESH_ID_TOKEN=wrong-sub` is an explicit negative fixture: it returns a validly signed refresh ID token with a different synthetic subject so that the client must reject it. It is not a supported production identity or configuration.

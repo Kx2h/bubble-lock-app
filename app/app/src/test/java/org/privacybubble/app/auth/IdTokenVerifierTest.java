@@ -99,4 +99,66 @@ public class IdTokenVerifierTest {
         assertThrows(IllegalArgumentException.class, () -> verify(keyUrl.serialize(), jwks(key.toPublicJWK())));
     }
 
+    private JWTClaimsSet.Builder refreshed() {
+        return new JWTClaimsSet.Builder().issuer(ISSUER).subject("person-1").audience(CLIENT)
+                .issueTime(new Date(NOW * 1000)).expirationTime(new Date((NOW + 120) * 1000));
+    }
+    private IdTokenVerifier.Identity identity(JWTClaimsSet initial) throws Exception {
+        return IdTokenVerifier.verifyInitial(sign(initial, key, "key-1"), jwks(key.toPublicJWK()), ISSUER, CLIENT, NONCE, NOW);
+    }
+    private void verifyRefresh(JWTClaimsSet value, IdTokenVerifier.Identity identity) throws Exception {
+        IdTokenVerifier.verifyRefresh(sign(value, key, "key-1"), jwks(key.toPublicJWK()), identity, NOW, NOW);
+    }
+    private void rejectRefresh(JWTClaimsSet value, IdTokenVerifier.Identity identity) throws Exception {
+        String jwt = sign(value, key, "key-1");
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(jwt, jwks(key.toPublicJWK()), identity, NOW, NOW));
+    }
+    @Test public void refreshIdTokenAcceptsOmittedAndMatchingNonce() throws Exception {
+        IdTokenVerifier.Identity initial = identity(claims().build());
+        verifyRefresh(refreshed().build(), initial);
+        verifyRefresh(refreshed().claim("nonce", NONCE).build(), initial);
+        assertEquals("VerifiedIdentity[redacted]", initial.toString());
+        String originalJwt = sign(claims().build(), key, "key-1");
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(originalJwt, jwks(key.toPublicJWK()), initial, NOW, NOW));
+    }
+    @Test public void refreshIdTokenBindsIssuerSubjectAudienceAndNonce() throws Exception {
+        IdTokenVerifier.Identity initial = identity(claims().build());
+        rejectRefresh(refreshed().issuer("https://other.example.test").build(), initial);
+        rejectRefresh(refreshed().subject("other").build(), initial);
+        rejectRefresh(refreshed().audience("other").build(), initial);
+        rejectRefresh(refreshed().audience(Arrays.asList(CLIENT, "other")).build(), initial);
+        rejectRefresh(refreshed().claim("nonce", "wrong").build(), initial);
+        rejectRefresh(refreshed().claim("nonce", "").build(), initial);
+        rejectRefresh(refreshed().claim("nonce", 42).build(), initial);
+        String jwt = sign(refreshed().build(), other, "key-1");
+        assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(jwt, jwks(key.toPublicJWK()), initial, NOW, NOW));
+    }
+    @Test public void refreshIdTokenChecksAuthTimeAzpAndIssuance() throws Exception {
+        Date auth = new Date((NOW - 100) * 1000);
+        IdTokenVerifier.Identity initial = identity(claims().claim("auth_time", auth).claim("azp", CLIENT).build());
+        verifyRefresh(refreshed().claim("auth_time", auth).claim("azp", CLIENT).build(), initial);
+        verifyRefresh(refreshed().claim("azp", CLIENT).build(), initial);
+        rejectRefresh(refreshed().claim("auth_time", new Date((NOW - 50) * 1000)).claim("azp", CLIENT).build(), initial);
+        rejectRefresh(refreshed().claim("azp", "other").build(), initial);
+        rejectRefresh(refreshed().build(), initial);
+        rejectRefresh(refreshed().claim("azp", CLIENT).issueTime(new Date((NOW - 100) * 1000)).build(), initial);
+        rejectRefresh(refreshed().claim("azp", CLIENT).issueTime(new Date((NOW + 61) * 1000)).build(), initial);
+        rejectRefresh(refreshed().claim("azp", CLIENT).expirationTime(new Date(NOW * 1000)).build(), initial);
+        IdTokenVerifier.Identity noAuthTime = identity(claims().build());
+        rejectRefresh(refreshed().claim("auth_time", auth).build(), noAuthTime);
+    }
+
+    @Test public void refreshRejectsExplicitNullAndWrongClaimTypes() throws Exception {
+        IdTokenVerifier.Identity initial = identity(claims().build());
+        for (String claim : new String[]{"\"nonce\":null", "\"auth_time\":null", "\"azp\":null", "\"auth_time\":\"bad\""}) {
+            String payload = "{\"iss\":\"" + ISSUER + "\",\"sub\":\"person-1\",\"aud\":\"" + CLIENT
+                    + "\",\"iat\":" + NOW + ",\"exp\":" + (NOW + 120) + "," + claim + "}";
+            com.nimbusds.jose.JWSObject jws = new com.nimbusds.jose.JWSObject(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("key-1").build(), new com.nimbusds.jose.Payload(payload));
+            jws.sign(new RSASSASigner(key));
+            String signed = jws.serialize();
+            assertThrows(IllegalArgumentException.class, () -> IdTokenVerifier.verifyRefresh(signed, jwks(key.toPublicJWK()), initial, NOW, NOW));
+        }
+    }
+
 }

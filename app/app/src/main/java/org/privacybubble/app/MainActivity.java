@@ -102,6 +102,12 @@ public final class MainActivity extends Activity {
             } catch (Exception e) { feedback.setText("사용자 정보, 쿼리, 프래그먼트가 없는 HTTPS 주소를 입력하세요."); }
         }));
         if (BuildConfig.DEBUG) {
+            section("합성 동의 시험", "실제 사용자나 권한에 영향을 주지 않는 로컬 모의 시험입니다.");
+            body.addView(button("합성 동의 화면 열기", v -> {
+                android.content.Intent intent = new android.content.Intent();
+                intent.setClassName(this, "org.privacybubble.app.SyntheticConsentActivity");
+                startActivity(intent);
+            }));
             section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
             testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
             testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);

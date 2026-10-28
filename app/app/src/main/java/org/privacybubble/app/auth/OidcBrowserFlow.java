@@ -59,11 +59,11 @@ public final class OidcBrowserFlow implements AutoCloseable {
         private String accessToken;
         private final long expiresAtElapsed;
         private RotatingSession rotating;
-        private Session(String subject, String accessToken, long expiresAtElapsed, OidcProvider provider, String clientId, String refreshToken) {
+        private Session(IdTokenVerifier.Identity identity, String accessToken, long expiresAtElapsed, OidcProvider provider, String clientId, String refreshToken) {
             this.expiresAtElapsed = expiresAtElapsed;
-            if (refreshToken == null) { this.subject = subject; this.accessToken = accessToken; }
-            else { this.rotating = new RotatingSession(subject, accessToken, refreshToken, expiresAtElapsed,
-                    SystemClock::elapsedRealtime, previous -> rotate(provider, clientId, previous)); }
+            if (refreshToken == null) { this.subject = identity.subject(); this.accessToken = accessToken; }
+            else { this.rotating = new RotatingSession(identity.subject(), accessToken, refreshToken, expiresAtElapsed,
+                    SystemClock::elapsedRealtime, previous -> rotate(provider, clientId, previous, identity)); }
         }
         public synchronized String subject() {
             if (rotating != null) return rotating.subject();
@@ -171,9 +171,9 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 } else refreshToken = null;
                 // Conservatively begin the lifetime before JWKS fetching, which may take time.
                 long expiresAtElapsed = exchangeStarted + (long) seconds * 1000;
-                String subject = provider.verifyIdToken(idToken, clientId, request.nonce, System.currentTimeMillis() / 1000);
+                IdTokenVerifier.Identity identity = provider.verifyIdentityToken(idToken, clientId, request.nonce);
                 if (SystemClock.elapsedRealtime() >= expiresAtElapsed) throw new IllegalArgumentException();
-                Session session = new Session(subject, access, expiresAtElapsed, provider, clientId, refreshToken);
+                Session session = new Session(identity, access, expiresAtElapsed, provider, clientId, refreshToken);
                 if (!main.post(() -> {
                     if (closed) { session.close(); return; }
                     // The main queue can be delayed past expiry after verification completed.
@@ -190,7 +190,8 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 + "&redirect_uri=" + enc(OidcRedirect.REDIRECT) + "&code_verifier=" + enc(request.codeVerifier);
         return postForm(provider.tokenEndpoint, form);
     }
-    private static RotatingSession.Response rotate(OidcProvider provider, String clientId, String refreshToken) throws Exception {
+    private static RotatingSession.Response rotate(OidcProvider provider, String clientId, String refreshToken, IdTokenVerifier.Identity identity) throws Exception {
+        long started = System.currentTimeMillis() / 1000;
         JSONObject token = postForm(provider.tokenEndpoint, "grant_type=refresh_token&client_id=" + enc(clientId) + "&refresh_token=" + enc(refreshToken));
         Object access = token.opt("access_token"), refresh = token.opt("refresh_token"), type = token.opt("token_type"), duration = token.opt("expires_in");
         Object scope = token.opt("scope");
@@ -198,7 +199,13 @@ public final class OidcBrowserFlow implements AutoCloseable {
                 || (token.has("scope") && !(scope instanceof String))) throw new IllegalArgumentException();
         double seconds = ((Number) duration).doubleValue();
         if (!Double.isFinite(seconds) || seconds != Math.rint(seconds) || seconds < 1 || seconds > 604800) throw new IllegalArgumentException();
-        return new RotatingSession.Response((String) access, (String) refresh, (String) type, (long) seconds, (String) scope, token.has("id_token"));
+        if (token.has("id_token")) {
+            Object refreshedId = token.opt("id_token");
+            if (!(refreshedId instanceof String) || ((String) refreshedId).isEmpty()) throw new IllegalArgumentException();
+            provider.verifyRefreshIdToken((String) refreshedId, identity, clientId, started);
+        }
+        // The optional ID token was verified above; failures close the rotating session without retry.
+        return new RotatingSession.Response((String) access, (String) refresh, (String) type, (long) seconds, (String) scope, false);
     }
     private static JSONObject postForm(java.net.URI endpoint, String form) throws Exception {
         byte[] body = form.getBytes(StandardCharsets.UTF_8);

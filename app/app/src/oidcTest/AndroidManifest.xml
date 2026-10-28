@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity android:name="org.privacybubble.app.auth.StateMismatchProbeActivity" android:exported="true" />
+        <activity android:name="org.privacybubble.app.SyntheticConsentActivity" android:exported="false" />
         <!-- Explicit-only, opt-in synthetic test; excluded from default debug and release. -->
         <activity android:name="org.privacybubble.app.auth.OidcSyntheticActivity" android:exported="true" />
     </application>

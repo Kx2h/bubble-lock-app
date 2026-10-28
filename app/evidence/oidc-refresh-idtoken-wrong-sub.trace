@@ -1,0 +1,7 @@
+GET /.well-known/openid-configuration
+GET /authorize
+POST /authorize
+POST /token
+GET /jwks
+POST /token
+GET /jwks

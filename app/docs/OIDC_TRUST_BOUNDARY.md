@@ -27,8 +27,8 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
 ### 합성 세션 갱신 경계
 
-합성 opt-in 거래만 `openid offline_access`와 `prompt=consent`를 요청한다. 초기 ID 토큰의 서명·issuer·audience·nonce로 확인한 subject를 세션에 연결하고, 갱신은 같은 discovery에서 얻은 HTTPS token endpoint와 client ID로만 보낸다. ID 토큰이 없는 갱신 응답의 subject 연속성은 합성 서버가 같은 grant에 refresh token을 묶는다는 전제에 의존하며, 클라이언트가 새 subject를 독립적으로 검증한 것은 아니다. 현재 갱신 응답에 ID 토큰이 포함되면 OIDC refresh ID 토큰 검증 규칙이 아직 구현되지 않아 거부한다.
+합성 opt-in 거래만 `openid offline_access`와 `prompt=consent`를 요청한다. 초기 ID 토큰의 서명·issuer·audience·nonce로 확인한 subject를 세션에 연결하고, 갱신은 같은 discovery에서 얻은 HTTPS token endpoint와 client ID로만 보낸다. ID 토큰이 없는 갱신 응답의 subject 연속성은 합성 서버가 같은 grant에 refresh token을 묶는다는 전제에 의존하며, 클라이언트가 새 subject를 독립적으로 검증한 것은 아니다. 갱신 응답에 ID 토큰이 있으면 서명과 최초 issuer·subject·audience를 검증하고, nonce가 있다면 최초 거래와 같은 값이어야 한다. 초기 토큰에 없던 auth_time을 새로 제시하거나 azp의 존재 여부가 바뀌는 경우, 최초 JWT 재사용 및 발급 시각 불일치는 보수적으로 거부한다.
 
 이 공개 클라이언트 시험은 매 갱신에서 새로운 refresh token을 요구하며, 동일 토큰·누락·변조 응답, 통신 실패나 시간 초과 등 결과가 불확실한 경우 기존 access/refresh 참조를 모두 폐기한다. 예전 refresh token은 재시도하지 않는다. 한 세션의 동시 갱신은 거부하고, 종료 중 도착한 결과는 사용하지 않는다. access token이 만료된 뒤에도 서버가 살아 있는 refresh grant를 승인하면 갱신할 수 있다. 토큰과 subject는 메모리에만 두고 로그·Intent·파일에 저장하지 않는다. `close()`는 결과 전달과 참조를 폐기하지만 이미 전송된 네트워크 요청을 서버에서 취소하거나 토큰을 revoke하지 않으며, JVM의 immutable 문자열 메모리를 즉시 지울 수 있다고 보장하지 않는다.
 
-이 정책은 합성 회전 서버와 [RFC 9700 §4.14](https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14)의 공개 클라이언트 재사용 탐지 모델에 맞춘 제한적인 시험 구현이다. 실제 공급자의 sender-constrained 토큰, 범위 축소, ID 토큰 갱신, refresh 만료·revoke, OS 보호 저장, 프로세스 복원, 운영 UI는 구현하거나 검증하지 않았다. issuer·scope·grant·보관 계약이 확정될 때까지 실제 사용자 인증에는 연결하지 않는다.
+이 정책은 합성 회전 서버와 [RFC 9700 §4.14](https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14)의 공개 클라이언트 재사용 탐지 모델에 맞춘 제한적인 시험 구현이다. 실제 공급자의 sender-constrained 토큰, 범위 축소, 실제 공급자의 ID 토큰 갱신 호환성, refresh 만료·revoke, OS 보호 저장, 프로세스 복원, 운영 UI는 구현하거나 검증하지 않았다. issuer·scope·grant·보관 계약이 확정될 때까지 실제 사용자 인증에는 연결하지 않는다.

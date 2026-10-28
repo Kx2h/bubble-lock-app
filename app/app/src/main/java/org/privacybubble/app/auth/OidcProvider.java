@@ -56,6 +56,19 @@ public final class OidcProvider {
         return IdTokenVerifier.verify(jwt, fetch(jwksUri.toString()), issuer, clientId, nonce, nowEpochSeconds);
     }
 
+    /** Context for rotation is created only from the verified initial ID token. */
+    IdTokenVerifier.Identity verifyIdentityToken(String jwt, String clientId, String nonce) throws Exception {
+        String keys = fetch(jwksUri.toString());
+        return IdTokenVerifier.verifyInitial(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000);
+    }
+
+    /** Verify a refreshed ID token using the same trusted provider and initial transaction. */
+    void verifyRefreshIdToken(String jwt, IdTokenVerifier.Identity initial, String clientId, long started) throws Exception {
+        if (initial == null || !initial.matches(issuer, clientId)) throw new IllegalArgumentException("ID token validation failed");
+        String keys = fetch(jwksUri.toString());
+        IdTokenVerifier.verifyRefresh(jwt, keys, initial, started, System.currentTimeMillis() / 1000);
+    }
+
     private static void requireCapability(Map<String, Object> doc, String key, String expected) throws Exception {
         List<String> values = JSONObjectUtils.getStringList(doc, key);
         if (values == null || !values.contains(expected)) throw new IllegalArgumentException("Unsupported OIDC provider");

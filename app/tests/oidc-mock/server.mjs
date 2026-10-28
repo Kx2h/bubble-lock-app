@@ -11,10 +11,10 @@ const escape = value => value.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;'
 const text = (v, max = 512) => typeof v === 'string' && v.length > 0 && v.length <= max;
 const required = (params, key) => params.getAll(key).length === 1 ? params.get(key) : null;
 
-export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, now = () => Math.floor(Date.now() / 1000) }) {
+export function createMockIdp({ issuer, cert, key, clientId = defaultClient, redirectUri = defaultRedirect, refreshIdToken = false, now = () => Math.floor(Date.now() / 1000) }) {
   const issuerUrl = new URL(issuer);
   if (issuerUrl.protocol !== 'https:' || issuerUrl.hostname !== 'localhost' || issuerUrl.username || issuerUrl.password || issuerUrl.pathname !== '/' || issuerUrl.search || issuerUrl.hash || !issuerUrl.port) throw Error('Mock issuer must be https://localhost:<port>');
-  if (!cert || !key || !text(clientId) || redirectUri !== defaultRedirect) throw Error('Invalid mock configuration');
+  if (![false, true, 'wrong-sub'].includes(refreshIdToken) || !cert || !key || !text(clientId) || redirectUri !== defaultRedirect) throw Error('Invalid mock configuration');
   issuer = issuer.replace(/\/$/, '');
   const keys = generateKeyPairSync('rsa', { modulusLength: 2048 });
   const jwk = { ...keys.publicKey.export({ format: 'jwk' }), kid: 'mock-signing-key', alg: 'RS256', use: 'sig' };
@@ -54,9 +54,9 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
     if (!(req.headers['content-type'] ?? '').toLowerCase().startsWith('application/x-www-form-urlencoded')) throw Error('content type');
     return new URLSearchParams(Buffer.concat(chunks).toString('utf8'));
   }
-  function issueToken(nonce) {
+  function issueToken(nonce, subject = 'synthetic-test-user') {
     const t = now(), header = b64(JSON.stringify({alg:'RS256',kid:jwk.kid,typ:'JWT'}));
-    const payload = b64(JSON.stringify({iss:issuer,sub:'synthetic-test-user',aud:clientId,iat:t,exp:t+120,nonce}));
+    const payload = b64(JSON.stringify({iss:issuer,sub:subject,aud:clientId,iat:t,exp:t+120,nonce}));
     const message = `${header}.${payload}`;
     return `${message}.${sign('RSA-SHA256', Buffer.from(message), keys.privateKey).toString('base64url')}`;
   }
@@ -114,7 +114,7 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
           }
           entry.used = true;
           const next = addRefresh(entry.family);
-          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), refresh_token:next});
+          return json(res, 200, {token_type:'Bearer', expires_in:120, access_token:randomBytes(32).toString('base64url'), refresh_token:next, ...(refreshIdToken ? {id_token:issueToken(undefined, refreshIdToken === 'wrong-sub' ? 'synthetic-other' : 'synthetic-test-user')} : {})});
         }
         return json(res, 400, {error:'unsupported_grant_type'});
       }
@@ -126,5 +126,5 @@ export function createMockIdp({ issuer, cert, key, clientId = defaultClient, red
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.MOCK_OIDC_PORT || 18443);
   if (!Number.isInteger(port) || port < 1024 || port > 65535 || !process.env.MOCK_OIDC_CERT || !process.env.MOCK_OIDC_KEY) throw Error('Set MOCK_OIDC_CERT and MOCK_OIDC_KEY; use a valid unprivileged port');
-  createMockIdp({issuer:`https://localhost:${port}`, cert:readFileSync(process.env.MOCK_OIDC_CERT), key:readFileSync(process.env.MOCK_OIDC_KEY)}).listen(port, '127.0.0.1', () => console.log(`Synthetic local IdP listening on 127.0.0.1:${port}`));
+  createMockIdp({issuer:`https://localhost:${port}`, cert:readFileSync(process.env.MOCK_OIDC_CERT), key:readFileSync(process.env.MOCK_OIDC_KEY), refreshIdToken:process.env.MOCK_REFRESH_ID_TOKEN === 'wrong-sub' ? 'wrong-sub' : process.env.MOCK_REFRESH_ID_TOKEN === '1'}).listen(port, '127.0.0.1', () => console.log(`Synthetic local IdP listening on 127.0.0.1:${port}`));
 }

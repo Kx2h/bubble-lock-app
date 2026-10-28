@@ -1,0 +1,9 @@
+{
+  "mode": "synthetic",
+  "beforeStatus": "active",
+  "afterStatus": "active",
+  "beforeGrantRevision": 1,
+  "afterGrantRevision": 1,
+  "sameReceipt": true,
+  "receiptIdSha256": "e48e27bd6b1ddf104ff3cf43727abb7b590531a23478b4089f7b79a76e40027c"
+}

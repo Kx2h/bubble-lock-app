@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /** Validates an ID token against an already authenticated issuer and JWKS document. */
@@ -34,65 +35,124 @@ public final class IdTokenVerifier {
      */
     public static String verify(String jwt, String jwksJson, String expectedIssuer,
                                 String clientId, String nonce, long nowEpochSeconds) {
-        try {
-            requireText(jwt, MAX_TOKEN_LENGTH);
-            requireText(jwksJson, MAX_JWKS_LENGTH);
-            requireText(expectedIssuer, 2048);
-            requireText(clientId, 512);
-            requireText(nonce, 512);
-            if (nowEpochSeconds <= 0 || nowEpochSeconds > Long.MAX_VALUE / 1000 - 60) fail();
-            URI issuer = new URI(expectedIssuer);
-            if (!"https".equalsIgnoreCase(issuer.getScheme()) || issuer.getHost() == null
-                    || issuer.getUserInfo() != null || issuer.getQuery() != null || issuer.getFragment() != null) fail();
+        return verifyInitial(jwt, jwksJson, expectedIssuer, clientId, nonce, nowEpochSeconds).subject();
+    }
 
-            SignedJWT token = SignedJWT.parse(jwt);
-            JWSHeader header = token.getHeader();
-            if (!JWSAlgorithm.RS256.equals(header.getAlgorithm())) fail();
-            String kid = header.getKeyID();
-            requireText(kid, 512);
-            if (header.getJWK() != null || header.getJWKURL() != null || header.getX509CertURL() != null
-                    || (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty())) fail();
-
-            List<JWK> keys = JWKSet.parse(jwksJson).getKeys();
-            JWK selected = null;
-            for (JWK key : keys) {
-                if (kid.equals(key.getKeyID())) {
-                    if (selected != null) fail(); // ambiguous key IDs are never accepted
-                    selected = key;
-                }
-            }
-            if (!(selected instanceof RSAKey) || selected.isPrivate()) fail();
-            RSAKey rsa = (RSAKey) selected;
-            if (rsa.size() < 2048 || (rsa.getAlgorithm() != null && !JWSAlgorithm.RS256.equals(rsa.getAlgorithm()))
-                    || (rsa.getKeyUse() != null && !KeyUse.SIGNATURE.equals(rsa.getKeyUse()))) fail();
-            Set<KeyOperation> operations = rsa.getKeyOperations();
-            if (operations != null && !operations.contains(KeyOperation.VERIFY)) fail();
-            if (!token.verify(new RSASSAVerifier(rsa))) fail();
-
-            JWTClaimsSet claims = token.getJWTClaimsSet();
-            if (!expectedIssuer.equals(claims.getIssuer())) fail();
-            List<String> audience = claims.getAudience();
-            if (audience == null || audience.size() != 1 || !clientId.equals(audience.get(0))) fail();
-            Object azp = claims.getClaim("azp");
-            if (azp != null && (!(azp instanceof String) || !clientId.equals(azp))) fail();
-            String subject = claims.getSubject();
-            requireText(subject, 512);
-            Date exp = claims.getExpirationTime();
-            Date issued = claims.getIssueTime();
-            Date notBefore = claims.getNotBeforeTime();
-            long nowMillis = nowEpochSeconds * 1000;
-            if (exp == null || issued == null || exp.getTime() <= nowMillis
-                    || issued.getTime() > (nowEpochSeconds + FUTURE_IAT_SKEW_SECONDS) * 1000
-                    || issued.getTime() > exp.getTime()
-                    || (notBefore != null && notBefore.getTime() > nowMillis)) fail();
-            Object suppliedNonce = claims.getClaim("nonce");
-            if (!(suppliedNonce instanceof String) || !MessageDigest.isEqual(
-                    nonce.getBytes(StandardCharsets.UTF_8), ((String) suppliedNonce).getBytes(StandardCharsets.UTF_8))) fail();
-            return subject;
-        } catch (Exception e) {
-            // No token contents or library parsing details in user-facing errors or logs.
-            throw new IllegalArgumentException("ID token validation failed");
+    /** Created only after initial ID-token validation; never serialize or log its contents. */
+    static final class Identity {
+        private final String issuer, clientId, subject, nonce, azp;
+        private final Long authTimeMillis;
+        private final long issuedMillis;
+        private final byte[] initialTokenDigest;
+        private Identity(String issuer, String clientId, String subject, String nonce, String azp,
+                         Long authTimeMillis, long issuedMillis, byte[] initialTokenDigest) {
+            this.issuer = issuer; this.clientId = clientId; this.subject = subject;
+            this.nonce = nonce; this.azp = azp; this.authTimeMillis = authTimeMillis;
+            this.issuedMillis = issuedMillis; this.initialTokenDigest = initialTokenDigest;
         }
+        String subject() { return subject; }
+        boolean matches(String issuer, String clientId) { return this.issuer.equals(issuer) && this.clientId.equals(clientId); }
+        @Override public String toString() { return "VerifiedIdentity[redacted]"; }
+    }
+
+    static Identity verifyInitial(String jwt, String jwksJson, String expectedIssuer,
+                                  String clientId, String nonce, long nowEpochSeconds) {
+        try {
+            requireText(nonce, 512);
+            JWTClaimsSet claims = validateSigned(jwt, jwksJson, expectedIssuer, clientId, nowEpochSeconds);
+            Object suppliedNonce = claims.getClaim("nonce");
+            if (!(suppliedNonce instanceof String) || !sameNonce(nonce, (String) suppliedNonce)) fail();
+            Object azp = claims.getClaim("azp");
+            if (claims.getClaims().containsKey("azp") && !(azp instanceof String)) fail();
+            Date authTime = authTime(claims);
+            Date issued = claims.getIssueTime();
+            if (authTime != null && authTime.getTime() > issued.getTime() + FUTURE_IAT_SKEW_SECONDS * 1000) fail();
+            return new Identity(expectedIssuer, clientId, claims.getSubject(), nonce, (String) azp,
+                    authTime == null ? null : authTime.getTime(), issued.getTime(), digest(jwt));
+        } catch (Exception e) { throw new IllegalArgumentException("ID token validation failed"); }
+    }
+
+    /** Refresh tokens may omit nonce and auth_time; if supplied they must bind to the initial token. */
+    static void verifyRefresh(String jwt, String jwksJson, Identity initial,
+                              long requestStartedEpochSeconds, long nowEpochSeconds) {
+        try {
+            if (initial == null || requestStartedEpochSeconds <= 0 || requestStartedEpochSeconds > nowEpochSeconds
+                    || nowEpochSeconds > Long.MAX_VALUE / 1000 - 60) fail();
+            JWTClaimsSet claims = validateSigned(jwt, jwksJson, initial.issuer, initial.clientId, nowEpochSeconds);
+            if (MessageDigest.isEqual(initial.initialTokenDigest, digest(jwt)) || !initial.subject.equals(claims.getSubject())) fail();
+            Object nonce = claims.getClaim("nonce");
+            if (claims.getClaims().containsKey("nonce") && (!(nonce instanceof String) || !sameNonce(initial.nonce, (String) nonce))) fail();
+            Object azp = claims.getClaim("azp");
+            if (claims.getClaims().containsKey("azp") && !(azp instanceof String)) fail();
+            if (!Objects.equals(initial.azp, azp)) fail();
+            Date originalAuth = authTime(claims);
+            if (originalAuth != null && (initial.authTimeMillis == null || originalAuth.getTime() != initial.authTimeMillis)) fail();
+            long issued = claims.getIssueTime().getTime();
+            if (issued < initial.issuedMillis || issued < (requestStartedEpochSeconds - FUTURE_IAT_SKEW_SECONDS) * 1000) fail();
+        } catch (Exception e) { throw new IllegalArgumentException("ID token validation failed"); }
+    }
+
+    private static byte[] digest(String token) throws Exception {
+        return MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static boolean sameNonce(String expected, String actual) {
+        return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), actual.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static Date authTime(JWTClaimsSet claims) throws Exception {
+        if (!claims.getClaims().containsKey("auth_time")) return null;
+        Date value = claims.getDateClaim("auth_time");
+        if (value == null) fail();
+        return value;
+    }
+
+    private static JWTClaimsSet validateSigned(String jwt, String jwksJson, String expectedIssuer,
+                                                String clientId, long nowEpochSeconds) throws Exception {
+        requireText(jwt, MAX_TOKEN_LENGTH);
+        requireText(jwksJson, MAX_JWKS_LENGTH);
+        requireText(expectedIssuer, 2048);
+        requireText(clientId, 512);
+        if (nowEpochSeconds <= 0 || nowEpochSeconds > Long.MAX_VALUE / 1000 - 60) fail();
+        URI issuer = new URI(expectedIssuer);
+        if (!"https".equalsIgnoreCase(issuer.getScheme()) || issuer.getHost() == null
+                || issuer.getUserInfo() != null || issuer.getQuery() != null || issuer.getFragment() != null) fail();
+        SignedJWT token = SignedJWT.parse(jwt);
+        JWSHeader header = token.getHeader();
+        if (!JWSAlgorithm.RS256.equals(header.getAlgorithm())) fail();
+        String kid = header.getKeyID();
+        requireText(kid, 512);
+        if (header.getJWK() != null || header.getJWKURL() != null || header.getX509CertURL() != null
+                || (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty())) fail();
+        List<JWK> keys = JWKSet.parse(jwksJson).getKeys();
+        JWK selected = null;
+        for (JWK key : keys) {
+            if (kid.equals(key.getKeyID())) {
+                if (selected != null) fail();
+                selected = key;
+            }
+        }
+        if (!(selected instanceof RSAKey) || selected.isPrivate()) fail();
+        RSAKey rsa = (RSAKey) selected;
+        if (rsa.size() < 2048 || (rsa.getAlgorithm() != null && !JWSAlgorithm.RS256.equals(rsa.getAlgorithm()))
+                || (rsa.getKeyUse() != null && !KeyUse.SIGNATURE.equals(rsa.getKeyUse()))) fail();
+        Set<KeyOperation> operations = rsa.getKeyOperations();
+        if (operations != null && !operations.contains(KeyOperation.VERIFY)) fail();
+        if (!token.verify(new RSASSAVerifier(rsa))) fail();
+        JWTClaimsSet claims = token.getJWTClaimsSet();
+        if (!expectedIssuer.equals(claims.getIssuer())) fail();
+        List<String> audience = claims.getAudience();
+        if (audience == null || audience.size() != 1 || !clientId.equals(audience.get(0))) fail();
+        Object azp = claims.getClaim("azp");
+        if (azp != null && (!(azp instanceof String) || !clientId.equals(azp))) fail();
+        requireText(claims.getSubject(), 512);
+        Date exp = claims.getExpirationTime(), issued = claims.getIssueTime(), notBefore = claims.getNotBeforeTime();
+        long nowMillis = nowEpochSeconds * 1000;
+        if (exp == null || issued == null || exp.getTime() <= nowMillis
+                || issued.getTime() > (nowEpochSeconds + FUTURE_IAT_SKEW_SECONDS) * 1000
+                || issued.getTime() > exp.getTime()
+                || (notBefore != null && notBefore.getTime() > nowMillis)) fail();
+        return claims;
     }
 
     private static void requireText(String value, int maxLength) {

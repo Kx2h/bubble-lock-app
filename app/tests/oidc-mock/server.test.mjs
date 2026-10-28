@@ -14,7 +14,7 @@ async function listenPort() {
   const s = net.createServer(); await new Promise(r => s.listen(0, '127.0.0.1', r));
   const port = s.address().port; await new Promise(r => s.close(r)); return port;
 }
-async function fixture(run) {
+async function fixture(run, {refreshIdToken = false} = {}) {
   await mkdir(resolve(appRoot, 'build'), {recursive:true});
   const dir = await mkdtemp(resolve(appRoot, 'build/oidc-mock-'));
   let server;
@@ -23,7 +23,7 @@ async function fixture(run) {
     const [cert,key] = await Promise.all(['server.pem','server.key'].map(p => readFile(resolve(dir,p))));
     const port = await listenPort(), issuer = `https://localhost:${port}`;
     let clock = 1800000000;
-    server = createMockIdp({issuer, cert, key, now:() => clock});
+    server = createMockIdp({issuer, cert, key, refreshIdToken, now:() => clock});
     await new Promise((r,j) => server.once('error',j).listen(port,'127.0.0.1',r));
     const request = (path, {method='GET', body, trust=true}={}) => new Promise((done, reject) => {
       const req = https.request({hostname:'127.0.0.1', servername:'localhost', port, path, method, ...(trust ? {ca:cert} : {}), headers:body ? {'Content-Type':'application/x-www-form-urlencoded'} : {}}, res => {
@@ -154,3 +154,32 @@ test('rotation limit revokes the family rather than retaining a usable token', a
   assert.equal(limited.status,400); assert.equal(JSON.parse(limited.body).error,'invalid_grant');
   assert.equal((await request('/token',{method:'POST',body:refreshForm(current).toString()})).status,400);
 }));
+
+// Optional mode exercises OIDC Core refresh ID tokens; the default remains no ID token.
+test('optional refresh ID token is signed and preserves identity without nonce', async () => fixture(async ({request, issuer, advance}) => {
+  const initial = await offlineGrant(request, issuer);
+  advance(1);
+  const result = await request('/token', {method:'POST', body:refreshForm(initial.refresh_token).toString()});
+  assert.equal(result.status, 200);
+  const data = JSON.parse(result.body);
+  const [header, payload, signature] = data.id_token.split('.');
+  const claims = JSON.parse(Buffer.from(payload, 'base64url'));
+  assert.equal(claims.iss, issuer);
+  assert.equal(claims.sub, 'synthetic-test-user');
+  assert.equal(claims.aud, 'privacy-bubble-android-test');
+  assert.equal(claims.nonce, undefined);
+  const jwks = JSON.parse((await request('/jwks')).body);
+  const key = createPublicKey({key:jwks.keys[0], format:'jwk'});
+  assert.ok(verify('RSA-SHA256', Buffer.from(`${header}.${payload}`), key, Buffer.from(signature,'base64url')));
+}, {refreshIdToken:true}));
+
+// Explicit fault fixture for device validation; never a real identity provider.
+test('fault mode emits a signed refresh ID token with the wrong subject', async () => fixture(async ({request, issuer}) => {
+  const initial = await offlineGrant(request, issuer);
+  const result = await request('/token', {method:'POST', body:refreshForm(initial.refresh_token).toString()});
+  assert.equal(result.status, 200);
+  const [header, payload, signature] = JSON.parse(result.body).id_token.split('.');
+  assert.equal(JSON.parse(Buffer.from(payload,'base64url')).sub, 'synthetic-other');
+  const jwks = JSON.parse((await request('/jwks')).body);
+  assert.ok(verify('RSA-SHA256', Buffer.from(`${header}.${payload}`), createPublicKey({key:jwks.keys[0],format:'jwk'}), Buffer.from(signature,'base64url')));
+}, {refreshIdToken:'wrong-sub'}));

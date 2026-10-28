@@ -54,3 +54,5 @@ OIDC는 아직 로그인 UI나 토큰 교환에 연결되지 않았습니다. �
 기기에서 읽기 재시도를 재현할 때는 실제 중계를 중지하고 `node app/tests/fixtures/retry-mock.mjs`를 실행한 뒤 기존 reverse 연결로 상태 조회를 한 번 누릅니다. 이 fixture는 첫 GET에 503, 다음 GET에 200을 반환하는 모의 서버입니다. 완료 후 실행한 fixture를 종료합니다. 실제 Mobius4나 키링 데이터가 아닙니다.
 
 Debug·release APK를 모두 빌드한 다음 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 패키지된 네트워크 정책과 테스트 redirect receiver의 빌드별 분리를 확인할 수 있습니다.
+
+Debug 빌드의 `합성 동의 시험`은 인증 없는 고정 가상 요청에 한정한 PoC입니다. 시작·기기 포트 연결과 종료 방법은 [합성 consent 서버](tests/consent-mock/README.md)를 참고하세요. 응답이 유실되면 미확정으로 잠그고 동일 요청을 사용자가 재전송합니다. 화면 종료 또는 프로세스 재시작 뒤에는 미확정 요청을 복구하지 못합니다. 이 기능은 운영 동의·grant·ACP나 실제 사용자 권한을 만들지 않습니다.
