@@ -1,0 +1,476 @@
+{
+  "schemaVersion": "1.0.0",
+  "role": "APP",
+  "docRev": "2.0.0",
+  "kind": "synthetic-mobile-integration-demo",
+  "executedAt": "2026-10-29T01:41:07+09:00",
+  "sourceCommit": "3c6d71b351812784768b729dbee18a2138ea8e87",
+  "keyringCommit": "d233c0f7c445be7b7505a69582a8fb0f471c57c2",
+  "apkSha256": "ad34c07435bdae3ca31a012153e930e01ac081f6c65ce9bfcc4307fbb4301512",
+  "device": {
+    "androidVersion": "14",
+    "applicationPackage": "org.privacybubble.app",
+    "buildType": "debug"
+  },
+  "scope": {
+    "actual": "KEYRING SQLite journal/outbox and TransportHub -> temporary loopback mTLS MQTT adapters / CORE GatewayBridge -> isolated real Mobius4 CSE -> Android debug read-only UI",
+    "inputs": "fixed synthetic telemetry, observation, and terminal receipt",
+    "physicalPiBleKeyring": false,
+    "productionLoginAuthorizationOrAcp": false,
+    "commandDispatch": false,
+    "backgroundPush": false
+  },
+  "hostRun": {
+    "aeName": "app-bridge-1814b419261346c7",
+    "results": [
+      {
+        "method": "POST",
+        "status": 201,
+        "rsc": "2001",
+        "correlated": true
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "rsc": "2001",
+        "correlated": true
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "rsc": "2001",
+        "correlated": true
+      },
+      {
+        "method": "POST",
+        "status": 201,
+        "rsc": "2001",
+        "correlated": true
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "rsc": "2000",
+        "correlated": true
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "rsc": "2000",
+        "correlated": true
+      },
+      {
+        "syntheticObservation": "verified",
+        "requestStatus": 200
+      },
+      {
+        "syntheticReceipt": "verified",
+        "requestStatus": 200,
+        "source": "outbox"
+      },
+      {
+        "bridge": "APPLIED",
+        "update": {
+          "status": 200,
+          "rsc": "2004",
+          "correlated": true
+        },
+        "stateAfter": true,
+        "bootstrapLabelPresent": true,
+        "observation": "unknown",
+        "adapterStatus": 200,
+        "outbox": {
+          "offlineRetained": true,
+          "corePubackRemoved": true,
+          "otherObservationPending": false,
+          "observationsQueued": 1,
+          "observationSettled": true,
+          "receiptOfflineRetained": true,
+          "receiptJournalPreserved": true,
+          "receiptSettled": true,
+          "receiptDeliveryRecorded": true,
+          "commandDispatched": false,
+          "brokerIngress": 1,
+          "mtls": true,
+          "missingClientCertRejected": true,
+          "observationReadbackVerified": true,
+          "observationEvidence": {
+            "createHttp": 201,
+            "createRsc": 2001,
+            "createRiMatched": true,
+            "readHttp": 200,
+            "readRsc": 2000,
+            "readRiMatched": true,
+            "contentMatched": true
+          },
+          "receiptReadbackVerified": true,
+          "receiptEvidence": {
+            "createHttp": 201,
+            "createRsc": 2001,
+            "createRiMatched": true,
+            "readHttp": 200,
+            "readRsc": 2000,
+            "readRiMatched": true,
+            "contentMatched": true
+          },
+          "commandIngress": 0
+        }
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "rsc": "2000",
+        "correlated": true
+      },
+      {
+        "method": "DELETE",
+        "status": 200,
+        "rsc": "2002",
+        "correlated": true
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "rsc": "4004",
+        "correlated": true
+      },
+      {
+        "cleanup": "verified"
+      }
+    ]
+  },
+  "deviceRestoration": {
+    "capturedAt": "2026-10-28T16:43:15.175271+00:00",
+    "restoredApkSha256": "bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24",
+    "originalApkSha256": "bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24",
+    "reverseUnchanged": true,
+    "stayOnOriginal": "0",
+    "stayOnAfter": "0",
+    "ownedDeviceRecordingAndDumpRemoved": true,
+    "appDataCleared": false,
+    "appUninstalled": false,
+    "trustStoreChanged": false,
+    "rootRecheck": {
+      "existingCsePidPreserved": 62814,
+      "test8787ListenerClosed": true,
+      "reverse8787Unchanged": true
+    }
+  },
+  "recording": {
+    "file": "mobile-integration-demo.mp4",
+    "sha256": "8dd28fe23519942ec4ed462debd522e610e54a7e0d6f936b106e01cb41617e42",
+    "metadata": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 720,
+          "height": 1462,
+          "r_frame_rate": "15/1"
+        }
+      ],
+      "format": {
+        "duration": "84.866667",
+        "size": "889462"
+      }
+    },
+    "processing": {
+      "sourceSize": [
+        1080,
+        2316
+      ],
+      "crop": {
+        "x": 0,
+        "y": 80,
+        "width": 1080,
+        "height": 2194
+      },
+      "audio": false,
+      "cutsOrTimeAcceleration": false,
+      "systemBarsRemoved": true
+    },
+    "actionLog": [
+      {
+        "seconds": 0.12,
+        "at": "2026-10-28T16:41:07.521224+00:00",
+        "action": "recording started within MainActivity"
+      },
+      {
+        "seconds": 5.77,
+        "at": "2026-10-28T16:41:13.180097+00:00",
+        "action": "테스트 상태 조회"
+      },
+      {
+        "seconds": 11.19,
+        "at": "2026-10-28T16:41:18.594964+00:00",
+        "action": "verified: 테스트 상태: 켜짐"
+      },
+      {
+        "seconds": 21.7,
+        "at": "2026-10-28T16:41:29.104095+00:00",
+        "action": "합성 관측 조회 화면 열기"
+      },
+      {
+        "seconds": 26.19,
+        "at": "2026-10-28T16:41:33.598740+00:00",
+        "action": "합성 관측 조회"
+      },
+      {
+        "seconds": 31.6,
+        "at": "2026-10-28T16:41:39.006493+00:00",
+        "action": "verified: CSE에 마지막 저장된 합성 관측"
+      },
+      {
+        "seconds": 40.73,
+        "at": "2026-10-28T16:41:48.138361+00:00",
+        "action": "return to MainActivity"
+      },
+      {
+        "seconds": 45.36,
+        "at": "2026-10-28T16:41:52.765925+00:00",
+        "action": "합성 결과 조회 화면 열기"
+      },
+      {
+        "seconds": 49.93,
+        "at": "2026-10-28T16:41:57.335285+00:00",
+        "action": "합성 결과 조회"
+      },
+      {
+        "seconds": 55.32,
+        "at": "2026-10-28T16:42:02.724154+00:00",
+        "action": "verified: INDETERMINATE"
+      },
+      {
+        "seconds": 62.01,
+        "at": "2026-10-28T16:42:09.411504+00:00",
+        "action": "scroll receipt details within app"
+      },
+      {
+        "seconds": 69.55,
+        "at": "2026-10-28T16:42:16.953703+00:00",
+        "action": "자동 조회 시작"
+      },
+      {
+        "seconds": 83.94,
+        "at": "2026-10-28T16:42:31.342354+00:00",
+        "action": "verified: 표시 내용 변화 없음"
+      },
+      {
+        "seconds": 86.45,
+        "at": "2026-10-28T16:42:33.856031+00:00",
+        "action": "자동 조회 중지"
+      },
+      {
+        "seconds": 86.45,
+        "at": "2026-10-28T16:42:33.857226+00:00",
+        "action": "read-only automatic query stopped"
+      },
+      {
+        "seconds": 86.55,
+        "at": "2026-10-28T16:42:33.954166+00:00",
+        "action": "recording completed within SyntheticReceiptActivity"
+      },
+      {
+        "seconds": 86.8,
+        "at": "2026-10-28T16:42:34.208622+00:00",
+        "action": "recording copied to workspace"
+      }
+    ],
+    "sourceSha256": "47eff1f421db9c9a0fb5cc2eb279418968fcc69d6d245142fe89e328b0daa35a",
+    "privacyReview": {
+      "foregroundCheckedThroughout": true,
+      "contactSheetSeconds": [
+        0,
+        12,
+        24,
+        36,
+        48,
+        60,
+        72,
+        84
+      ],
+      "reviewedBy": "APP and coordinating agent",
+      "visible": "APP UI, fixed example.org hint, synthetic IDs and values; generic system edge handle remains",
+      "homeOrNotificationsSeen": false,
+      "realEndpointSeen": false,
+      "approvedForEvidenceCopy": true
+    }
+  },
+  "presentationLimit": "APP test-scope screen recording only. Does not complete physical Raspberry Pi integration evidence or production release gates.",
+  "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029",
+  "artifactRef": [
+    "app/evidence/mobile-integration-demo.mp4",
+    "app/evidence/mobile-integration-demo.md",
+    "app/evidence/mobile-integration-demo.receipt.json",
+    "app/evidence/mobile-integration-demo.host.log",
+    "app/evidence/mobile-integration-demo.SHA256SUMS"
+  ],
+  "executionLog": {
+    "file": "app/evidence/mobile-integration-demo.host.log",
+    "sha256": "cb4402e023a56e2577f257fee5c1858430922916b8c2be1baf154f569f995a8e",
+    "bytes": 1890,
+    "provenance": "Unchanged combined host stdout/stderr captured by tee for the interactive --phone run. Contains test AE name, ready message and final JSON only. No credentials or device serial.",
+    "hostRunProvenance": "hostRun is the parsed final JSON object from this original log. hostRun.results preserves every original result in the same order; only JSON formatting differs."
+  },
+  "expectedActualChecks": [
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-01",
+      "check": "Real team journal/outbox sends only fixed synthetic inputs",
+      "expected": {
+        "commandDispatched": false,
+        "commandIngress": 0,
+        "mtls": true,
+        "missingClientCertRejected": true
+      },
+      "actual": {
+        "commandDispatched": false,
+        "commandIngress": 0,
+        "mtls": true,
+        "missingClientCertRejected": true
+      },
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-02",
+      "check": "Receipt journal/pending survive offline reopen, then delivery is recorded",
+      "expected": {
+        "receiptOfflineRetained": true,
+        "receiptJournalPreserved": true,
+        "receiptSettled": true,
+        "receiptDeliveryRecorded": true
+      },
+      "actual": {
+        "receiptOfflineRetained": true,
+        "receiptJournalPreserved": true,
+        "receiptSettled": true,
+        "receiptDeliveryRecorded": true
+      },
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-03",
+      "check": "Observation and receipt CREATE/readback have correct RI/RSC and identical content",
+      "expected": {
+        "createHttp": 201,
+        "createRsc": "2001",
+        "createRiMatched": true,
+        "readHttp": 200,
+        "readRsc": "2000",
+        "readRiMatched": true,
+        "contentMatched": true
+      },
+      "actual": {
+        "observation": {
+          "createHttp": 201,
+          "createRsc": 2001,
+          "createRiMatched": true,
+          "readHttp": 200,
+          "readRsc": 2000,
+          "readRiMatched": true,
+          "contentMatched": true
+        },
+        "receipt": {
+          "createHttp": 201,
+          "createRsc": 2001,
+          "createRiMatched": true,
+          "readHttp": 200,
+          "readRsc": 2000,
+          "readRiMatched": true,
+          "contentMatched": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-04",
+      "check": "Android reads state, last stored synthetic observation, and indeterminate receipt",
+      "expected": [
+        "state true with physical observation unconfirmed",
+        "last stored synthetic observation",
+        "INDETERMINATE / INVALID_RECEIPT / unknown acceptance, application and GPIO readback",
+        "unchanged display content during foreground automatic read"
+      ],
+      "actual": [
+        "state read verified at 11.19s",
+        "synthetic observation verified at 31.60s",
+        "INDETERMINATE verified at 55.32s and receipt fields visible in reviewed keyframes",
+        "unchanged display verified at 83.94s; automatic read stopped at 86.45s after recording"
+      ],
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-05",
+      "check": "Delete only owned AE and verify absence",
+      "expected": {
+        "deleteHttp": 200,
+        "deleteRsc": "2002",
+        "getHttp": 404,
+        "getRsc": "4004",
+        "correlated": true,
+        "cleanup": "verified"
+      },
+      "actual": {
+        "delete": {
+          "method": "DELETE",
+          "status": 200,
+          "rsc": "2002",
+          "correlated": true
+        },
+        "get": {
+          "method": "GET",
+          "status": 404,
+          "rsc": "4004",
+          "correlated": true
+        },
+        "cleanup": "verified"
+      },
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-06",
+      "check": "Restore device and preserve existing CSE/reverse",
+      "expected": {
+        "apkHashMatches": true,
+        "reverseUnchanged": true,
+        "stayOn": "0",
+        "ownedFilesRemoved": true,
+        "appDataCleared": false,
+        "trustStoreChanged": false,
+        "test8787ListenerClosed": true,
+        "existingCsePreserved": true
+      },
+      "actual": {
+        "apkHashMatches": true,
+        "reverseUnchanged": true,
+        "stayOn": "0",
+        "ownedFilesRemoved": true,
+        "appDataCleared": false,
+        "trustStoreChanged": false,
+        "test8787ListenerClosed": true,
+        "existingCsePreserved": true
+      },
+      "passed": true
+    },
+    {
+      "testId": "APP-MOBILE-SYNTHETIC-OUTBOX-DEMO-20261029-07",
+      "check": "Video readable and scoped to reviewed app UI",
+      "expected": {
+        "fullDecodeSucceeded": true,
+        "durationSecondsAtMost": 120,
+        "homeOrNotificationsSeen": false,
+        "realEndpointSeen": false
+      },
+      "actual": {
+        "fullDecodeSucceeded": true,
+        "durationSeconds": 84.866667,
+        "homeOrNotificationsSeen": false,
+        "realEndpointSeen": false
+      },
+      "passed": true
+    }
+  ],
+  "performer": "APP",
+  "reviewer": "APP (coordinating/root agent; contact sheet review)",
+  "releaseGateStatus": "not-evaluated",
+  "gateNote": "This is a scoped synthetic integration artifact, with no official release gate ID or gate approval assigned."
+}
