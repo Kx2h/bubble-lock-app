@@ -36,6 +36,7 @@ public final class AuthenticatedConsentActivity extends Activity {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Runnable reviewTick = this::checkReview;
+    private final Runnable expiryTick = this::render;
     private SharedPreferences preferences;
     private OidcBrowserFlow flow;
     private OidcBrowserFlow.Session session;
@@ -43,7 +44,7 @@ public final class AuthenticatedConsentActivity extends Activity {
     private CheckBox choice;
     private Button login, logout, load, approve, revoke, retry, discard;
     private volatile boolean destroyed;
-    private boolean busy, known, active, uncertain, storageFailure;
+    private boolean busy, known, active, uncertain, storageFailure, resumed;
     private int revision;
     private String instance;
     private Pending pending;
@@ -86,7 +87,26 @@ public final class AuthenticatedConsentActivity extends Activity {
     private Button button(LinearLayout layout, String text, android.view.View.OnClickListener listener) {
         Button b = new Button(this); b.setText(text); b.setAllCaps(false); b.setOnClickListener(listener); layout.addView(b); return b;
     }
+    @Override protected void onResume() {
+        super.onResume();
+        resumed = true;
+        render();
+    }
+    @Override protected void onPause() {
+        resumed = false;
+        main.removeCallbacks(expiryTick);
+        super.onPause();
+    }
     private void render() {
+        main.removeCallbacks(expiryTick);
+        if (known && active && current != null && ConsentGrantExpiry.needsServerCheck(
+                System.currentTimeMillis(), Instant.parse(current.expires).toEpochMilli())) {
+            // Device time only prompts a fresh server read; it cannot revoke or establish a grant.
+            known = false; review = null; main.removeCallbacks(reviewTick);
+            choice.setChecked(false);
+            status.setText("기기 시간상 합성 유효기간 경과 · 서버 상태를 다시 확인하세요"
+                    + (uncertain ? "\n이전 합성 처리 결과 미확정 · 새 변경 차단" : ""));
+        }
         if (review != null && !reviewMatches(review, current)) {
             review = null; main.removeCallbacks(reviewTick); choice.setChecked(false);
             status.setText("합성 검토 확인 만료 또는 상태 변경 · 다시 조회하고 확인하세요");
@@ -101,6 +121,7 @@ public final class AuthenticatedConsentActivity extends Activity {
         revoke.setEnabled(!busy && loggedIn && known && active && !uncertain && choice.isChecked() && review != null);
         retry.setEnabled(!busy && loggedIn && uncertain && pending != null && choice.isChecked());
         discard.setEnabled(!busy && (uncertain || storageFailure));
+        if (resumed && known && active && !destroyed) main.postDelayed(expiryTick, 1000);
     }
     private void checkReview() { if (destroyed || review == null) return; render(); if (review != null) main.postDelayed(reviewTick, 1000); }
     private static boolean reviewMatches(ConsentReviewGate review, Snapshot snapshot) {
@@ -264,6 +285,6 @@ public final class AuthenticatedConsentActivity extends Activity {
     private static final class Snapshot { final String instance,status,expires; final int revision; Snapshot(String i,String s,int r,String e) { instance=i;status=s;revision=r;expires=e; } }
     private static final class Pending { final String endpoint,body,instance,key,correlation; final boolean approving; final ConsentReviewGate review; boolean dispatched; Pending(String e,String b,String i,boolean a,ConsentReviewGate r) { endpoint=e;body=b;instance=i;approving=a;review=r;key=UUID.randomUUID().toString();correlation=UUID.randomUUID().toString(); } }
     @Override protected void onDestroy() {
-        destroyed = true; main.removeCallbacks(reviewTick); if (flow != null) flow.close(); if (session != null) session.close(); worker.shutdownNow(); super.onDestroy();
+        destroyed = true; main.removeCallbacks(reviewTick); main.removeCallbacks(expiryTick); if (flow != null) flow.close(); if (session != null) session.close(); worker.shutdownNow(); super.onDestroy();
     }
 }
