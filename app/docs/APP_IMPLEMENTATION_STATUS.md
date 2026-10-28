@@ -13,6 +13,8 @@ APP 운영 산출물은 아직 완료되지 않았다. 현재 구현은 Guardian
 
 근거: [앱 범위](../README.md), [메인 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java), [빌드 구분](../app/build.gradle), [release manifest](../app/src/release/AndroidManifest.xml), [OIDC 검증 경계](OIDC_TRUST_BOUNDARY.md), [API 전송 경계](API_TRANSPORT.md).
 
+후속 수정으로 미연결 서버 설정의 입력 초안·선택 범위·피드백을 역할 전환과 화면 재생성에 전달한다. 공기계에서 초안 유지·명시 저장/삭제·재실행을 확인했고 [12개 기기 확인과 복원 기록](../evidence/settings-draft-device.md)에 범위와 해시를 고정했다. 주소의 실제 API 요청 연결은 여전히 남아 있다.
+
 ## 요구별 상태
 
 아래의 “남은 구현”은 APP 담당의 실제 개발 잔여분이다. 계약이 없다는 사유로 이 개발까지 완료 처리하지 않는다. “필수 인수 계약”의 C 번호는 다음 절과 연결한다.
@@ -65,7 +67,7 @@ APP 운영 산출물은 아직 완료되지 않았다. 현재 구현은 Guardian
 
 ## 공개 저장소·제출 상태
 
-로컬 별도 브랜치 `feature/app`는 존재한다. [Kx2h/bubble-lock-app](https://github.com/Kx2h/bubble-lock-app) 공개 저장소는 생성되었으나, 현재 작업 세션의 코드 푸시는 HTTP 403으로 실패해 코드가 업로드되지 않은 상태다. 저장소 접근 및 Contents 쓰기 권한을 확인해야 한다. 저장소 생성만으로 APP 코드 공개·원격 브랜치·release SHA·재현 가능한 제출을 완료 처리하지 않는다. 토큰 값은 문서·코드·증거에 포함하지 않는다. 이 상태는 현재 세션의 확인 결과이며 권한이나 원격 상태가 바뀌면 다시 확인해야 한다.
+로컬 별도 브랜치 `feature/app`는 존재한다. 2026-10-29 Git 권한 변경 후 [Kx2h/bubble-lock-app](https://github.com/Kx2h/bubble-lock-app) 공개 저장소의 `main`·`feature/app`에 APP 이력을 업로드했고, 두 원격 브랜치에 `791acfc`가 포함됨을 확인했다. 이후 APP 변경은 `app-public/feature/app`을 추적한다. 원본 `tirofina/bubble_lock`의 `feature/app` 푸시는 같은 시점에도 HTTP 403으로 거절되므로 원본 팀 저장소 반영은 남아 있다. 공개 업로드는 운영 기능·공식 release gate 완료를 뜻하지 않는다. 토큰 값은 문서·코드·증거에 포함하지 않는다.
 
 발표용 [합성 화면 녹화와 receipt](../evidence/mobile-integration-demo.md)는 APP 소스 `3c6d71b`의 debug APK를 기준으로 고정했다. APK·영상 hash와 시험·정리 범위는 해당 receipt에 연결한다. 이 영상이 실제 사용자 승인과 실물 기기 명령의 운영 통합을 완료시키지는 않는다.
 
@@ -75,6 +77,6 @@ APP 운영 산출물은 아직 완료되지 않았다. 현재 구현은 Guardian
 2. 운영 로그인/역할/등록과 실제 consent/grant를 앱에 연결한다. 합성 Activity를 운영 경로로 표시하거나 임의 endpoint를 만들어 이 단계를 대체하지 않는다.
 3. 승인 intent와 실제 incident/Group command·receipt를 연결하고, 회수·만료·미확정 결과를 같은 서버 계약으로 처리한다.
 4. 실제 상태/위치/handover/FL와 알림을 연결한 뒤 C9의 정상·거절·회수·재전송 기기 통합시험과 증거를 고정한다.
-5. 쓰기 가능한 Git 인증으로 검토된 commit을 공개 저장소에 push하고 원격 SHA를 확인한다. 녹화·release·재현 절차와 코드 commit을 같은 제출 기록에 연결한다.
+5. 검토된 변경을 공개 저장소에 push하고 원격 SHA를 확인한다. 원본 팀 저장소 반영과 공식 release는 별도 인수·통합 검증 뒤 진행하며 녹화·release·재현 절차와 코드 commit을 같은 제출 기록에 연결한다.
 
 운영 계약이 없는 동안 실제 기능 연결은 막혀 있으나 APP 구현 잔여분은 그대로 남는다. 추가 합성 기능이나 screenshot 수 증가를 이 요구들의 완료 조건으로 사용하지 않는다.

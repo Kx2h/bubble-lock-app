@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "testId": "APP-SETTINGS-DRAFT-DEVICE-20261029",
+  "role": "APP",
+  "docRev": "2.0.0",
+  "kind": "server-settings-lifecycle-device",
+  "recordedAt": "2026-10-28T18:21:03.150072+00:00",
+  "performer": "APP",
+  "reviewer": "APP independent source review",
+  "releaseGateStatus": "not-evaluated",
+  "appSourceCommit": "8c3e30c33927b1a74498b2531d21a2124f35350c",
+  "wrapperCommit": "e2010029f2432f3002ebeedaee8e9d13efa995d8",
+  "sourceFileSha256": "db55f1ed086e28f675da9189b40d93ecad1a9581cc692f3c42ce766a781efa0e",
+  "apkSha256": "24db8503401e7cd882f5c787c2076b2da7301954a2b55be1001a6fe3e865f1f8",
+  "apkBuiltBeforeSourceCommit": true,
+  "device": {
+    "androidVersion": "14",
+    "applicationPackage": "org.privacybubble.app",
+    "buildType": "debug"
+  },
+  "scope": {
+    "addressUsed": "https://draft.example.org/v1",
+    "addressUsedForNetworkRequests": false,
+    "productionLoginOrAuthorization": false,
+    "cseOrKeyringModified": false
+  },
+  "baselineChecks": [
+    {
+      "name": "old APK loses unsaved draft on role change",
+      "expected": "",
+      "actual": "",
+      "passed": true
+    }
+  ],
+  "logArtifactRef": "settings-draft-device.checks.json",
+  "logSha256": "582cc9ec3ecad5a03922bd46bf58f1dfffb761c9890ca83fdc3aa91e0901b897",
+  "checksPassed": 12,
+  "build": {
+    "debug": "passed",
+    "release": "passed",
+    "isolation": "passed: default debug excludes opt-in synthetic CA/Activity; release rejects cleartext and test Activities",
+    "warnings": [
+      "AGP 8.5.2 tested through compileSdk 34; compileSdk 35 used",
+      "SDK XML v4 read by tools supporting through v3"
+    ]
+  },
+  "wrapperRestoreCheck": {
+    "command": "app/scripts/adb-windows.sh -s <serial> install -r <absolute-linux-path-to-readable-apk>",
+    "expected": "APK path converted and install succeeds",
+    "actual": "Performing Streamed Install; Success",
+    "passed": true,
+    "privateBackupDirectoryReadableByWindows": false,
+    "apkOnlyStagedInReadableWorkspaceDirectory": true
+  },
+  "restoration": {
+    "at": "2026-10-28T18:19:54.818910+00:00",
+    "originalApkSha256": "bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24",
+    "restoredApkSha256": "bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24",
+    "preferencesRestored": true,
+    "originalConnectionPrefsExisted": false,
+    "rotationBefore": {
+      "accelerometer_rotation": "0",
+      "user_rotation": "0"
+    },
+    "rotationAfter": {
+      "accelerometer_rotation": "0",
+      "user_rotation": "0"
+    },
+    "reverseUnchanged": true,
+    "stayOnUnchanged": true,
+    "ownedDeviceXmlRemoved": true,
+    "ownedHostApkStagingRemoved": true,
+    "appUninstalled": false,
+    "appDataCleared": false,
+    "systemOrBrowserTrustChanged": false
+  },
+  "limits": [
+    "Cursor selection indices were source-reviewed; no instrumented cursor or IME assertion was performed.",
+    "No operational API, authentication, grant, command, physical keyring, or push was exercised."
+  ]
+}

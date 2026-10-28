@@ -1,0 +1,74 @@
+[
+  {
+    "name": "unsaved draft survives role change",
+    "expected": "https://draft.example.org/v1",
+    "actual": "https://draft.example.org/v1",
+    "passed": true
+  },
+  {
+    "name": "unsaved draft survives landscape recreation",
+    "expected": "https://draft.example.org/v1",
+    "actual": "https://draft.example.org/v1",
+    "passed": true
+  },
+  {
+    "name": "unsaved draft survives portrait recreation",
+    "expected": "https://draft.example.org/v1",
+    "actual": "https://draft.example.org/v1",
+    "passed": true
+  },
+  {
+    "name": "unsaved draft not persisted after force-stop",
+    "expected": "",
+    "actual": "",
+    "passed": true
+  },
+  {
+    "name": "invalid HTTP address rejected",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "validation feedback survives role change",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "explicit save confirmed",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "save feedback survives role change",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "explicit saved address survives restart",
+    "expected": "https://draft.example.org/v1",
+    "actual": "https://draft.example.org/v1",
+    "passed": true
+  },
+  {
+    "name": "explicit delete confirmed",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "delete feedback survives role change",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "name": "explicit delete survives restart",
+    "expected": "",
+    "actual": "",
+    "passed": true
+  }
+]
