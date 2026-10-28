@@ -55,6 +55,7 @@ for (const mode of ['direct', 'mqtt', 'mqtt-reconnect', 'mqtt-keyring', 'mqtt-ke
       if (req.url === `/Mobius/${aeName}` && req.method === 'DELETE') { removed = true; return reply(200,'2002',{}); }
       if (req.url === `/Mobius/${aeName}` && req.method === 'GET') return removed ? reply(404,'4004',{}) : reply(200,'2000',{'m2m:ae':{rn:aeName,ri:'Cabc123'}});
       if (req.url === `/Mobius/${aeName}/observations` && req.method === 'POST') { observation = body['m2m:cin']; return reply(201,'2001',{'m2m:cin':observation}); }
+      if (observation && req.url === `/Mobius/${aeName}/observations/la` && req.method === 'GET') return reply(200,'2000',{'m2m:cin':observation});
       if (observation && req.url === `/Mobius/${aeName}/observations/${observation.rn}` && req.method === 'GET') return reply(200,'2000',{'m2m:cin':observation});
       if (req.url === `/Mobius/${aeName}/bubbleState` && req.method === 'PUT') { puts++; state = body['pb:binarySwitch'].state; return reply(200,'2004',{}); }
       if (req.url === `/Mobius/${aeName}/bubbleState` && req.method === 'GET') return reply(200,'2000',{'pb:binarySwitch':{rn:'bubbleState',cnd:'org.onem2m.common.moduleclass.binarySwitch',state,lbl:['unobserved']}});

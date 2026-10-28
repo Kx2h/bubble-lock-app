@@ -128,7 +128,30 @@ test('does not expose a general proxy or write endpoint', async () => {
   await withServer(async () => { throw new Error('unexpected'); }, async base => {
     assert.equal((await fetch(`${base}/api/test/bubble-state`, { method: 'POST' })).status, 404);
     assert.equal((await fetch(`${base}/api/test/bubble-state?url=example`)).status, 404);
+    assert.equal((await fetch(`${base}/api/test/observation`)).status, 404);
   });
+});
+test('synthetic observation is isolated, read-only and fails closed', async () => {
+  assert.throws(() => createServer({enableSyntheticObservation:true}), /isolated test AE/);
+  let mode = 'valid';
+  const expected = {version:1,gatewayId:'app-isolated',deviceId:'synthetic-keyring',bootId:'synthetic-boot',sequence:1,
+    observedAt:'2026-01-01T00:00:00Z',receivedAt:'2026-01-01T00:00:00Z',timestampSource:'gateway-received',state:true,battery:null,rssi:null};
+  const server = createServer({testAeName:'app-bridge-0123456789abcdef',enableSyntheticObservation:true,fetchImpl:async (url,options) => {
+    assert.equal(url,'http://127.0.0.1:7599/Mobius/app-bridge-0123456789abcdef/observations/la');
+    if (mode === 'missing') return new Response('',{status:404});
+    const headers = {'X-M2M-RI':mode === 'wrong-ri' ? 'wrong' : options.headers['X-M2M-RI'],'X-M2M-RSC':mode === 'wrong-rsc' ? '4000' : '2000'};
+    const observation = {...expected,...(mode === 'wrong-device' ? {deviceId:'real-device'} : {}),...(mode === 'bad-rssi' ? {rssi:200} : {}),...(mode === 'bad-time' ? {observedAt:'2026-02-30T00:00:00Z'} : {})};
+    return new Response(JSON.stringify({'m2m:cin':{rn:mode === 'wrong-rn' ? 'other' : 'gw-'+'a'.repeat(64),con:observation}}),{headers});
+  }});
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    let response=await fetch(`${base}/api/test/observation`); assert.equal(response.status,200);
+    let body=await response.json(); assert.equal(body.mode,'synthetic'); assert.equal(body.battery,null); assert.equal(body.rssi,null);
+    for (mode of ['missing','wrong-ri','wrong-rsc','wrong-device','wrong-rn','bad-rssi','bad-time']) { response=await fetch(`${base}/api/test/observation`); assert.equal(response.status,502); body=await response.json(); assert.equal(body.state,undefined); }
+    assert.equal((await fetch(`${base}/api/test/observation?x=1`)).status,404);
+    assert.equal((await fetch(`${base}/api/test/observation`,{method:'POST'})).status,404);
+  } finally { await new Promise(resolve=>server.close(resolve)); }
 });
 test('reports an unavailable upstream', async () => {
   await withServer(async () => { throw new Error('offline'); }, async base => {

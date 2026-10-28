@@ -77,11 +77,17 @@ try {
   ok(after,200,'2000');
   const expectedState = !reconnect;
   if (after.parsed?.['pb:binarySwitch']?.state !== expectedState) throw Error('Updated state absent');
-  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName});
+  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName,enableSyntheticObservation:verifyObservation});
   await new Promise((resolve,reject)=>proxy.once('error',reject).listen(phone ? 8787 : 0,'127.0.0.1',resolve));
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
   if (answer.status !== 200 || value.state !== expectedState || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
+  if (verifyObservation) {
+    const observation = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/observation`);
+    const payload = await observation.json();
+    if (observation.status !== 200 || payload.mode !== 'synthetic' || payload.deviceId !== 'synthetic-keyring' || payload.timestampSource !== 'gateway-received') throw Error('APP adapter did not retrieve the synthetic CIN');
+    results.push({syntheticObservation:'verified',requestStatus:observation.status});
+  }
   results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {}), ...(outboxEvidence ? {outbox:outboxEvidence} : {}), ...(projection ? {keyring:{nullMeasurementsSkipped:projection.nullMeasurementsSkipped,duplicateSkipped:projection.duplicateSkipped,reopenPreserved:projection.reopenPreserved,wireSequences:projection.wireSequences}} : {})});
   if (phone) {
     console.log(JSON.stringify({ready:true, aeName, port:8787, note:'Press Enter to clean up the test AE.'}));

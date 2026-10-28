@@ -56,10 +56,11 @@ function httpsRead(url, headers, tls) {
 }
 
 // Local, read-only adapter for the PC-MOBIUS-CORE v1 test contract.
-export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', fetchImpl = fetch, tls } = {}) {
+export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', enableSyntheticObservation = false, fetchImpl = fetch, tls } = {}) {
   const base = new URL(mobiusUrl);
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) throw new Error('Invalid Mobius URL');
   if (typeof testAeName !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(testAeName)) throw new Error('Invalid test AE name');
+  if (typeof enableSyntheticObservation !== 'boolean' || (enableSyntheticObservation && !/^app-bridge-[a-f0-9]{16}$/.test(testAeName))) throw new Error('Synthetic observation requires an isolated test AE');
   if (base.protocol === 'https:' && (!tls?.ca || !tls?.cert || !tls?.key)) throw new Error('HTTPS requires CA, client certificate and key');
   if (base.protocol === 'http:' && tls) throw new Error('Client TLS credentials require HTTPS');
   const url = `${base.href.replace(/\/$/, '')}/${testAeName}/bubbleState`;
@@ -67,15 +68,17 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
     const send = (status, payload) => { res.writeHead(status); res.end(JSON.stringify(payload)); };
-    if (req.method !== 'GET' || req.url !== '/api/test/bubble-state') return send(404, { error: 'not_found' });
+    const observationRequest = enableSyntheticObservation && req.url === '/api/test/observation';
+    if (req.method !== 'GET' || (req.url !== '/api/test/bubble-state' && !observationRequest)) return send(404, { error: 'not_found' });
     const requestId = `app-test-${randomUUID()}`;
     const headers = { Accept: 'application/json', 'X-M2M-RVI': '4', 'X-M2M-Origin': originator, 'X-M2M-RI': requestId };
     try {
       let response;
       if (base.protocol === 'https:') {
-        response = await httpsRead(url, headers, tls);
+        response = await httpsRead(observationRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/observations/la` : url, headers, tls);
       } else {
-        const upstream = await fetchImpl(url, { headers, signal: AbortSignal.timeout(5000), redirect: 'error' });
+        const target = observationRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/observations/la` : url;
+        const upstream = await fetchImpl(target, { headers, signal: AbortSignal.timeout(5000), redirect: 'error' });
         response = { status: upstream.status, body: await readBounded(upstream.body), requestId: upstream.headers.get('x-m2m-ri'), resultCode: upstream.headers.get('x-m2m-rsc') };
       }
       if (response.status !== 200) return send(502, { mode: 'test', error: 'mobius_http_error', upstreamStatus: response.status, requestId });
@@ -85,6 +88,20 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
       let data;
       try { data = JSON.parse(response.body.toString('utf8')); }
       catch { return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId }); }
+      if (observationRequest) {
+        const cin = data?.['m2m:cin']; const o = cin?.con;
+        if (!cin || typeof cin.rn !== 'string' || !/^gw-[a-f0-9]{64}$/.test(cin.rn) || !o || typeof o !== 'object' || Array.isArray(o)
+            || o.version !== 1 || o.gatewayId !== 'app-isolated' || o.deviceId !== 'synthetic-keyring' || o.bootId !== 'synthetic-boot'
+            || !Number.isInteger(o.sequence) || o.sequence < 0 || o.sequence > 4294967295 || o.observedAt !== '2026-01-01T00:00:00Z' || o.receivedAt !== '2026-01-01T00:00:00Z'
+            || o.timestampSource !== 'gateway-received' || typeof o.state !== 'boolean'
+            || !(o.rssi === null || (Number.isInteger(o.rssi) && o.rssi >= -127 && o.rssi <= 20))
+            || !(o.battery === null || (typeof o.battery === 'number' && Number.isFinite(o.battery) && o.battery >= 0 && o.battery <= 100))) {
+          return send(502, { mode: 'test', error: 'invalid_synthetic_observation', requestId });
+        }
+        return send(200, { mode: 'synthetic', gatewayId: o.gatewayId, deviceId: o.deviceId, sequence: o.sequence,
+          observedAt: o.observedAt, receivedAt: o.receivedAt, timestampSource: o.timestampSource,
+          state: o.state, rssi: o.rssi, battery: o.battery, requestId });
+      }
       const resource = data?.['pb:binarySwitch'];
       const state = resource?.state;
       // A boolean alone is not enough to establish that the returned resource

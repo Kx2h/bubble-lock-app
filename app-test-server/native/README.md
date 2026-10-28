@@ -76,6 +76,8 @@ git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7
 
 이 시험은 KEYRING 코드의 validator·SQLite·projection을 호출하지만 전체 Gateway daemon이나 outbox의 실제 전송 루프는 실행하지 않는다. Node 합성 송신자가 projection을 읽어 MQTT로 전달한다. `--mqtt-reconnect`는 두 번째 projection을 KEYRING 코드에서 생성하지 않으므로 `--keyring`과 함께 사용할 수 없다. 실제 BLE, Pi, 키링, 배터리·RSSI 관측, 인증 및 운영 권한의 증거가 아니다. checkout이 없는 경우 별도 단위시험은 skip되지만 `--keyring` 실경로 시험은 CSE 자원 생성 전에 실패한다.
 
+`--mqtt --keyring-outbox --observation-cin --phone` 시험에서는 같은 격리 AE의 `observations/la`를 읽는 합성 관측 화면을 사용할 수 있다. 중계는 이 시험에 한해 고유 `app-bridge-<16 hex>` AE와 고정된 합성 기기·Gateway·시간 fixture만 허용하며 HTTP/RSC·요청 ID와 CIN 이름을 확인한다. 화면의 관측·배터리·RSSI는 합성 값이다. 마지막 저장 순서는 기기의 실제 최신 상태나 관측 시간 순서를 증명하지 않고 RSSI는 거리가 아니다. 빈 container, 식별자 불일치 또는 통신 오류는 값을 추정하지 않고 조회 실패로 표시한다. 기본 중계에는 이 조회 경로가 없다.
+
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
 
 `--mqtt --keyring-outbox --observation-cin`은 고유 AE 아래 시험용 `observations` container를 추가하고 KEYRING 원본 관측 outbox도 확인한다. 별도 mTLS MQTT 시험 어댑터는 해당 container의 CREATE만 실제 loopback CSE HTTP에 전달하며, CSE의 CREATE HTTP 201/RSC 2001/요청 ID와 별도 RETRIEVE HTTP 200/RSC 2000/요청 ID 및 CIN 이름·내용 일치를 확인한 후에만 같은 MQTT 요청 ID로 성공 응답을 보낸다. 이후 팀 Gateway의 SQLite outbox에서 해당 항목이 제거되는지 검사한다. 오류나 불일치에는 성공 응답을 보내지 않는다. CORE telemetry는 별도 경로로 이전과 같이 검증한다.

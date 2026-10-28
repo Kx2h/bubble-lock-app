@@ -20,7 +20,7 @@ final class TestStateClient {
     }
 
     TestStateClient(URL endpoint, long retryDelayMillis, long budgetMillis) {
-        if (!"http".equals(endpoint.getProtocol()) || !"127.0.0.1".equals(endpoint.getHost()) || endpoint.getUserInfo() != null || endpoint.getQuery() != null || endpoint.getRef() != null || !"/api/test/bubble-state".equals(endpoint.getPath())) {
+        if (!"http".equals(endpoint.getProtocol()) || !"127.0.0.1".equals(endpoint.getHost()) || endpoint.getUserInfo() != null || endpoint.getQuery() != null || endpoint.getRef() != null || !("/api/test/bubble-state".equals(endpoint.getPath()) || "/api/test/observation".equals(endpoint.getPath()))) {
             throw new IllegalArgumentException("Only the local test adapter is supported");
         }
         if (retryDelayMillis < 0 || retryDelayMillis > 1000) throw new IllegalArgumentException("Invalid retry delay");

@@ -129,6 +129,11 @@ public final class MainActivity extends Activity {
             testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
             testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);
             testAutoButton = button("자동 갱신 시작", v -> testState.toggleAutomatic()); body.addView(testAutoButton);
+            body.addView(button("합성 관측 조회 화면 열기", v -> {
+                android.content.Intent intent = new android.content.Intent();
+                intent.setClassName(this, "org.privacybubble.app.SyntheticObservationActivity");
+                startActivity(intent);
+            }));
             renderTestState();
         }
     }
