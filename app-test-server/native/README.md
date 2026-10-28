@@ -37,7 +37,7 @@ Bootstrap은 KEYRING 시험 구성의 AE와 ty=28 `pb:binarySwitch`를 생성하
 "$WORKSPACE/.local/node/bin/node" --test app-test-server/native/core-app-bridge-check.test.mjs app-test-server/server.test.mjs
 # 휴대폰으로 조회할 때: 8787 포트가 비어 있고 해당 기기의 reverse가 준비된 경우에만
 "$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --phone
-# ready 출력 뒤 기기에서 상태 조회하고, 터미널에서 Enter를 눌러 정리한다.
+# stdin이 열린 터미널에서 ready 출력 뒤 기기 조회를 수행하고 Enter를 눌러 정리한다.
 ```
 
 기본 주소가 아닌 격리 CSE는 `APP_CORE_TEST_CSE_URL=http://127.0.0.1:<port>/Mobius`로 지정한다. HTTP loopback만 허용한다. 스크립트는 AE 생성 요청 직전에 고유 이름을 출력한다. 생성 응답이 유실되거나 신원이 맞지 않으면 `cleanup: manual-review`를 출력하고 자동 삭제하지 않는다. 강제 종료 시에도 자동 삭제를 보장하지 않으므로 출력의 AE 이름과 CSE 상태를 직접 확인하고, 소유권이 확정되지 않으면 다른 자원을 삭제하지 않는다. `--phone`은 기존 reverse를 생성·삭제하지 않으며 이미 사용 중인 8787 포트를 덮어쓰지 않는다. 실패 시 종료 코드는 0이 아니고 `cleanup` 결과를 확인해야 한다. 실기기 결과는 [APP 증거](../../app/evidence/core-bridge-cse-app.md)에 별도 기록한다.
@@ -77,6 +77,8 @@ git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7
 이 시험은 KEYRING 코드의 validator·SQLite·projection을 호출하지만 전체 Gateway daemon이나 outbox의 실제 전송 루프는 실행하지 않는다. Node 합성 송신자가 projection을 읽어 MQTT로 전달한다. `--mqtt-reconnect`는 두 번째 projection을 KEYRING 코드에서 생성하지 않으므로 `--keyring`과 함께 사용할 수 없다. 실제 BLE, Pi, 키링, 배터리·RSSI 관측, 인증 및 운영 권한의 증거가 아니다. checkout이 없는 경우 별도 단위시험은 skip되지만 `--keyring` 실경로 시험은 CSE 자원 생성 전에 실패한다.
 
 `--mqtt --keyring-outbox --observation-cin --phone` 시험에서는 같은 격리 AE의 `observations/la`를 읽는 합성 관측 화면을 사용할 수 있다. 중계는 이 시험에 한해 고유 `app-bridge-<16 hex>` AE와 고정된 합성 기기·Gateway·시간 fixture만 허용하며 HTTP/RSC·요청 ID와 CIN 이름을 확인한다. 화면의 관측·배터리·RSSI는 합성 값이다. 마지막 저장 순서는 기기의 실제 최신 상태나 관측 시간 순서를 증명하지 않고 RSSI는 거리가 아니다. 빈 container, 식별자 불일치 또는 통신 오류는 값을 추정하지 않고 조회 실패로 표시한다. 기본 중계에는 이 조회 경로가 없다.
+
+`--mqtt --keyring-outbox --observation-cin --receipt-cin --phone`은 같은 격리 AE에 고정 KEYRING 코드로 생성한 합성 `INDETERMINATE` receipt를 직접 저장해 앱의 합성 결과 조회 화면까지 연결한다. 생성·readback의 oneM2M RI/RSC와 전체 내용을 대조하며 합성 명령을 전송하거나 기기를 실행하지 않는다. Enter 또는 stdin EOF로 정리를 시작하며 stdin이 닫힌 자동 실행은 조회 준비 직후 종료한다. `APP_CORE_TEST_PROXY_PORT=0`은 호스트 시험용 임의 포트를 사용하며, 휴대폰의 고정 8787 연결에는 기본 포트를 사용한다. 정확한 범위와 정리 절차는 [APP 합성 결과 시험](../../app/docs/SYNTHETIC_RECEIPT_POC.md)을 참고한다.
 
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
 

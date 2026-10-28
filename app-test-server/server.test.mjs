@@ -129,7 +129,40 @@ test('does not expose a general proxy or write endpoint', async () => {
     assert.equal((await fetch(`${base}/api/test/bubble-state`, { method: 'POST' })).status, 404);
     assert.equal((await fetch(`${base}/api/test/bubble-state?url=example`)).status, 404);
     assert.equal((await fetch(`${base}/api/test/observation`)).status, 404);
+    assert.equal((await fetch(`${base}/api/test/receipt`)).status, 404);
   });
+});
+test('synthetic receipt requires an isolated AE and preserves distinct outcomes', async () => {
+  assert.throws(() => createServer({enableSyntheticReceipt:true}), /isolated test AE/);
+  let mode = 'valid', status = 'INDETERMINATE';
+  const expected = {version:1,gatewayId:'app-isolated',deviceId:'synthetic-keyring',commandId:'synthetic-command-1',
+    payloadHash:'0'.repeat(64),status,ackCode:'INVALID_RECEIPT',grantRevision:1,ownershipEpoch:1,
+    timestampSource:'unavailable',acceptedAt:null,appliedAt:null,receivedAt:'2026-10-28T12:00:00Z',readback:null};
+  const server = createServer({testAeName:'app-bridge-0123456789abcdef',enableSyntheticReceipt:true,fetchImpl:async (url,options) => {
+    assert.equal(url,'http://127.0.0.1:7599/Mobius/app-bridge-0123456789abcdef/receipts/la');
+    if (mode === 'missing') return new Response('',{status:404});
+    const headers = {'X-M2M-RI':mode === 'wrong-ri' ? 'wrong' : options.headers['X-M2M-RI'],'X-M2M-RSC':mode === 'wrong-rsc' ? '4000' : '2000'};
+    const receipt = {...expected,status,...(mode === 'wrong-device' ? {deviceId:'real-device'} : {}),
+      ...(mode === 'bad-status' ? {status:'UNKNOWN'} : {}), ...(mode === 'bad-time' ? {receivedAt:'2026-02-30T00:00:00Z'} : {}),
+      ...(mode === 'bad-source' ? {acceptedAt:'2026-10-28T12:00:00Z'} : {}), ...(mode === 'bad-readback' ? {readback:{state:'true'}} : {}),
+      ...(mode === 'estimated' ? {timestampSource:'gateway-estimated',acceptedAt:'2026-10-28T11:59:59Z',appliedAt:'2026-10-28T12:00:00Z',readback:{state:true}} : {})};
+    return new Response(JSON.stringify({'m2m:cin':{rn:mode === 'wrong-rn' ? 'other' : 'synthetic-receipt',con:receipt}}),{headers});
+  }});
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    for (status of ['APPLIED','REJECTED','TIMEOUT','INDETERMINATE']) {
+      const response=await fetch(`${base}/api/test/receipt`); assert.equal(response.status,200);
+      const body=await response.json(); assert.equal(body.mode,'synthetic'); assert.equal(body.status,status); assert.equal(body.readback,null);
+    }
+    mode='estimated'; { const response=await fetch(`${base}/api/test/receipt`); assert.equal(response.status,200);
+      const body=await response.json(); assert.equal(body.timestampSource,'gateway-estimated'); assert.equal(body.readback.state,true); }
+    for (mode of ['missing','wrong-ri','wrong-rsc','wrong-device','wrong-rn','bad-status','bad-time','bad-source','bad-readback']) {
+      const response=await fetch(`${base}/api/test/receipt`); assert.equal(response.status,502); const body=await response.json(); assert.equal(body.status,undefined);
+    }
+    assert.equal((await fetch(`${base}/api/test/receipt?x=1`)).status,404);
+    assert.equal((await fetch(`${base}/api/test/receipt`,{method:'POST'})).status,404);
+  } finally { await new Promise(resolve=>server.close(resolve)); }
 });
 test('synthetic observation is isolated, read-only and fails closed', async () => {
   assert.throws(() => createServer({enableSyntheticObservation:true}), /isolated test AE/);

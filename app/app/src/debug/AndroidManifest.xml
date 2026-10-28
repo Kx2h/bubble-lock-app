@@ -4,5 +4,6 @@
         <activity android:name="org.privacybubble.app.auth.StateMismatchProbeActivity" android:exported="true" />
         <activity android:name="org.privacybubble.app.SyntheticConsentActivity" android:exported="false" />
         <activity android:name="org.privacybubble.app.SyntheticObservationActivity" android:exported="false" />
+        <activity android:name="org.privacybubble.app.SyntheticReceiptActivity" android:exported="false" />
     </application>
 </manifest>

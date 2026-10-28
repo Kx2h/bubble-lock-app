@@ -65,4 +65,6 @@ Debug 빌드의 `합성 동의 시험`은 인증 없는 고정 가상 요청에 
 
 별도 opt-in debug 빌드의 인증된 합성 동의 연결은 [시험 범위와 미확정 표시](docs/AUTHENTICATED_CONSENT_POC.md), [HTTPS mock 서버 실행](tests/auth-consent-mock/README.md)을 참고하세요. 실제 운영 인증이나 권한 부여 기능은 아닙니다.
 
+Debug 빌드의 합성 결과 조회는 별도 테스트 CSE에 저장된 고정 합성 receipt만 표시합니다. 결과·시간 출처와 정리 방법은 [합성 결과 조회 시험](docs/SYNTHETIC_RECEIPT_POC.md)에 설명되어 있습니다. 실제 승인, 장치 명령 또는 물리 동작의 증거가 아닙니다.
+
 Debug의 `합성 관측 조회 화면`은 고유 시험 AE에서만 켜지는 중계를 통해 합성 CIN을 수동 조회합니다. [시험 실행](../app-test-server/native/README.md)은 `--mqtt --keyring-outbox --observation-cin --phone`을 사용하며 기존 `8787` reverse가 필요합니다. 이 화면은 CSE에 마지막 저장된 고정 합성 fixture만 표시하고 실제 기기·현재 상태·위치로 해석하지 않습니다. Gateway 수신 기반 시각과 조회 시각을 구분하고, RSSI는 거리가 아닙니다. 결과가 없거나 검증·연결이 실패하면 이전 값 대신 오류를 표시합니다. 기본 중계에는 이 조회 경로가 없으며 release에는 시험 화면이 없습니다.

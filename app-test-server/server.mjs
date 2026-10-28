@@ -56,11 +56,12 @@ function httpsRead(url, headers, tls) {
 }
 
 // Local, read-only adapter for the PC-MOBIUS-CORE v1 test contract.
-export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', enableSyntheticObservation = false, fetchImpl = fetch, tls } = {}) {
+export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', enableSyntheticObservation = false, enableSyntheticReceipt = false, fetchImpl = fetch, tls } = {}) {
   const base = new URL(mobiusUrl);
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) throw new Error('Invalid Mobius URL');
   if (typeof testAeName !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(testAeName)) throw new Error('Invalid test AE name');
   if (typeof enableSyntheticObservation !== 'boolean' || (enableSyntheticObservation && !/^app-bridge-[a-f0-9]{16}$/.test(testAeName))) throw new Error('Synthetic observation requires an isolated test AE');
+  if (typeof enableSyntheticReceipt !== 'boolean' || (enableSyntheticReceipt && !/^app-bridge-[a-f0-9]{16}$/.test(testAeName))) throw new Error('Synthetic receipt requires an isolated test AE');
   if (base.protocol === 'https:' && (!tls?.ca || !tls?.cert || !tls?.key)) throw new Error('HTTPS requires CA, client certificate and key');
   if (base.protocol === 'http:' && tls) throw new Error('Client TLS credentials require HTTPS');
   const url = `${base.href.replace(/\/$/, '')}/${testAeName}/bubbleState`;
@@ -69,15 +70,17 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
     res.setHeader('Cache-Control', 'no-store');
     const send = (status, payload) => { res.writeHead(status); res.end(JSON.stringify(payload)); };
     const observationRequest = enableSyntheticObservation && req.url === '/api/test/observation';
-    if (req.method !== 'GET' || (req.url !== '/api/test/bubble-state' && !observationRequest)) return send(404, { error: 'not_found' });
+    const receiptRequest = enableSyntheticReceipt && req.url === '/api/test/receipt';
+    if (req.method !== 'GET' || (req.url !== '/api/test/bubble-state' && !observationRequest && !receiptRequest)) return send(404, { error: 'not_found' });
     const requestId = `app-test-${randomUUID()}`;
     const headers = { Accept: 'application/json', 'X-M2M-RVI': '4', 'X-M2M-Origin': originator, 'X-M2M-RI': requestId };
     try {
       let response;
+      const target = observationRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/observations/la`
+        : receiptRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/receipts/la` : url;
       if (base.protocol === 'https:') {
-        response = await httpsRead(observationRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/observations/la` : url, headers, tls);
+        response = await httpsRead(target, headers, tls);
       } else {
-        const target = observationRequest ? `${base.href.replace(/\/$/, '')}/${testAeName}/observations/la` : url;
         const upstream = await fetchImpl(target, { headers, signal: AbortSignal.timeout(5000), redirect: 'error' });
         response = { status: upstream.status, body: await readBounded(upstream.body), requestId: upstream.headers.get('x-m2m-ri'), resultCode: upstream.headers.get('x-m2m-rsc') };
       }
@@ -88,6 +91,30 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
       let data;
       try { data = JSON.parse(response.body.toString('utf8')); }
       catch { return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId }); }
+      if (receiptRequest) {
+        const cin = data?.['m2m:cin'], r = cin?.con;
+        const validTime = value => {
+          if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/.test(value) || value.startsWith('0000')) return false;
+          const epoch = Date.parse(value);
+          return Number.isFinite(epoch) && new Date(epoch).toISOString().slice(0,19) === value.slice(0,19);
+        };
+        if (!cin || cin.rn !== 'synthetic-receipt' || !r || typeof r !== 'object' || Array.isArray(r)
+            || r.version !== 1 || r.gatewayId !== 'app-isolated' || r.deviceId !== 'synthetic-keyring'
+            || r.commandId !== 'synthetic-command-1' || r.payloadHash !== '0'.repeat(64)
+            || !['APPLIED','REJECTED','TIMEOUT','INDETERMINATE'].includes(r.status)
+            || typeof r.ackCode !== 'string' || !/^[A-Z][A-Z0-9_]{0,63}$/.test(r.ackCode)
+            || r.grantRevision !== 1 || r.ownershipEpoch !== 1 || !validTime(r.receivedAt)
+            || !['unavailable','gateway-estimated'].includes(r.timestampSource)
+            || !(r.acceptedAt === null || validTime(r.acceptedAt)) || !(r.appliedAt === null || validTime(r.appliedAt))
+            || (r.timestampSource === 'unavailable' && (r.acceptedAt !== null || r.appliedAt !== null))
+            || (r.timestampSource === 'gateway-estimated' && r.acceptedAt === null)
+            || !(r.readback === null || (typeof r.readback === 'object' && !Array.isArray(r.readback) && Object.keys(r.readback).length === 1 && typeof r.readback.state === 'boolean'))) {
+          return send(502, { mode:'test', error:'invalid_synthetic_receipt', requestId });
+        }
+        return send(200, { mode:'synthetic', gatewayId:r.gatewayId, deviceId:r.deviceId, commandId:r.commandId,
+          status:r.status, ackCode:r.ackCode, timestampSource:r.timestampSource, acceptedAt:r.acceptedAt,
+          appliedAt:r.appliedAt, receivedAt:r.receivedAt, readback:r.readback, requestId });
+      }
       if (observationRequest) {
         const cin = data?.['m2m:cin']; const o = cin?.con;
         if (!cin || typeof cin.rn !== 'string' || !/^gw-[a-f0-9]{64}$/.test(cin.rn) || !o || typeof o !== 'object' || Array.isArray(o)

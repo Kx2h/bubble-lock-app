@@ -1,14 +1,23 @@
 import { randomUUID } from 'node:crypto';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox', '--observation-cin'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1 || (process.argv.includes('--observation-cin') && !process.argv.includes('--keyring-outbox'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox [--observation-cin]]]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox', '--observation-cin', '--receipt-cin'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1 || (process.argv.includes('--observation-cin') && !process.argv.includes('--keyring-outbox')) || (process.argv.includes('--receipt-cin') && !process.argv.includes('--observation-cin'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox [--observation-cin [--receipt-cin]]]]');
 const phone = process.argv.includes('--phone');
 const useMqtt = process.argv.includes('--mqtt');
 const reconnect = process.argv.includes('--mqtt-reconnect');
 const useKeyring = process.argv.includes('--keyring');
 const useOutbox = process.argv.includes('--keyring-outbox');
 const verifyObservation = process.argv.includes('--observation-cin');
+const verifyReceipt = process.argv.includes('--receipt-cin');
+// Optional port 0 permits collision-free host tests. The device default remains 8787.
+const configuredPort = process.env.APP_CORE_TEST_PROXY_PORT ?? '8787';
+if (!/^(0|[1-9][0-9]{0,4})$/.test(configuredPort) || Number(configuredPort) > 65535) throw Error('Invalid test proxy port');
+const proxyPort = Number(configuredPort);
 const cse = new URL(process.env.APP_CORE_TEST_CSE_URL ?? 'http://127.0.0.1:50545/Mobius');
 if (cse.protocol !== 'http:' || cse.hostname !== '127.0.0.1' || !cse.port || cse.pathname !== '/Mobius'
     || cse.username || cse.password || cse.search || cse.hash) throw Error('Test CSE must be HTTP loopback with an explicit port and /Mobius path');
@@ -51,6 +60,10 @@ try {
     const container = await req('POST', resource, aeId, {'m2m:cnt':{rn:'observations'}}, 3);
     ok(container,201,'2001');
   }
+  if (verifyReceipt) {
+    const container = await req('POST', resource, aeId, {'m2m:cnt':{rn:'receipts'}}, 3);
+    ok(container,201,'2001');
+  }
   const before = await req('GET', `${resource}/bubbleState`, aeId);
   ok(before,200,'2000');
   if (before.parsed?.['pb:binarySwitch']?.state !== false) throw Error('Unexpected initial state');
@@ -77,8 +90,20 @@ try {
   ok(after,200,'2000');
   const expectedState = !reconnect;
   if (after.parsed?.['pb:binarySwitch']?.state !== expectedState) throw Error('Updated state absent');
-  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName,enableSyntheticObservation:verifyObservation});
-  await new Promise((resolve,reject)=>proxy.once('error',reject).listen(phone ? 8787 : 0,'127.0.0.1',resolve));
+  if (verifyReceipt) {
+    const python = fileURLToPath(new URL('../../../../.local/keyring-gateway-venv/bin/python', import.meta.url));
+    const helper = fileURLToPath(new URL('./keyring-receipt-fixture.py', import.meta.url));
+    const generated = await promisify(execFile)(python, ['-I','-B',helper,keyringSource], {timeout:10000,maxBuffer:65536});
+    const fixture = JSON.parse(generated.stdout);
+    const receipt = await req('POST', `${resource}/receipts`, aeId, {'m2m:cin':{rn:'synthetic-receipt',cnf:'application/json:0',con:fixture}}, 4);
+    ok(receipt,201,'2001');
+    const read = await req('GET', `${resource}/receipts/synthetic-receipt`, aeId);
+    ok(read,200,'2000');
+    if (read.parsed?.['m2m:cin']?.rn !== 'synthetic-receipt' || !isDeepStrictEqual(read.parsed?.['m2m:cin']?.con, fixture)) throw Error('Synthetic receipt readback mismatch');
+    results.push({syntheticReceiptStored:true,contentMatched:true});
+  }
+  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName,enableSyntheticObservation:verifyObservation,enableSyntheticReceipt:verifyReceipt});
+  await new Promise((resolve,reject)=>proxy.once('error',reject).listen(phone ? proxyPort : 0,'127.0.0.1',resolve));
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
   if (answer.status !== 200 || value.state !== expectedState || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
@@ -88,10 +113,20 @@ try {
     if (observation.status !== 200 || payload.mode !== 'synthetic' || payload.deviceId !== 'synthetic-keyring' || payload.timestampSource !== 'gateway-received') throw Error('APP adapter did not retrieve the synthetic CIN');
     results.push({syntheticObservation:'verified',requestStatus:observation.status});
   }
+  if (verifyReceipt) {
+    const receipt = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/receipt`);
+    const payload = await receipt.json();
+    if (receipt.status !== 200 || payload.mode !== 'synthetic' || payload.commandId !== 'synthetic-command-1' || payload.status !== 'INDETERMINATE') throw Error('APP adapter did not retrieve the synthetic receipt');
+    results.push({syntheticReceipt:'verified',requestStatus:receipt.status});
+  }
   results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {}), ...(outboxEvidence ? {outbox:outboxEvidence} : {}), ...(projection ? {keyring:{nullMeasurementsSkipped:projection.nullMeasurementsSkipped,duplicateSkipped:projection.duplicateSkipped,reopenPreserved:projection.reopenPreserved,wireSequences:projection.wireSequences}} : {})});
   if (phone) {
-    console.log(JSON.stringify({ready:true, aeName, port:8787, note:'Press Enter to clean up the test AE.'}));
-    await new Promise(resolve=>process.stdin.once('data',resolve));
+    console.log(JSON.stringify({ready:true, aeName, port:proxy.address().port, note:'Press Enter or close stdin to clean up the test AE.'}));
+    if (!process.stdin.readableEnded) await new Promise(resolve => {
+      process.stdin.once('data', resolve);
+      process.stdin.once('end', resolve);
+      process.stdin.resume();
+    });
     process.stdin.pause();
   }
 } catch (error) {

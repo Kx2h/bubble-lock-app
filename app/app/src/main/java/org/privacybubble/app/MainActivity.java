@@ -134,6 +134,11 @@ public final class MainActivity extends Activity {
                 intent.setClassName(this, "org.privacybubble.app.SyntheticObservationActivity");
                 startActivity(intent);
             }));
+            body.addView(button("합성 결과 조회 화면 열기", v -> {
+                android.content.Intent intent = new android.content.Intent();
+                intent.setClassName(this, "org.privacybubble.app.SyntheticReceiptActivity");
+                startActivity(intent);
+            }));
             renderTestState();
         }
     }

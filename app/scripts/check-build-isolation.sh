@@ -21,5 +21,6 @@ if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -q 'net.openid.app
 if "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.auth.(OidcSyntheticActivity|AuthenticatedConsentActivity)'; then echo 'Synthetic Activity is present in default debug.' >&2; exit 1; fi
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticConsentActivity' || { echo 'Debug consent test Activity is missing.' >&2; exit 1; }
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticObservationActivity' || { echo 'Debug observation test Activity is missing.' >&2; exit 1; }
-if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.(SyntheticConsentActivity|SyntheticObservationActivity|auth.(OidcSyntheticActivity|AuthenticatedConsentActivity|StateMismatchProbeActivity))'; then echo 'Test Activity is present in release.' >&2; exit 1; fi
+"$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticReceiptActivity' || { echo 'Debug receipt test Activity is missing.' >&2; exit 1; }
+if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.(SyntheticConsentActivity|SyntheticObservationActivity|SyntheticReceiptActivity|auth.(OidcSyntheticActivity|AuthenticatedConsentActivity|StateMismatchProbeActivity))'; then echo 'Test Activity is present in release.' >&2; exit 1; fi
 echo 'PASS: default debug excludes synthetic CA and Activity; release rejects cleartext and test Activities'
