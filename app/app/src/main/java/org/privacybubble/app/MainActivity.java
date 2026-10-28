@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -25,7 +27,7 @@ import java.util.concurrent.Executors;
 
 /** UI for the unconnected client and explicitly isolated Mobius4 test read. */
 public final class MainActivity extends Activity {
-    private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private TestState testState;
     private LinearLayout body;
     private TextView testStatus;
     private Button testButton;
@@ -34,16 +36,22 @@ public final class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        Object retained = getLastNonConfigurationInstance();
+        testState = retained instanceof TestState ? (TestState) retained : new TestState();
         settings = getSharedPreferences("connection", MODE_PRIVATE);
         if (state != null) role = state.getString("role", "Guardian");
         render();
+        testState.listener = this::renderTestState;
+        renderTestState();
     }
+    @Override public Object onRetainNonConfigurationInstance() { return testState; }
     @Override protected void onSaveInstanceState(Bundle state) {
         state.putString("role", role);
         super.onSaveInstanceState(state);
     }
     @Override protected void onDestroy() {
-        worker.shutdownNow();
+        testState.listener = null;
+        if (!isChangingConfigurations()) testState.close();
         super.onDestroy();
     }
     private int dp(int value) { return (int) (value * getResources().getDisplayMetrics().density + 0.5f); }
@@ -98,29 +106,57 @@ public final class MainActivity extends Activity {
         section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
         testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
         testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);
+        renderTestState();
+    }
+    private void renderTestState() {
+        if (testStatus != null && testButton != null) {
+            testStatus.setText(testState.message);
+            testButton.setEnabled(!testState.inFlight);
+        }
     }
     private void fetchTestState() {
-        final TextView target = testStatus; final Button control = testButton;
-        control.setEnabled(false); target.setText("조회 중…");
-        worker.execute(() -> {
-            String result;
-            HttpURLConnection connection = null;
-            try {
-                connection = (HttpURLConnection) new URL("http://127.0.0.1:8787/api/test/bubble-state").openConnection();
-                connection.setConnectTimeout(5000); connection.setReadTimeout(8000); connection.setInstanceFollowRedirects(false); connection.setRequestMethod("GET");
-                if (connection.getResponseCode() != 200) throw new IllegalStateException("HTTP " + connection.getResponseCode());
-                ByteArrayOutputStream data = new ByteArrayOutputStream();
-                try (InputStream input = connection.getInputStream()) {
-                    byte[] buffer = new byte[1024]; int n;
-                    while ((n = input.read(buffer)) != -1) { data.write(buffer, 0, n); if (data.size() > 16384) throw new IllegalStateException("응답 크기 초과"); }
-                }
-                JSONObject json = new JSONObject(new String(data.toByteArray(), StandardCharsets.UTF_8));
-                if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
-                result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n요청 ID: " + json.optString("requestId", "없음");
-            } catch (Exception e) { result = "조회 실패 · 테스트 프록시와 adb reverse 연결을 확인하세요."; }
-            finally { if (connection != null) connection.disconnect(); }
-            final String message = result;
-            runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) { target.setText(message); control.setEnabled(true); } });
-        });
+        testState.fetch();
+    }
+
+    /** Retains request state across configuration changes; the Activity detaches on destroy. */
+    private static final class TestState {
+        private final ExecutorService worker = Executors.newSingleThreadExecutor();
+        private final Handler main = new Handler(Looper.getMainLooper());
+        private String message = "조회 전";
+        private boolean inFlight;
+        private boolean closed;
+        private Runnable listener;
+
+        private void notifyListener() { if (listener != null) listener.run(); }
+        private void close() { closed = true; listener = null; worker.shutdownNow(); }
+        private void fetch() {
+            if (closed || inFlight) return;
+            inFlight = true; message = "조회 중…"; notifyListener();
+            worker.execute(() -> {
+                String result;
+                HttpURLConnection connection = null;
+                try {
+                    connection = (HttpURLConnection) new URL("http://127.0.0.1:8787/api/test/bubble-state").openConnection();
+                    connection.setConnectTimeout(5000); connection.setReadTimeout(8000); connection.setInstanceFollowRedirects(false); connection.setRequestMethod("GET");
+                    if (connection.getResponseCode() != 200) throw new IllegalStateException("HTTP " + connection.getResponseCode());
+                    ByteArrayOutputStream data = new ByteArrayOutputStream();
+                    try (InputStream input = connection.getInputStream()) {
+                        byte[] buffer = new byte[1024]; int n;
+                        while ((n = input.read(buffer)) != -1) { data.write(buffer, 0, n); if (data.size() > 16384) throw new IllegalStateException("응답 크기 초과"); }
+                    }
+                    JSONObject json = new JSONObject(new String(data.toByteArray(), StandardCharsets.UTF_8));
+                    if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
+                    String observation = json.optString("observation", "unknown");
+                    String source = "unobserved".equals(observation) ? "초기값 · 장치 관측 전" : "관측 여부 미확인";
+                    result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source + "\n요청 ID: " + json.optString("requestId", "없음");
+                } catch (Exception e) { result = "조회 실패 · 테스트 프록시와 adb reverse 연결을 확인하세요."; }
+                finally { if (connection != null) connection.disconnect(); }
+                final String completed = result;
+                main.post(() -> {
+                    if (closed) return;
+                    message = completed; inFlight = false; notifyListener();
+                });
+            });
+        }
     }
 }

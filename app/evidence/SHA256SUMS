@@ -1,3 +1,5 @@
 012c68c568757b32fd0bfd49c372264b38bb80a654875153acbe55d7ba971472  app/evidence/adapter-test.tap
 00b71315b631b25c601c0a61119cd6bf943bd2ac326d3dec76486ff07a1d6bc2  app/evidence/core-test.tap
 b01588f7d4b2de81defe820b5cc38d7e9f8902da62f8abc5986a104069460f8f  app/evidence/android-build.log
+b081d99e86aa45b404b70dbef9723a7d79ac6f565609bd2768f3377b41535a18  app/evidence/app-poc-tests.tap
+1fe98fc79d50c403f891a5901f3daa403d2d6fae27932d1993b3ace17f6d9d5d  app/evidence/android-build-poc.log

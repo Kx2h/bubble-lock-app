@@ -23,3 +23,17 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 ```
 
 2026-10-28 빌드는 성공했으나 AGP 8.5.2가 SDK 35에 대해 검증 범위 경고를 출력했습니다. `evidence/android-build.log`는 빌드 로그이며 실제 휴대폰 시험을 의미하지 않습니다. ADB 기기 미연결로 설치와 동적 시험은 아직 수행하지 않았습니다. CORE 계약 및 테스트 중계의 자동시험 로그와 hash는 `evidence/`에 있습니다.
+
+실기기 PoC용 도구는 기기 serial을 명시해야 하며 기존 앱과 포트가 있으면 설치·연결을 덮어쓰지 않습니다. `cleanup`은 지정 기기의 이 앱 및 앱 데이터와 일치하는 `tcp:8787` reverse 연결을 제거합니다. 이미 사용 중인 앱이나 포트인 경우 정리 명령을 실행하지 마세요.
+
+```sh
+# 저장소 루트에서, PC 테스트 중계 실행 후
+export ADB="$PWD/app/scripts/adb-windows.sh"  # WSL + Windows ADB인 경우; Linux ADB 경로도 사용 가능
+"$ADB" devices -l
+app/scripts/device-poc.sh <serial> status
+app/scripts/device-poc.sh <serial> install
+app/scripts/device-poc.sh <serial> launch
+# 시험 후 명시적으로 앱/앱 데이터 및 포트 제거
+app/scripts/device-poc.sh <serial> cleanup
+node --test app/scripts/device-poc.test.mjs
+```

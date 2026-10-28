@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: maps CORE contract and creates independent request identifiers
+ok 1 - maps CORE contract and creates independent request identifiers
+  ---
+  duration_ms: 18.514796
+  type: 'test'
+  ...
+# Subtest: preserves bootstrap unobserved label and never infers observation
+ok 2 - preserves bootstrap unobserved label and never infers observation
+  ---
+  duration_ms: 10.384045
+  type: 'test'
+  ...
+# Subtest: reports malformed and upstream errors without claiming a state
+ok 3 - reports malformed and upstream errors without claiming a state
+  ---
+  duration_ms: 3.52049
+  type: 'test'
+  ...
+# Subtest: does not expose a general proxy or write endpoint
+ok 4 - does not expose a general proxy or write endpoint
+  ---
+  duration_ms: 3.407246
+  type: 'test'
+  ...
+# Subtest: reports an unavailable upstream
+ok 5 - reports an unavailable upstream
+  ---
+  duration_ms: 3.238486
+  type: 'test'
+  ...
+# Subtest: bounds HTTP upstream responses, including chunked bodies
+ok 6 - bounds HTTP upstream responses, including chunked bodies
+  ---
+  duration_ms: 2.494557
+  type: 'test'
+  ...
+# Subtest: HTTPS requires all client credentials and forbids them with HTTP
+ok 7 - HTTPS requires all client credentials and forbids them with HTTP
+  ---
+  duration_ms: 0.407371
+  type: 'test'
+  ...
+# Subtest: mTLS verifies the server and presents client credentials; oversized responses fail
+ok 8 - mTLS verifies the server and presents client credentials; oversized responses fail
+  ---
+  duration_ms: 422.952059
+  type: 'test'
+  ...
+# Subtest: install selects one device and refuses to overwrite an existing app
+ok 9 - install selects one device and refuses to overwrite an existing app
+  ---
+  duration_ms: 17.741765
+  type: 'test'
+  ...
+# Subtest: launch sets up the reverse port only when available
+ok 10 - launch sets up the reverse port only when available
+  ---
+  duration_ms: 16.512326
+  type: 'test'
+  ...
+# Subtest: existing reverse mapping and unauthorized device stop the workflow
+ok 11 - existing reverse mapping and unauthorized device stop the workflow
+  ---
+  duration_ms: 18.656469
+  type: 'test'
+  ...
+# Subtest: cleanup targets only the app and the specified reverse port
+ok 12 - cleanup targets only the app and the specified reverse port
+  ---
+  duration_ms: 16.895077
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 507.770369
