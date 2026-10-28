@@ -52,8 +52,12 @@ export npm_config_cache="$WORKSPACE/.local/npm-cache"
 npm ci --prefix app-test-server/native/mqtt --ignore-scripts --no-audit --no-fund
 node --test app-test-server/native/core-app-bridge-check.test.mjs
 node app-test-server/native/core-app-bridge-check.mjs --mqtt
+# broker 중단·재시작 후 CORE 재구독 및 새 상태 전달을 확인
+node app-test-server/native/core-app-bridge-check.mjs --mqtt --mqtt-reconnect
 # 공기계 시험: 이미 연결된 reverse를 유지하고 빈 8787 포트에서만 실행
 node app-test-server/native/core-app-bridge-check.mjs --mqtt --phone
 ```
 
 broker는 TCP loopback의 임의 포트에만 바인딩하며 인증·TLS·ACL·영속 저장을 사용하지 않는 시험용이다. 합성 송신자가 실제 MQTT 프로토콜을 사용하지만 물리 Pi·BLE·키링, 외부 broker, TLS/MQTT ACL 및 운영 API를 검증하지 않는다. `APPLIED`만으로 성공을 추정하지 않고 별도의 HTTP RSC·요청 ID와 CSE readback을 확인한다. Node와 의존성·캐시는 작업 폴더 아래에만 둔다. 설치한 `node_modules`는 Git에 포함하지 않는다.
+
+`--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.

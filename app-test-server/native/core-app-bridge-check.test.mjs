@@ -32,7 +32,7 @@ for (const mode of ['lost-response', 'wrong-identity']) {
   });
 }
 
-for (const mode of ['direct', 'mqtt']) {
+for (const mode of ['direct', 'mqtt', 'mqtt-reconnect']) {
   test(`${mode} mode updates only its isolated resource and cleans it up`, async () => {
     let aeName, state = false, removed = false, puts = 0;
     const cse = http.createServer(async (req, res) => {
@@ -56,7 +56,7 @@ for (const mode of ['direct', 'mqtt']) {
     });
     await new Promise(resolve => cse.listen(0, '127.0.0.1', resolve));
     try {
-      const args = mode === 'mqtt' ? [script, '--mqtt'] : [script];
+      const args = mode === 'mqtt-reconnect' ? [script, '--mqtt', '--mqtt-reconnect'] : mode === 'mqtt' ? [script, '--mqtt'] : [script];
       const child = spawn(process.execPath, args, {env:{...process.env,APP_CORE_TEST_CSE_URL:`http://127.0.0.1:${cse.address().port}/Mobius`}});
       let output = '';
       child.stdout.on('data', chunk => { output += chunk; });
@@ -66,12 +66,16 @@ for (const mode of ['direct', 'mqtt']) {
       const result = output.trim().split('\n').map(JSON.parse).at(-1);
       const summary = result.results.find(x => x.bridge);
       assert.equal(summary.update.rsc,'2004');
-      assert.equal(summary.stateAfter,true);
+      assert.equal(summary.stateAfter,mode !== 'mqtt-reconnect');
       assert.equal(summary.observation,'unknown');
-      assert.equal(puts,1);
+      assert.equal(puts,mode === 'mqtt-reconnect' ? 2 : 1);
       assert.equal(removed,true);
       assert.ok(result.results.some(x => x.cleanup === 'verified'));
       if (mode === 'mqtt') assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:1});
+      else if (mode === 'mqtt-reconnect') {
+        assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:2,reconnected:true});
+        assert.deepEqual(summary.reconnectUpdate,{status:200,rsc:'2004',correlated:true});
+      }
       else assert.equal(summary.mqtt,undefined);
     } finally { await new Promise(resolve => cse.close(resolve)); }
   });

@@ -2,9 +2,10 @@ import { randomUUID } from 'node:crypto';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => !['--phone', '--mqtt'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || (process.argv.includes('--mqtt-reconnect') && !process.argv.includes('--mqtt'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect]]');
 const phone = process.argv.includes('--phone');
 const useMqtt = process.argv.includes('--mqtt');
+const reconnect = process.argv.includes('--mqtt-reconnect');
 const cse = new URL(process.env.APP_CORE_TEST_CSE_URL ?? 'http://127.0.0.1:50545/Mobius');
 if (cse.protocol !== 'http:' || cse.hostname !== '127.0.0.1' || !cse.port || cse.pathname !== '/Mobius'
     || cse.username || cse.password || cse.search || cse.hash) throw Error('Test CSE must be HTTP loopback with an explicit port and /Mobius path');
@@ -46,7 +47,7 @@ try {
   let receipt, updates, mqttEvidence;
   if (useMqtt) {
     const { runMqttUpdate } = await import('./mqtt/run.mjs');
-    ({receipt, updates, ...mqttEvidence} = await runMqttUpdate({origin:cse.origin,aeId,aeName,telemetry}));
+    ({receipt, updates, ...mqttEvidence} = await runMqttUpdate({origin:cse.origin,aeId,aeName,telemetry,reconnect}));
   } else {
     const mqttClient = {async subscribe(){},async publish(){},on(){}};
     updates = [];
@@ -57,16 +58,17 @@ try {
     }});
     receipt = await bridge.handleTelemetry(telemetry);
   }
-  if (receipt.status !== 'APPLIED' || updates.length !== 1 || updates[0].status !== 200 || updates[0].rsc !== '2004' || !updates[0].correlated) throw Error('Bridge update not independently verified');
+  if (receipt.status !== 'APPLIED' || updates.length !== (reconnect ? 2 : 1) || updates.some(update => update.status !== 200 || update.rsc !== '2004' || !update.correlated)) throw Error('Bridge update not independently verified');
   const after = await req('GET', `${resource}/bubbleState`, aeId);
   ok(after,200,'2000');
-  if (after.parsed?.['pb:binarySwitch']?.state !== true) throw Error('Updated state absent');
+  const expectedState = !reconnect;
+  if (after.parsed?.['pb:binarySwitch']?.state !== expectedState) throw Error('Updated state absent');
   proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName});
   await new Promise((resolve,reject)=>proxy.once('error',reject).listen(phone ? 8787 : 0,'127.0.0.1',resolve));
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
-  if (answer.status !== 200 || value.state !== true || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
-  results.push({bridge:receipt.status, update:updates[0], stateAfter:true, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {})});
+  if (answer.status !== 200 || value.state !== expectedState || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
+  results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {})});
   if (phone) {
     console.log(JSON.stringify({ready:true, aeName, port:8787, note:'Press Enter to clean up the test AE.'}));
     await new Promise(resolve=>process.stdin.once('data',resolve));

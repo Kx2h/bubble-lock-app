@@ -7,9 +7,9 @@ import { GatewayBridge } from '../../../pc-mobius/src/gateway-bridge.mjs';
 
 // Real MQTT 3.1.1 broker and clients, bound only to an ephemeral loopback port.
 // Inputs remain synthetic and the MQTT hop is not authenticated or encrypted.
-export async function runMqttUpdate({ origin, aeId, aeName, telemetry }) {
-  const broker = await Aedes.createBroker();
-  const server = net.createServer(broker.handle);
+export async function runMqttUpdate({ origin, aeId, aeName, telemetry, reconnect = false }) {
+  let broker = await Aedes.createBroker();
+  let server = net.createServer(broker.handle);
   let subscriber, publisher;
   let mqttError;
   const updates = [], subscriptions = [], messages = [], deliveries = [];
@@ -23,7 +23,8 @@ export async function runMqttUpdate({ origin, aeId, aeName, telemetry }) {
   try {
     await new Promise((resolve, reject) => server.once('error', reject).listen(0, '127.0.0.1', resolve));
     const url = `mqtt://127.0.0.1:${server.address().port}`;
-    subscriber = mqtt.connect(url, { clientId: 'app-core-bridge', protocolVersion: 4, clean: true, reconnectPeriod: 0 });
+    const port = server.address().port;
+    subscriber = mqtt.connect(url, { clientId: 'app-core-bridge', protocolVersion: 4, clean: true, reconnectPeriod: reconnect ? 250 : 0 });
     subscriber.on('error', error => { mqttError = error; });
     subscriber.on('message', (topic, _payload, packet) => deliveries.push({ topic, qos: packet.qos }));
     await once(subscriber, 'connect', { signal: AbortSignal.timeout(8000) });
@@ -63,7 +64,45 @@ export async function runMqttUpdate({ origin, aeId, aeName, telemetry }) {
     }
     if (bridge.receipts.length !== 2 || bridge.receipts[1].status !== 'DUPLICATE' || updates.length !== 1
         || deliveries.filter(message => message.topic === bridge.telemetryTopic && message.qos === 1).length !== 2) throw Error('Duplicate telemetry was not safely deduplicated');
-    return { receipt: bridge.receipts[0], updates, topic: bridge.telemetryTopic, qos: 1, retained: false, duplicate: 'DUPLICATE', updateCount: updates.length };
+    if (reconnect) {
+      await publisher.endAsync(true);
+      publisher = undefined;
+      const offline = once(subscriber, 'offline', { signal: AbortSignal.timeout(8000) });
+      await new Promise(resolve => broker.close(resolve));
+      await new Promise(resolve => server.close(resolve));
+      await offline;
+      // Replace the broker on the same loopback port; no messages are sent while offline.
+      broker = await Aedes.createBroker();
+      broker.on('subscribe', onSubscribe);
+      server = net.createServer(broker.handle);
+      const connected = once(subscriber, 'connect', { signal: AbortSignal.timeout(8000) });
+      await new Promise((resolve, reject) => server.once('error', reject).listen(port, '127.0.0.1', resolve));
+      await connected;
+      mqttError = undefined;
+      const previousSubscriptions = subscriptions.length;
+      // The CORE runner calls start() after every connect, while the bridge itself
+      // attaches the message listener only once.
+      await bridge.start();
+      const resubscribeUntil = performance.now() + 8000;
+      while (!subscriptions.slice(previousSubscriptions).some(sub => sub.topic === bridge.telemetryTopic && sub.qos === 1)) {
+        if (mqttError) throw mqttError;
+        if (performance.now() >= resubscribeUntil) throw Error('MQTT resubscription timeout');
+        await delay(25);
+      }
+      publisher = mqtt.connect(url, { clientId: 'app-test-gateway', protocolVersion: 4, clean: true, reconnectPeriod: 0 });
+      publisher.on('error', error => { mqttError = error; });
+      await once(publisher, 'connect', { signal: AbortSignal.timeout(8000) });
+      await publisher.publishAsync(bridge.telemetryTopic, JSON.stringify({ ...telemetry, sequence: telemetry.sequence + 1, state: false }), { qos: 1, retain: false });
+      const recoveredUntil = performance.now() + 12000;
+      while (bridge.receipts.length < 3) {
+        if (mqttError) throw mqttError;
+        if (performance.now() >= recoveredUntil) throw Error('MQTT recovery receipt timeout');
+        await delay(25);
+      }
+      if (bridge.receipts.length !== 3 || bridge.receipts[2].status !== 'APPLIED' || updates.length !== 2
+          || !deliveries.some(message => message.topic === bridge.telemetryTopic && message.qos === 1)) throw Error('MQTT recovery not observed');
+    }
+    return { receipt: bridge.receipts[0], updates, topic: bridge.telemetryTopic, qos: 1, retained: false, duplicate: 'DUPLICATE', updateCount: updates.length, ...(reconnect ? {reconnected: true} : {}) };
   } finally {
     if (publisher) await publisher.endAsync(true);
     if (subscriber) await subscriber.endAsync(true);
