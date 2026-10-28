@@ -35,30 +35,30 @@ export async function runMqttUpdate({ origin, aeId, aeName, telemetry }) {
         return response;
       } });
     await bridge.start();
-    const subscribedUntil = Date.now() + 8000;
+    const subscribedUntil = performance.now() + 8000;
     while (!subscriptions.some(sub => sub.topic === bridge.telemetryTopic && sub.qos === 1)) {
       if (mqttError) throw mqttError;
-      if (Date.now() >= subscribedUntil) throw Error('MQTT telemetry subscription timeout');
+      if (performance.now() >= subscribedUntil) throw Error('MQTT telemetry subscription timeout');
       await delay(25);
     }
     publisher = mqtt.connect(url, { clientId: 'app-test-gateway', protocolVersion: 4, clean: true, reconnectPeriod: 0 });
     publisher.on('error', error => { mqttError = error; });
     await once(publisher, 'connect', { signal: AbortSignal.timeout(8000) });
     await publisher.publishAsync(bridge.telemetryTopic, JSON.stringify(telemetry), { qos: 1, retain: false });
-    const receiptUntil = Date.now() + 12000;
+    const receiptUntil = performance.now() + 12000;
     while (bridge.receipts.length === 0) {
       if (mqttError) throw mqttError;
-      if (Date.now() >= receiptUntil) throw Error('CORE bridge receipt timeout');
+      if (performance.now() >= receiptUntil) throw Error('CORE bridge receipt timeout');
       await delay(25);
     }
     if (!messages.some(message => message.topic === bridge.telemetryTopic && message.qos === 1 && message.retain === false)
         || !deliveries.some(message => message.topic === bridge.telemetryTopic && message.qos === 1)) throw Error('MQTT QoS 1 delivery not observed');
     if (bridge.receipts.length !== 1) throw Error('Unexpected bridge receipt count');
     await publisher.publishAsync(bridge.telemetryTopic, JSON.stringify(telemetry), { qos: 1, retain: false });
-    const duplicateUntil = Date.now() + 8000;
+    const duplicateUntil = performance.now() + 8000;
     while (bridge.receipts.length < 2) {
       if (mqttError) throw mqttError;
-      if (Date.now() >= duplicateUntil) throw Error('Duplicate telemetry receipt timeout');
+      if (performance.now() >= duplicateUntil) throw Error('Duplicate telemetry receipt timeout');
       await delay(25);
     }
     if (bridge.receipts.length !== 2 || bridge.receipts[1].status !== 'DUPLICATE' || updates.length !== 1
