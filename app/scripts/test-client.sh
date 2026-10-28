@@ -11,13 +11,16 @@ mkdir -p "$out"
   "$app_dir/app/src/main/java/org/privacybubble/app/TestRefreshState.java" \
   "$app_dir/app/src/main/java/org/privacybubble/app/TestObservation.java" \
   "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticReceiptLabels.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticReceiptMonitor.java" \
   "$app_dir/tests/manual/org/privacybubble/app/TestStateClientTest.java" \
   "$app_dir/tests/manual/org/privacybubble/app/TestResourceTimestampTest.java" \
   "$app_dir/tests/manual/org/privacybubble/app/TestRefreshStateTest.java" \
   "$app_dir/tests/manual/org/privacybubble/app/TestObservationTest.java" \
-  "$app_dir/tests/manual/org/privacybubble/app/SyntheticReceiptLabelsTest.java"
+  "$app_dir/tests/manual/org/privacybubble/app/SyntheticReceiptLabelsTest.java" \
+  "$app_dir/tests/manual/org/privacybubble/app/SyntheticReceiptMonitorTest.java"
 "$java" --add-modules jdk.httpserver -cp "$out" org.privacybubble.app.TestStateClientTest
 "$java" -cp "$out" org.privacybubble.app.TestResourceTimestampTest
 "$java" -cp "$out" org.privacybubble.app.TestRefreshStateTest
 "$java" -cp "$out" org.privacybubble.app.TestObservationTest
 "$java" -cp "$out" org.privacybubble.app.SyntheticReceiptLabelsTest
+"$java" -cp "$out" org.privacybubble.app.SyntheticReceiptMonitorTest
