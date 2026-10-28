@@ -6,11 +6,11 @@ port=tcp:8787
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 app_dir=$(cd -- "$script_dir/.." && pwd)
 adb=${ADB:-adb}
-usage() { echo "Usage: ADB=/path/to/adb $0 <serial> <status|install|launch|cleanup>" >&2; exit 2; }
+usage() { echo "Usage: ADB=/path/to/adb $0 <serial> <status|install|launch|cleanup|cleanup-port>" >&2; exit 2; }
 [[ $# == 2 && -n $1 && $1 != -* ]] || usage
 serial=$1
 command=$2
-case "$command" in status|install|launch|cleanup) ;; *) usage ;; esac
+case "$command" in status|install|launch|cleanup|cleanup-port) ;; *) usage ;; esac
 # ADB's get-state can report "device" even when the devices list says
 # "unauthorized". Require an exact serial and authorized state from the list.
 device_list=$("$adb" devices) || { echo 'Could not list ADB devices.' >&2; exit 1; }
@@ -49,6 +49,16 @@ get_reverse_list() { "$adb" -s "$serial" reverse --list; }
 has_reverse() { awk -v port="$port" '$2 == port { found=1 } END { exit !found }' <<< "$1"; }
 has_our_reverse() { awk -v port="$port" '{ sub(/\r$/, "", $3) } $2 == port && $3 == port { found=1 } END { exit !found }' <<< "$1"; }
 prepare_markers() { (umask 077; mkdir -p "$marker_dir"); }
+remove_owned_reverse() {
+  local reverse_list
+  reverse_list=$(get_reverse_list) || { echo 'Could not query reverse mappings.' >&2; return 1; }
+  [[ -f $port_marker ]] || { echo 'No reverse ownership marker; leaving mappings unchanged.'; return 0; }
+  if has_reverse "$reverse_list" && ! has_our_reverse "$reverse_list"; then
+    echo 'Reverse mapping changed; refusing to remove it.' >&2; return 1
+  fi
+  if has_our_reverse "$reverse_list"; then "$adb" -s "$serial" reverse --remove "$port"; fi
+  rm -f -- "$port_marker"
+}
 case "$command" in
   status)
     "$adb" -s "$serial" shell pm path "$package" || true
@@ -103,5 +113,8 @@ case "$command" in
     rm -f -- "$package_marker"
     if [[ -f $port_marker ]] && has_our_reverse "$reverse_list"; then "$adb" -s "$serial" reverse --remove "$port"; fi
     rm -f -- "$port_marker"
+    ;;
+  cleanup-port)
+    remove_owned_reverse
     ;;
 esac

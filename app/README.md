@@ -35,8 +35,12 @@ app/scripts/device-poc.sh <serial> install
 app/scripts/device-poc.sh <serial> launch
 # 시험 후 명시적으로 앱/앱 데이터 및 포트 제거
 app/scripts/device-poc.sh <serial> cleanup
+# 앱을 이 도구로 설치하지 않아 cleanup이 중단된 경우, 도구가 만든 포트만 정리
+app/scripts/device-poc.sh <serial> cleanup-port
 node --test app/scripts/device-poc.test.mjs
 ```
+
+`cleanup-port`는 앱을 삭제하지 않습니다. 도구의 소유 기록이 있고 현재 reverse 대상이 그대로일 때만 `tcp:8787`을 제거합니다. 연결이 바뀐 경우에는 제거를 거부합니다.
 
 이 도구를 거치지 않고 직접 ADB로 설치한 앱과 포트에는 소유 기록이 없으므로 `cleanup`이 자동으로 제거하지 않습니다. 기록을 별도로 삭제하거나 작업 폴더를 옮겨 기록을 잃은 경우에도 마찬가지입니다. `gradle clean`은 이 기록을 삭제하지 않습니다. 직접 설치한 PoC를 제거할 때는 먼저 지정 기기와 앱·포트의 상태를 확인한 후, 제거 대상이 맞으면 아래 명령을 실행하세요. 앱 삭제는 앱 전용 데이터도 함께 삭제합니다.
 

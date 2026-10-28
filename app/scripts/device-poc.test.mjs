@@ -28,7 +28,7 @@ case "$*" in
   'get-state') echo "\${DEVICE_STATE:-device}" ;;
   'shell pm path org.privacybubble.app') if [[ \${INSTALLED:-0} == 1 || -f "$STATE.installed" ]]; then echo 'package:/data/app/test.apk'; fi ;;
   'shell sha256sum /data/app/test.apk') echo "\${APK_DIGEST:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}  /data/app/test.apk" ;;
-  'reverse --list') if [[ \${MAPPED:-0} == 1 || -f "$STATE.mapped" ]]; then echo 'selected tcp:8787 tcp:8787'; fi ;;
+  'reverse --list') if [[ \${MAPPED:-0} == 1 || -f "$STATE.mapped" ]]; then echo "selected tcp:8787 \${MAPPED_TARGET:-tcp:8787}"; fi ;;
   'reverse --no-rebind tcp:8787 tcp:8787') touch "$STATE.mapped" ;;
   'reverse --remove tcp:8787') rm -f "$STATE.mapped" ;;
   'uninstall org.privacybubble.app') rm -f "$STATE.installed" ;;
@@ -91,4 +91,21 @@ test('cleanup refuses an app not installed by this script or changed after insta
 test('cleanup does not remove an unowned reverse mapping', async () => fixture(async ({ invoke, calls }) => {
   assert.equal(invoke(['selected', 'cleanup'], { MAPPED: '1' }).status, 0);
   assert.ok(!(await calls()).some(line => line.includes('reverse --remove')));
+}));
+
+test('cleanup-port removes its mapping even when the installed app is unowned', async () => fixture(async ({ invoke, calls }) => {
+  assert.equal(invoke(['selected', 'launch'], { INSTALLED: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { INSTALLED: '1' }).status, 0);
+  assert.equal(invoke(['selected', 'cleanup-port'], { INSTALLED: '1' }).status, 0);
+  const lines = await calls();
+  assert.ok(lines.includes('-s selected reverse --remove tcp:8787'));
+  assert.ok(!lines.some(line => line.includes(' uninstall ')));
+}));
+
+test('cleanup-port leaves unowned or changed mappings untouched', async () => fixture(async ({ invoke, calls }) => {
+  assert.equal(invoke(['selected', 'cleanup-port'], { MAPPED: '1' }).status, 0);
+  assert.equal(invoke(['selected', 'launch'], { INSTALLED: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup-port'], { MAPPED_TARGET: 'tcp:9999' }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes('reverse --remove')));
+  assert.equal(invoke(['selected', 'cleanup-port']).status, 0);
 }));
