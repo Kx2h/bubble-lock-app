@@ -70,12 +70,15 @@ public final class SyntheticConsentActivity extends Activity {
         model.listener = this::render; render();
     }
     @Override public Object onRetainNonConfigurationInstance() { return model; }
+    @Override protected void onResume() { super.onResume(); model.resume(); }
+    @Override protected void onPause() { model.pause(); super.onPause(); }
     @Override protected void onDestroy() {
         model.listener = null;
         if (!isChangingConfigurations()) model.close();
         super.onDestroy();
     }
     private void render() {
+        if (!model.known && model.pending == null && choice.isChecked()) choice.setChecked(false);
         status.setText(model.message);
         refresh.setEnabled(!model.busy && !model.storageFault && model.pending == null);
         choice.setEnabled(!model.busy && !model.storageFault && !model.epochMismatch && (model.known || model.pending != null));
@@ -88,10 +91,13 @@ public final class SyntheticConsentActivity extends Activity {
     private static final class State {
         private final ExecutorService worker = Executors.newSingleThreadExecutor();
         private final Handler main = new Handler(Looper.getMainLooper());
+        private final Runnable expiryTick = this::checkExpiry;
         private static final String PENDING_KEY = "pending_v1";
         private final SharedPreferences preferences;
         private boolean busy, known, active, storageFault, epochMismatch;
+        private boolean visible;
         private volatile boolean closed;
+        private long expiryMillis;
         private int grantRevision;
         private String serverInstance;
         private SyntheticPending pending;
@@ -110,7 +116,19 @@ public final class SyntheticConsentActivity extends Activity {
             }
         }
         private void notifyUi() { if (listener != null) listener.run(); }
-        private void close() { closed = true; listener = null; worker.shutdownNow(); }
+        private void resume() { if (!closed) { visible = true; checkExpiry(); } }
+        private void pause() { visible = false; main.removeCallbacks(expiryTick); }
+        private void close() { closed = true; main.removeCallbacks(expiryTick); listener = null; worker.shutdownNow(); }
+        private void checkExpiry() {
+            main.removeCallbacks(expiryTick);
+            if (closed) return;
+            if (known && active && SyntheticGrantExpiry.needsServerCheck(System.currentTimeMillis(), expiryMillis)) {
+                known = false;
+                message = "기기 시간상 합성 유효기간 경과 · 서버 상태를 다시 확인하세요.";
+                notifyUi();
+            }
+            if (visible && known && active) main.postDelayed(expiryTick, 1000);
+        }
         private void discardBlockedRecord() {
             if (closed || busy || !(storageFault || epochMismatch)) return;
             if (!preferences.edit().remove(PENDING_KEY).commit()) {
@@ -147,6 +165,7 @@ public final class SyntheticConsentActivity extends Activity {
             });
         }
         private void mutate(boolean approving) {
+            checkExpiry();
             if (closed || busy || storageFault || !known || pending != null || approving == active) return;
             try {
                 String body = approving ? SyntheticPending.APPROVE_BODY
@@ -207,8 +226,10 @@ public final class SyntheticConsentActivity extends Activity {
         }
         private void apply(Snapshot result) {
             known = true; active = result.active; grantRevision = result.revision; serverInstance = result.instance;
+            expiryMillis = result.active ? SyntheticGrantExpiry.parse(result.expires) : 0;
             message = "합성 서버 상태: " + result.status + (result.active ? "\n합성 만료 시각: " + result.expires : "")
                     + "\n서버 조회 시점의 상태입니다. 실제 권한은 없습니다.";
+            checkExpiry();
         }
         private static JSONObject call(String endpoint, SyntheticPending operation) throws Exception {
             if (!(endpoint.equals("request") || endpoint.equals("grant") || endpoint.equals("approve") || endpoint.equals("revoke"))) throw new IllegalArgumentException();
