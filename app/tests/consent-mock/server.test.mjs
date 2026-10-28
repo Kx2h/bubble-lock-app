@@ -10,11 +10,12 @@ async function fixture(options, run) {
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
   const url = `http://127.0.0.1:${server.address().port}${basePath}`;
   const get = async path => { const res=await fetch(url+path); return {code:res.status,body:await res.json()}; };
+  const instance = (await get('/request')).body.serverInstanceId;
   const post = async (path, body, n = 1, headers = {}) => {
-    const res=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(n),'X-Correlation-ID':'synthetic-correlation-1',...headers},body:JSON.stringify(body)});
+    const res=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(n),'X-Correlation-ID':'synthetic-correlation-1','X-Mock-Instance-ID':instance,...headers},body:JSON.stringify(body)});
     return {code:res.status,body:await res.json()};
   };
-  try { await run({url,get,post}); } finally { await new Promise(resolve => server.close(resolve)); }
+  try { await run({url,get,post,instance}); } finally { await new Promise(resolve => server.close(resolve)); }
 }
 
 test('request, approve and revoke are explicitly synthetic and revisioned', async () => fixture({}, async ({get,post}) => {
@@ -53,8 +54,8 @@ test('expiry and revocation reject stale or inactive use', async () => {
   });
 });
 
-test('lost mutation response is uncertain, same-key retry returns original receipt', async () => fixture({dropFirstMutationResponse:true}, async ({url,get,post}) => {
-  await assert.rejects(fetch(`${url}/approve`,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(1),'X-Correlation-ID':'synthetic-correlation-1'},body:JSON.stringify(valid)}));
+test('lost mutation response is uncertain, same-key retry returns original receipt', async () => fixture({dropFirstMutationResponse:true}, async ({url,get,post,instance}) => {
+  await assert.rejects(fetch(`${url}/approve`,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(1),'X-Correlation-ID':'synthetic-correlation-1','X-Mock-Instance-ID':instance},body:JSON.stringify(valid)}));
   const observed=await get('/grant'); assert.equal(observed.body.status,'active');
   const retry=await post('/approve',valid,1); assert.equal(retry.code,200); assert.deepEqual(retry.body.grant,observed.body.grant);
   assert.equal(retry.body.grant.grantRevision,1);
@@ -81,4 +82,53 @@ test('replayed receipt is historical; GET gives current expiration', async () =>
     assert.deepEqual(await post('/approve',valid,1),original);
     const state=await get('/grant'); assert.equal(state.body.status,'expired'); assert.equal(state.body.grant.grantRevision,2);
   });
+});
+
+
+test('instance fence rejects lost-response replay after restart before any mutation', async () => {
+  let stale, priorGrant;
+  await fixture({dropFirstMutationResponse:true}, async ({url,get,instance}) => {
+    stale=instance;
+    await assert.rejects(fetch(`${url}/approve`,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(91),'X-Correlation-ID':'synthetic-correlation-1','X-Mock-Instance-ID':stale},body:JSON.stringify(valid)}));
+    priorGrant=(await get('/grant')).body.grant;
+    assert.equal(priorGrant.grantRevision,1);
+  });
+  await fixture({}, async ({get,post,instance}) => {
+    assert.notEqual(instance,stale);
+    const mismatch=await post('/approve',valid,91,{'X-Mock-Instance-ID':stale});
+    assert.equal(mismatch.code,409); assert.equal(mismatch.body.error,'instance_mismatch');
+    assert.equal(mismatch.body.serverInstanceId,instance);
+    assert.equal((await get('/grant')).body.status,'none');
+    const fresh=await post('/approve',valid,91); assert.equal(fresh.code,200);
+    assert.notEqual(fresh.body.grant.receiptId,priorGrant.receiptId);
+  });
+});
+
+test('invalid, missing and stale instance values never consume an idempotency key', async () => fixture({}, async ({get,post,instance}) => {
+  assert.equal((await get('/grant')).body.serverInstanceId,instance);
+  assert.equal((await post('/approve',valid,10,{'X-Mock-Instance-ID':''})).body.error,'invalid_instance');
+  assert.equal((await post('/approve',valid,10,{'X-Mock-Instance-ID':'00000000-0000-4000-8000-000000000000'})).body.error,'instance_mismatch');
+  assert.equal((await get('/grant')).body.status,'none');
+  assert.equal((await post('/approve',valid,10)).code,200);
+}));
+
+test('same-address restart does not replay an uncertain mutation into an empty ledger', async () => {
+  const first=createConsentMock({dropFirstMutationResponse:true});
+  await new Promise(resolve => first.listen(0,'127.0.0.1',resolve));
+  const port=first.address().port, url=`http://127.0.0.1:${port}${basePath}`;
+  let stale;
+  try {
+    stale=(await (await fetch(`${url}/request`)).json()).serverInstanceId;
+    await assert.rejects(fetch(`${url}/approve`,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(99),'X-Correlation-ID':'synthetic-correlation-1','X-Mock-Instance-ID':stale},body:JSON.stringify(valid)}));
+    assert.equal((await (await fetch(`${url}/grant`)).json()).status,'active');
+  } finally { await new Promise(resolve => first.close(resolve)); }
+  const second=createConsentMock();
+  await new Promise((resolve,reject) => second.once('error',reject).listen(port,'127.0.0.1',resolve));
+  try {
+    const current=await (await fetch(`${url}/request`,{headers:{Connection:'close'}})).json();
+    assert.notEqual(current.serverInstanceId,stale);
+    const retry=await fetch(`${url}/approve`,{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':key(99),'X-Correlation-ID':'synthetic-correlation-1','X-Mock-Instance-ID':stale,Connection:'close'},body:JSON.stringify(valid)});
+    assert.equal(retry.status,409); assert.equal((await retry.json()).error,'instance_mismatch');
+    assert.equal((await (await fetch(`${url}/grant`,{headers:{Connection:'close'}})).json()).status,'none');
+  } finally { await new Promise(resolve => second.close(resolve)); }
 });

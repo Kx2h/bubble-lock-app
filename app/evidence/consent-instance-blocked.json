@@ -1,0 +1,8 @@
+{
+  "mode": "synthetic",
+  "differentInstance": true,
+  "previousStatus": "active",
+  "newStatus": "none",
+  "newGrantNull": true,
+  "newInstanceMutationPosts": 0
+}

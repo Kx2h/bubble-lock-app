@@ -13,6 +13,9 @@ const stable = object => JSON.stringify(object, (_key, value) => {
 });
 
 export function createConsentMock({ now = () => Date.now(), dropFirstMutationResponse = false } = {}) {
+  // A restarted process has lost its idempotency ledger. Never replay a request
+  // against a different process and accidentally create a second grant.
+  const serverInstanceId = randomUUID();
   let grant = null, status = 'none', revision = 0, drop = dropFirstMutationResponse;
   const operations = new Map();
   const refreshExpiry = () => {
@@ -20,7 +23,7 @@ export function createConsentMock({ now = () => Date.now(), dropFirstMutationRes
       status = 'expired'; grant = {...grant, grantRevision: ++revision};
     }
   };
-  const response = (res, code, body) => { res.writeHead(code); res.end(JSON.stringify(body)); };
+  const response = (res, code, body) => { res.writeHead(code); res.end(JSON.stringify({...body, serverInstanceId})); };
   const error = name => ({mode:'synthetic', error:name});
   async function bodyJson(req) {
     let size = 0; const chunks = [];
@@ -34,6 +37,11 @@ export function createConsentMock({ now = () => Date.now(), dropFirstMutationRes
     if (req.method === 'GET' && req.url === `${BASE}/request`) return response(res, 200, {mode:'synthetic',request:REQUEST});
     if (req.method === 'GET' && req.url === `${BASE}/grant`) { refreshExpiry(); return response(res, 200, {mode:'synthetic',status,grant}); }
     if (req.method !== 'POST' || ![`${BASE}/approve`,`${BASE}/revoke`].includes(req.url)) return response(res,404,error('not_found'));
+    const expectedInstance = req.headers['x-mock-instance-id'];
+    if (typeof expectedInstance !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(expectedInstance)) return response(res,400,error('invalid_instance'));
+    // Check before reading the body, looking up a key, expiring a grant, or
+    // changing either the grant or idempotency ledger.
+    if (expectedInstance !== serverInstanceId) return response(res,409,error('instance_mismatch'));
     const id = req.headers['idempotency-key'], correlation = req.headers['x-correlation-id'];
     if (typeof id !== 'string' || !HEADER.test(id) || typeof correlation !== 'string' || !HEADER.test(correlation)) return response(res,400,error('invalid_headers'));
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] ?? '')) return response(res,415,error('invalid_content_type'));

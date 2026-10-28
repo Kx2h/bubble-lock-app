@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: request, approve and revoke are explicitly synthetic and revisioned
+ok 1 - request, approve and revoke are explicitly synthetic and revisioned
+  ---
+  duration_ms: 25.461959
+  type: 'test'
+  ...
+# Subtest: rejects mismatched purpose, scopes, TTL, revision and unrecognized fields
+ok 2 - rejects mismatched purpose, scopes, TTL, revision and unrecognized fields
+  ---
+  duration_ms: 11.738413
+  type: 'test'
+  ...
+# Subtest: replays identical mutation without duplicating, conflicting key is rejected
+ok 3 - replays identical mutation without duplicating, conflicting key is rejected
+  ---
+  duration_ms: 5.431491
+  type: 'test'
+  ...
+# Subtest: expiry and revocation reject stale or inactive use
+ok 4 - expiry and revocation reject stale or inactive use
+  ---
+  duration_ms: 7.802195
+  type: 'test'
+  ...
+# Subtest: lost mutation response is uncertain, same-key retry returns original receipt
+ok 5 - lost mutation response is uncertain, same-key retry returns original receipt
+  ---
+  duration_ms: 6.252792
+  type: 'test'
+  ...
+# Subtest: requires bounded identifiers and does not offer a general proxy
+ok 6 - requires bounded identifiers and does not offer a general proxy
+  ---
+  duration_ms: 3.515551
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate submissions settle once; different keys cannot both grant
+ok 7 - concurrent duplicate submissions settle once; different keys cannot both grant
+  ---
+  duration_ms: 10.642385
+  type: 'test'
+  ...
+# Subtest: replayed receipt is historical; GET gives current expiration
+ok 8 - replayed receipt is historical; GET gives current expiration
+  ---
+  duration_ms: 4.866141
+  type: 'test'
+  ...
+# Subtest: instance fence rejects lost-response replay after restart before any mutation
+ok 9 - instance fence rejects lost-response replay after restart before any mutation
+  ---
+  duration_ms: 5.611562
+  type: 'test'
+  ...
+# Subtest: invalid, missing and stale instance values never consume an idempotency key
+ok 10 - invalid, missing and stale instance values never consume an idempotency key
+  ---
+  duration_ms: 4.177555
+  type: 'test'
+  ...
+# Subtest: same-address restart does not replay an uncertain mutation into an empty ledger
+ok 11 - same-address restart does not replay an uncertain mutation into an empty ledger
+  ---
+  duration_ms: 5.48375
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 136.311603

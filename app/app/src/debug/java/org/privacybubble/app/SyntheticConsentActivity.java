@@ -1,6 +1,8 @@
 package org.privacybubble.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,12 +30,12 @@ public final class SyntheticConsentActivity extends Activity {
     private State model;
     private TextView status;
     private CheckBox choice;
-    private Button refresh, approve, revoke, retry;
+    private Button refresh, approve, revoke, retry, discard;
 
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         Object retained = getLastNonConfigurationInstance();
-        model = retained instanceof State ? (State) retained : new State();
+        model = retained instanceof State ? (State) retained : new State(getSharedPreferences("synthetic_consent_pending", MODE_PRIVATE));
         ScrollView scroll = new ScrollView(this);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -53,6 +55,13 @@ public final class SyntheticConsentActivity extends Activity {
         approve = new Button(this); approve.setText("합성 승인"); approve.setAllCaps(false); layout.addView(approve);
         revoke = new Button(this); revoke.setText("합성 회수"); revoke.setAllCaps(false); layout.addView(revoke);
         retry = new Button(this); retry.setText("미확정 합성 요청 재전송"); retry.setAllCaps(false); layout.addView(retry);
+        discard = new Button(this); discard.setText("차단된 합성 보류 기록 삭제"); discard.setAllCaps(false); layout.addView(discard);
+        discard.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("합성 보류 기록 삭제")
+                .setMessage("시험용 보류 기록만 지웁니다. 이전 요청 결과는 확인할 수 없으며 실제 권한에는 영향을 주지 않습니다.")
+                .setNegativeButton("취소", null)
+                .setPositiveButton("기록 삭제", (dialog, which) -> model.discardBlockedRecord())
+                .show());
         refresh.setOnClickListener(v -> { choice.setChecked(false); model.refresh(); });
         approve.setOnClickListener(v -> { if (choice.isChecked()) { choice.setChecked(false); model.mutate(true); } });
         revoke.setOnClickListener(v -> { if (choice.isChecked()) { choice.setChecked(false); model.mutate(false); } });
@@ -68,29 +77,63 @@ public final class SyntheticConsentActivity extends Activity {
     }
     private void render() {
         status.setText(model.message);
-        refresh.setEnabled(!model.busy && model.pending == null);
-        choice.setEnabled(!model.busy && (model.known || model.pending != null));
+        refresh.setEnabled(!model.busy && !model.storageFault && model.pending == null);
+        choice.setEnabled(!model.busy && !model.storageFault && !model.epochMismatch && (model.known || model.pending != null));
         approve.setEnabled(!model.busy && model.known && !model.active && choice.isChecked());
         revoke.setEnabled(!model.busy && model.known && model.active && choice.isChecked());
-        retry.setEnabled(!model.busy && !model.known && model.pending != null && choice.isChecked());
+        retry.setEnabled(!model.busy && !model.storageFault && !model.epochMismatch && !model.known && model.pending != null && choice.isChecked());
+        discard.setEnabled(!model.busy && (model.storageFault || model.epochMismatch));
     }
 
     private static final class State {
         private final ExecutorService worker = Executors.newSingleThreadExecutor();
         private final Handler main = new Handler(Looper.getMainLooper());
-        private boolean busy, closed, known, active;
+        private static final String PENDING_KEY = "pending_v1";
+        private final SharedPreferences preferences;
+        private boolean busy, closed, known, active, storageFault, epochMismatch;
         private int grantRevision;
-        private Pending pending;
+        private String serverInstance;
+        private SyntheticPending pending;
         private String message = "합성 상태 미조회 · 먼저 조회하세요.";
         private Runnable listener;
+        State(SharedPreferences preferences) {
+            this.preferences = preferences;
+            try {
+                if (preferences.contains(PENDING_KEY)) {
+                    pending = SyntheticPending.decode(preferences.getString(PENDING_KEY, null));
+                    message = "저장된 합성 요청이 미확정입니다. 선택 후 같은 요청을 재전송하세요.";
+                }
+            } catch (Exception failure) {
+                storageFault = true;
+                message = "합성 보류 기록을 확인할 수 없어 변경을 차단했습니다. 차단된 합성 보류 기록만 삭제할 수 있습니다.";
+            }
+        }
         private void notifyUi() { if (listener != null) listener.run(); }
         private void close() { closed = true; listener = null; worker.shutdownNow(); }
+        private void discardBlockedRecord() {
+            if (closed || busy || !(storageFault || epochMismatch)) return;
+            if (!preferences.edit().remove(PENDING_KEY).commit()) {
+                storageFault = true;
+                message = "합성 보류 기록을 삭제하지 못해 변경을 차단했습니다.";
+            } else {
+                pending = null; storageFault = false; epochMismatch = false; known = false; active = false; serverInstance = null;
+                message = "합성 보류 기록을 삭제했습니다. 이전 요청 결과는 확인할 수 없습니다. 현재 상태를 다시 조회하세요.";
+            }
+            notifyUi();
+        }
         private void refresh() {
-            if (closed || busy || pending != null) return;
+            if (closed || busy || storageFault || pending != null) return;
             busy = true; known = false; message = "합성 상태 조회 중…"; notifyUi();
             worker.execute(() -> {
                 Snapshot snapshot = null;
-                try { validateRequest(call("request", null)); snapshot = parseGrant(call("grant", null)); }
+                try {
+                    JSONObject request = call("request", null);
+                    validateRequest(request);
+                    String instance = instance(request);
+                    Snapshot found = parseGrant(call("grant", null));
+                    if (!instance.equals(found.instance)) throw new EpochMismatch();
+                    snapshot = found;
+                }
                 catch (Exception ignored) { }
                 final Snapshot result = snapshot;
                 main.post(() -> {
@@ -103,59 +146,75 @@ public final class SyntheticConsentActivity extends Activity {
             });
         }
         private void mutate(boolean approving) {
-            if (closed || busy || !known || pending != null || approving == active) return;
+            if (closed || busy || storageFault || !known || pending != null || approving == active) return;
             try {
-                JSONObject body = new JSONObject();
-                body.put("requestId", "synthetic-request-1");
-                if (approving) {
-                    body.put("revision", 1); body.put("purpose", "synthetic-location-check");
-                    body.put("scopes", new JSONArray().put("test.location.read")); body.put("ttlSeconds", 120);
-                } else body.put("grantRevision", grantRevision);
-                pending = new Pending(approving ? "approve" : "revoke", body.toString(), approving);
+                String body = approving ? SyntheticPending.APPROVE_BODY
+                        : "{\"requestId\":\"synthetic-request-1\",\"grantRevision\":" + grantRevision + "}";
+                SyntheticPending next = new SyntheticPending(serverInstance, approving ? "approve" : "revoke", body,
+                        UUID.randomUUID().toString(), UUID.randomUUID().toString());
+                // Synchronous persistence precedes every network mutation.
+                if (!preferences.edit().putString(PENDING_KEY, next.encode()).commit()) throw new IllegalStateException();
+                pending = next;
                 sendPending();
-            } catch (Exception ignored) { known = false; message = "합성 요청 미확정 · 다시 조회하세요."; notifyUi(); }
+            } catch (Exception failure) {
+                storageFault = true; known = false;
+                message = "합성 요청 보관에 실패해 전송을 차단했습니다. 차단된 합성 보류 기록만 삭제할 수 있습니다."; notifyUi();
+            }
         }
         private void retry() {
-            if (closed || busy || known || pending == null) return;
+            if (closed || busy || storageFault || epochMismatch || known || pending == null) return;
             sendPending();
         }
         private void sendPending() {
-            final Pending operation = pending;
+            final SyntheticPending operation = pending;
             busy = true; known = false; message = "합성 요청 처리 중…"; notifyUi();
             worker.execute(() -> {
                 Snapshot snapshot = null;
+                boolean differentInstance = false;
                 try {
+                    Snapshot before = parseGrant(call("grant", null));
+                    if (!operation.instance.equals(before.instance)) throw new EpochMismatch();
                     JSONObject reply = call(operation.endpoint, operation);
                     Snapshot acknowledged = parseGrant(reply);
+                    if (!operation.instance.equals(acknowledged.instance)) throw new EpochMismatch();
                     if (!(reply.opt("correlationId") instanceof String) || !operation.correlation.equals(reply.opt("correlationId"))
                             || acknowledged.active != operation.approving
                             || !(operation.approving ? "active" : "revoked").equals(acknowledged.status)) throw new IllegalStateException();
                     // A repeated receipt can be stale; only a fresh read describes current server state.
                     snapshot = parseGrant(call("grant", null));
-                } catch (Exception ignored) { }
+                    if (!operation.instance.equals(snapshot.instance)) throw new EpochMismatch();
+                } catch (EpochMismatch mismatch) { differentInstance = true; snapshot = null; }
+                catch (Exception ignored) { }
                 final Snapshot result = snapshot;
+                final boolean mismatch = differentInstance;
                 main.post(() -> {
                     if (closed) return;
                     busy = false;
-                    if (result == null) {
-                        known = false; message = "합성 처리 결과 미확정 · 자동 재시도하지 않았습니다. 선택 후 같은 요청을 직접 재전송하세요. 화면 종료 또는 프로세스 재시작 시 보류 요청이 사라져 복구할 수 없습니다.";
+                    if (mismatch) {
+                        epochMismatch = true; known = false;
+                        message = "합성 서버가 재시작되어 보류 요청을 재전송할 수 없습니다. 차단된 합성 보류 기록만 삭제할 수 있습니다.";
+                    } else if (result == null) {
+                        known = false; message = "합성 처리 결과 미확정 · 선택 후 저장된 같은 요청을 직접 재전송하세요.";
+                    } else if (!preferences.edit().remove(PENDING_KEY).commit()) {
+                        storageFault = true; known = false;
+                        message = "합성 보류 기록을 정리하지 못해 변경을 차단했습니다.";
                     } else { pending = null; apply(result); }
                     notifyUi();
                 });
             });
         }
         private void apply(Snapshot result) {
-            known = true; active = result.active; grantRevision = result.revision;
+            known = true; active = result.active; grantRevision = result.revision; serverInstance = result.instance;
             message = "합성 서버 상태: " + result.status + (result.active ? "\n합성 만료 시각: " + result.expires : "")
                     + "\n서버 조회 시점의 상태입니다. 실제 권한은 없습니다.";
         }
-        private static JSONObject call(String endpoint, Pending operation) throws Exception {
+        private static JSONObject call(String endpoint, SyntheticPending operation) throws Exception {
             if (!(endpoint.equals("request") || endpoint.equals("grant") || endpoint.equals("approve") || endpoint.equals("revoke"))) throw new IllegalArgumentException();
             byte[] payload = operation == null ? new byte[0] : operation.body.getBytes(StandardCharsets.UTF_8);
             String headers = (operation == null ? "GET " : "POST ") + "/api/mock-consent/v1/" + endpoint + " HTTP/1.0\r\n"
                     + "Host: 127.0.0.1:18787\r\nConnection: close\r\n"
                     + (operation == null ? "" : "Content-Type: application/json\r\nIdempotency-Key: "
-                    + operation.key + "\r\nX-Correlation-ID: " + operation.correlation + "\r\nContent-Length: " + payload.length + "\r\n")
+                    + operation.key + "\r\nX-Correlation-ID: " + operation.correlation + "\r\nX-Mock-Instance-ID: " + operation.instance + "\r\nContent-Length: " + payload.length + "\r\n")
                     + "\r\n";
             // A single socket and a single write attempt: no client or framework POST retry.
             try (Socket socket = new Socket()) {
@@ -188,7 +247,13 @@ public final class SyntheticConsentActivity extends Activity {
             SyntheticConsentValidator.request(json.opt("mode"), r.opt("requestId"), r.opt("principal"), r.opt("purpose"),
                     scopes.opt(0), r.opt("revision"), r.opt("ttlSeconds"));
         }
+        private static String instance(JSONObject json) throws Exception {
+            Object id = json.opt("serverInstanceId");
+            if (!(id instanceof String) || !SyntheticPending.uuid((String) id)) throw new IllegalStateException();
+            return (String) id;
+        }
         private static Snapshot parseGrant(JSONObject json) throws Exception {
+            String serverInstance = instance(json);
             if (!json.has("grant")) throw new IllegalStateException();
             boolean grantNull = json.isNull("grant");
             JSONObject g = grantNull ? null : json.getJSONObject("grant");
@@ -198,21 +263,15 @@ public final class SyntheticConsentActivity extends Activity {
                     g == null ? null : g.opt("receiptId"));
             String status = (String) json.get("status");
             return new Snapshot(status, g == null ? 0 : (Integer) g.get("grantRevision"),
-                    g == null ? "" : (String) g.get("expiresAt"));
+                    g == null ? "" : (String) g.get("expiresAt"), serverInstance);
         }
 
     }
-    private static final class Pending {
-        final String endpoint, body, key, correlation; final boolean approving;
-        Pending(String endpoint, String body, boolean approving) {
-            this.endpoint = endpoint; this.body = body; this.approving = approving;
-            this.key = UUID.randomUUID().toString(); this.correlation = UUID.randomUUID().toString();
-        }
-    }
+    private static final class EpochMismatch extends Exception { }
     private static final class Snapshot {
-        final String status, expires; final boolean active; final int revision;
-        Snapshot(String status, int revision, String expires) {
-            this.status = status; this.active = status.equals("active"); this.revision = revision; this.expires = expires;
+        final String status, expires, instance; final boolean active; final int revision;
+        Snapshot(String status, int revision, String expires, String instance) {
+            this.status = status; this.active = status.equals("active"); this.revision = revision; this.expires = expires; this.instance = instance;
         }
     }
 }

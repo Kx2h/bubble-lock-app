@@ -1,0 +1,10 @@
+{
+  "mode": "synthetic",
+  "sameInstance": true,
+  "sameReceipt": true,
+  "sameRevision": true,
+  "beforeStatus": "active",
+  "afterStatus": "active",
+  "approvePosts": 2,
+  "sameKey": true
+}
