@@ -1,0 +1,92 @@
+
+> privacy-bubble-pc-mobius-core@0.1.0 test
+> node --test test/**/*.test.mjs
+
+TAP version 13
+# Subtest: oneM2M contract keeps the CORE ownership and release headers
+ok 1 - oneM2M contract keeps the CORE ownership and release headers
+  ---
+  duration_ms: 0.73419
+  type: 'test'
+  ...
+# Subtest: oneM2M flow covers resource creation, state update, retrieve, subscription and group
+ok 2 - oneM2M flow covers resource creation, state update, retrieve, subscription and group
+  ---
+  duration_ms: 0.175903
+  type: 'test'
+  ...
+# Subtest: Raspberry Pi Gateway contract binds BLE, MQTT, HTTPS and oneM2M mapping
+ok 3 - Raspberry Pi Gateway contract binds BLE, MQTT, HTTPS and oneM2M mapping
+  ---
+  duration_ms: 0.108275
+  type: 'test'
+  ...
+# Subtest: GatewayBridge publishes oneM2M MQTT primitive and settles response rqi/rsc
+ok 4 - GatewayBridge publishes oneM2M MQTT primitive and settles response rqi/rsc
+  ---
+  duration_ms: 1.852342
+  type: 'test'
+  ...
+# Subtest: GatewayBridge maps Raspberry Pi telemetry to oneM2M state and deduplicates sequence
+ok 5 - GatewayBridge maps Raspberry Pi telemetry to oneM2M state and deduplicates sequence
+  ---
+  duration_ms: 1.269013
+  type: 'test'
+  ...
+# Subtest: GatewayBridge publishes command and settles it with ACK/readback
+ok 6 - GatewayBridge publishes command and settles it with ACK/readback
+  ---
+  duration_ms: 0.624918
+  type: 'test'
+  ...
+# Subtest: GatewayBridge keeps a reviewable telemetry event available for retry
+ok 7 - GatewayBridge keeps a reviewable telemetry event available for retry
+  ---
+  duration_ms: 1.292838
+  type: 'test'
+  ...
+# Subtest: GroupDispatcher fans out a command and settles member readback
+ok 8 - GroupDispatcher fans out a command and settles member readback
+  ---
+  duration_ms: 1.471688
+  type: 'test'
+  ...
+# Subtest: GroupDispatcher retries the member whose ACK remains pending
+ok 9 - GroupDispatcher retries the member whose ACK remains pending
+  ---
+  duration_ms: 0.437118
+  type: 'test'
+  ...
+# Subtest: CORE migration defines event, dispatch, receipt and oneM2M binding tables
+ok 10 - CORE migration defines event, dispatch, receipt and oneM2M binding tables
+  ---
+  duration_ms: 0.66005
+  type: 'test'
+  ...
+# Subtest: ReceiptJournal writes a hash-recorded JSONL receipt
+ok 11 - ReceiptJournal writes a hash-recorded JSONL receipt
+  ---
+  duration_ms: 4.498105
+  type: 'test'
+  ...
+# Subtest: CORE release manifest maps runtime artifacts and replay commands
+ok 12 - CORE release manifest maps runtime artifacts and replay commands
+  ---
+  duration_ms: 0.478407
+  type: 'test'
+  ...
+# Subtest: Gateway event schema preserves BLE-to-Mobius payload contract
+ok 13 - Gateway event schema preserves BLE-to-Mobius payload contract
+  ---
+  duration_ms: 0.658457
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 48.588061
