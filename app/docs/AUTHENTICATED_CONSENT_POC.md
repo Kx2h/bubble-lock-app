@@ -8,4 +8,6 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10. 이 화면은 테스트용 IdP·
 
 Activity 종료 중 전송 직전의 종료·중단 여부와 세션을 다시 검사하지만, 그 검사 직후 종료되거나 이미 전송된 HTTP 요청이 서버에서 처리되는 것을 취소한다고 보장하지 않는다. 이 경우에도 미확정 표시를 남긴다. 성공 receipt는 서버 instance와 correlation을 확인하고 서버의 현재 상태를 다시 읽어야 표시를 해제한다. 테스트 서버의 휘발성 ledger나 instance ID는 운영 권한 또는 실제 복구 보장이 아니다.
 
+응답이 조금씩 계속 도착하더라도 요청 시작 후 10초 경과 여부를 헤더와 각 본문 read 전후에 검사한다. 연결·헤더 처리 중이나 이미 진행 중인 read는 차단된 호출이 돌아온 뒤에야 경과 여부를 검사하므로 정확한 전체 시간 제한은 아니다. 연결과 read에는 각각 기존 5초 소켓 제한을 적용하지만, 차단된 요청 본문 쓰기의 전체 시간 제한은 보장하지 않는다. 시간 초과를 포함한 변경 요청 실패는 서버 처리 여부를 단정하지 않고 미확정 상태로 남긴다. 응답 기한 단위시험은 `app/tests/auth-consent-mock/test-response-deadline.sh`로 실행한다.
+
 정상·부정·종료/재시작·토큰 만료와 기기 정리 증거는 별도 receipt로 기록한다. 실제 연동 전에는 issuer, client, verified App Links, API의 principal·scope·idempotency·durability 계약, secret 보관 및 운영 테스트가 필요하다.

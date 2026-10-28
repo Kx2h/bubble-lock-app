@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -186,6 +185,7 @@ public final class AuthenticatedConsentActivity extends Activity {
     private static JSONObject call(String endpoint, String body, Pending op, String accessToken) throws Exception {
         if (!(endpoint.equals("request") || endpoint.equals("grant") || endpoint.equals("approve") || endpoint.equals("revoke"))) throw new IllegalArgumentException();
         if (accessToken == null || accessToken.length() > 16384 || accessToken.isEmpty()) throw new IllegalArgumentException();
+        ResponseDeadline deadline = new ResponseDeadline(System::nanoTime, 10_000_000_000L);
         HttpsURLConnection conn = (HttpsURLConnection) new URL(API + endpoint).openConnection();
         conn.setConnectTimeout(5000); conn.setReadTimeout(5000); conn.setInstanceFollowRedirects(false); conn.setUseCaches(false);
         conn.setRequestProperty("Authorization", "Bearer " + accessToken); conn.setRequestProperty("Accept", "application/json");
@@ -197,11 +197,11 @@ public final class AuthenticatedConsentActivity extends Activity {
                 conn.setRequestProperty("X-Correlation-ID", op.correlation); conn.setRequestProperty("X-Mock-Instance-ID", op.instance);
                 try (OutputStream out = conn.getOutputStream()) { out.write(payload); }
             } else conn.setRequestMethod("GET");
+            deadline.check();
             if (conn.getResponseCode() != 200) throw new IllegalStateException();
-            try (InputStream in = conn.getInputStream(); ByteArrayOutputStream data = new ByteArrayOutputStream()) {
-                byte[] bytes = new byte[1024]; int count;
-                while ((count = in.read(bytes)) != -1) { if (data.size() + count > 16384) throw new IllegalStateException(); data.write(bytes, 0, count); }
-                return new JSONObject(new String(data.toByteArray(), StandardCharsets.UTF_8));
+            deadline.check();
+            try (InputStream in = conn.getInputStream()) {
+                return new JSONObject(deadline.read(in, 16384));
             }
         } finally { conn.disconnect(); }
     }
