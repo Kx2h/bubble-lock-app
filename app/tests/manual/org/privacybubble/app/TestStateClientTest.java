@@ -44,5 +44,28 @@ public final class TestStateClientTest {
             try { client.read(); throw new AssertionError("interrupted call must stop"); } catch (InterruptedException expected) { } finally { Thread.interrupted(); }
             System.out.println("PASS: bounded GET retry, non-retry errors, response limit, loopback and cancellation");
         } finally { server.stop(0); }
+
+        AtomicInteger slowCalls = new AtomicInteger();
+        HttpServer slow = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        slow.createContext("/api/test/bubble-state", exchange -> {
+            slowCalls.incrementAndGet();
+            exchange.sendResponseHeaders(200, 20);
+            try (var output = exchange.getResponseBody()) {
+                for (int i = 0; i < 20; i++) {
+                    output.write('x'); output.flush();
+                    try { Thread.sleep(75); } catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); break; }
+                }
+            } catch (java.io.IOException disconnected) { /* expected when client times out */ }
+        });
+        slow.start();
+        try {
+            URL url = new URL("http://127.0.0.1:" + slow.getAddress().getPort() + "/api/test/bubble-state");
+            long started = System.nanoTime();
+            try { new TestStateClient(url, 0, 300).read(); throw new AssertionError("dribbling body must time out"); }
+            catch (TestStateClient.DeadlineExceeded expected) { }
+            if ((System.nanoTime() - started) > 3_000_000_000L) throw new AssertionError("response was not bounded");
+            if (slowCalls.get() != 1) throw new AssertionError("budget exhaustion must not retry");
+            System.out.println("PASS: slow-drip body exceeds the shared request budget without retry");
+        } finally { slow.stop(0); }
     }
 }

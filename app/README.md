@@ -53,7 +53,7 @@ node --test app/scripts/device-poc.test.mjs
 
 OIDC는 아직 운영 로그인 UI나 운영 토큰 교환에 연결되지 않았습니다. 신뢰된 issuer의 HTTPS discovery/JWKS와 RS256 ID 토큰 검증 경계는 [OIDC 검증 준비](docs/OIDC_TRUST_BOUNDARY.md)에 설명되어 있으며 Nimbus JOSE+JWT 9.47이 필요합니다. `:app:testDebugUnitTest`의 JVM 단위시험은 검증 경계에 대한 시험이고 실제 IdP 또는 휴대폰 로그인 시험은 아닙니다.
 
-로컬 테스트 상태 조회는 연결 오류와 HTTP 503·504에서 한 번 재시도합니다. HTTP 403·502와 잘못된 응답은 재시도하지 않습니다. 실제 사용자 인증이나 서버 권한에 적용되는 재시도 정책은 아닙니다. 저장소 루트에서 `app/scripts/test-client.sh`로 JVM 클라이언트 시험을 실행할 수 있습니다.
+로컬 테스트 상태 조회는 연결 오류와 HTTP 503·504에서 한 번 재시도합니다. HTTP 403·502와 잘못된 응답은 재시도하지 않습니다. 두 시도에 걸친 10초 경과 예산을 확인하며, 응답 본문이 조금씩 계속 도착하더라도 예산을 넘으면 중단하고 재시도하지 않습니다. 진행 중인 연결·헤더 수신이나 읽기는 호출이 반환된 뒤에 경과 여부를 확인하므로 엄격한 전체 시간 제한은 아닙니다. 실제 사용자 인증이나 서버 권한에 적용되는 재시도 정책은 아닙니다. 저장소 루트에서 `app/scripts/test-client.sh`로 JVM 클라이언트 시험을 실행할 수 있습니다.
 
 기기에서 읽기 재시도를 재현할 때는 실제 중계를 중지하고 `node app/tests/fixtures/retry-mock.mjs`를 실행한 뒤 기존 reverse 연결로 상태 조회를 한 번 누릅니다. 이 fixture는 첫 GET에 503, 다음 GET에 200을 반환하는 모의 서버입니다. 완료 후 실행한 fixture를 종료합니다. 실제 Mobius4나 키링 데이터가 아닙니다.
 
