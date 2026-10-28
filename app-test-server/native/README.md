@@ -80,6 +80,16 @@ git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7
 
 `--mqtt --keyring-outbox --observation-cin --receipt-cin --phone`은 같은 격리 AE에 고정 KEYRING 코드로 생성한 합성 `INDETERMINATE` receipt를 직접 저장해 앱의 합성 결과 조회 화면까지 연결한다. 생성·readback의 oneM2M RI/RSC와 전체 내용을 대조하며 합성 명령을 전송하거나 기기를 실행하지 않는다. Enter 또는 stdin EOF로 정리를 시작하며 stdin이 닫힌 자동 실행은 조회 준비 직후 종료한다. `APP_CORE_TEST_PROXY_PORT=0`은 호스트 시험용 임의 포트를 사용하며, 휴대폰의 고정 8787 연결에는 기본 포트를 사용한다. 정확한 범위와 정리 절차는 [APP 합성 결과 시험](../../app/docs/SYNTHETIC_RECEIPT_POC.md)을 참고한다.
 
+`--receipt-cin` 대신 `--receipt-outbox`를 쓰면 같은 고정 합성 결과를 팀 코드의 실제 command journal과 receipt outbox에 기록해 전송한다. `Store.accept`와 `Gateway._finish`로 `INDETERMINATE` 결과만 기록하고 dispatch·authorize·BLE·command publish는 호출하지 않는다. 연결 전 `_outbox_loop`의 재시도 및 DB 재열기 뒤 pending·미전달 journal 보존을 확인한다. 연결 후 `Store.stage_receipts`와 `TransportHub.publish`가 만든 정확한 `gw-SHA256` CIN만 별도 mTLS MQTT→HTTP 시험 어댑터로 전달하고, CSE CREATE·독립 readback의 RI/RSC와 전체 본문이 일치한 뒤에만 응답한다. 이후 실제 outbox 항목 제거와 journal의 `receipt_delivered=1`을 확인한다.
+
+```sh
+node --test app-test-server/native/mqtt/receipt-bridge.test.mjs app-test-server/native/core-app-bridge-check.test.mjs app-test-server/server.test.mjs
+node app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring-outbox --observation-cin --receipt-outbox
+# 기존 기기의 8787 reverse와 빈 8787 포트에서 같은 합성 결과 화면을 확인하려면 --phone 추가
+```
+
+이 모드에서 APP 중계는 `syntheticReceiptSource: 'outbox'`라는 명시적 시험 설정과 고정 합성 command ID에서 계산한 CIN 이름을 사용한다. 기존 `direct` 모드는 `synthetic-receipt` 이름만 허용하며 임의의 receipts CIN으로 확장되지 않는다. 서버 응답 본문의 형태와 앱은 기존 합성 조회와 동일하다. 이 검증은 새 명령 실행·물리 ACK·실제 사용자 권한의 증거가 아니며, 응답 유실 뒤 CIN 이름 충돌의 회복이나 실제 Gateway daemon 전체 실행은 구현하지 않는다. 호스트 결과는 [receipt outbox 기록](evidence/keyring-receipt-outbox.md)에 있다.
+
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
 
 `--mqtt --keyring-outbox --observation-cin`은 고유 AE 아래 시험용 `observations` container를 추가하고 KEYRING 원본 관측 outbox도 확인한다. 별도 mTLS MQTT 시험 어댑터는 해당 container의 CREATE만 실제 loopback CSE HTTP에 전달하며, CSE의 CREATE HTTP 201/RSC 2001/요청 ID와 별도 RETRIEVE HTTP 200/RSC 2000/요청 ID 및 CIN 이름·내용 일치를 확인한 후에만 같은 MQTT 요청 ID로 성공 응답을 보낸다. 이후 팀 Gateway의 SQLite outbox에서 해당 항목이 제거되는지 검사한다. 오류나 불일치에는 성공 응답을 보내지 않는다. CORE telemetry는 별도 경로로 이전과 같이 검증한다.

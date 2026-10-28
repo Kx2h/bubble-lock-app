@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from './server.mjs';
+import { SYNTHETIC_RECEIPT_RN } from './native/mqtt/receipt-bridge.mjs';
 
 function switchResource(overrides = {}) {
   return { rn: 'bubbleState', cnd: 'org.onem2m.common.moduleclass.binarySwitch', state: false, ...overrides };
@@ -163,6 +164,27 @@ test('synthetic receipt requires an isolated AE and preserves distinct outcomes'
     assert.equal((await fetch(`${base}/api/test/receipt?x=1`)).status,404);
     assert.equal((await fetch(`${base}/api/test/receipt`,{method:'POST'})).status,404);
   } finally { await new Promise(resolve=>server.close(resolve)); }
+});
+test('outbox receipt source accepts only the exact pinned synthetic journal name', async () => {
+  assert.throws(() => createServer({syntheticReceiptSource:'outbox'}), /Invalid synthetic receipt source/);
+  assert.throws(() => createServer({syntheticReceiptSource:'other'}), /Invalid synthetic receipt source/);
+  for (const source of ['direct','outbox']) {
+    let name = source === 'outbox' ? SYNTHETIC_RECEIPT_RN : 'synthetic-receipt';
+    const server = createServer({testAeName:'app-bridge-0123456789abcdef',enableSyntheticReceipt:true,syntheticReceiptSource:source,
+      fetchImpl:async (_url, options) => validResponse(JSON.stringify({'m2m:cin':{rn:name,con:{version:1,gatewayId:'app-isolated',
+        deviceId:'synthetic-keyring',commandId:'synthetic-command-1',payloadHash:'0'.repeat(64),status:'INDETERMINATE',
+        ackCode:'INVALID_RECEIPT',grantRevision:1,ownershipEpoch:1,timestampSource:'unavailable',acceptedAt:null,
+        appliedAt:null,receivedAt:'2026-10-29T01:02:03.004Z',readback:null}}}),options)});
+    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    try {
+      const url = `http://127.0.0.1:${server.address().port}/api/test/receipt`;
+      assert.equal((await fetch(url)).status,200);
+      name = source === 'outbox' ? 'synthetic-receipt' : SYNTHETIC_RECEIPT_RN;
+      assert.equal((await fetch(url)).status,502);
+      name = 'gw-'+'a'.repeat(64);
+      assert.equal((await fetch(url)).status,502);
+    } finally { await new Promise(resolve=>server.close(resolve)); }
+  }
 });
 test('synthetic observation is isolated, read-only and fails closed', async () => {
   assert.throws(() => createServer({enableSyntheticObservation:true}), /isolated test AE/);

@@ -1,7 +1,7 @@
 import http from 'node:http';
 import https from 'node:https';
 import { readFileSync } from 'node:fs';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 const MAX_RESPONSE_BYTES = 65536;
@@ -56,12 +56,15 @@ function httpsRead(url, headers, tls) {
 }
 
 // Local, read-only adapter for the PC-MOBIUS-CORE v1 test contract.
-export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', enableSyntheticObservation = false, enableSyntheticReceipt = false, fetchImpl = fetch, tls } = {}) {
+export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', enableSyntheticObservation = false, enableSyntheticReceipt = false, syntheticReceiptSource = 'direct', fetchImpl = fetch, tls } = {}) {
   const base = new URL(mobiusUrl);
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) throw new Error('Invalid Mobius URL');
   if (typeof testAeName !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(testAeName)) throw new Error('Invalid test AE name');
   if (typeof enableSyntheticObservation !== 'boolean' || (enableSyntheticObservation && !/^app-bridge-[a-f0-9]{16}$/.test(testAeName))) throw new Error('Synthetic observation requires an isolated test AE');
   if (typeof enableSyntheticReceipt !== 'boolean' || (enableSyntheticReceipt && !/^app-bridge-[a-f0-9]{16}$/.test(testAeName))) throw new Error('Synthetic receipt requires an isolated test AE');
+  if (!['direct','outbox'].includes(syntheticReceiptSource) || (syntheticReceiptSource === 'outbox' && !enableSyntheticReceipt)) throw new Error('Invalid synthetic receipt source');
+  const receiptRqi = `kr-${createHash('sha256').update('receipt:synthetic-command-1').digest('hex').slice(0,48)}`;
+  const receiptName = syntheticReceiptSource === 'direct' ? 'synthetic-receipt' : `gw-${createHash('sha256').update(receiptRqi).digest('hex')}`;
   if (base.protocol === 'https:' && (!tls?.ca || !tls?.cert || !tls?.key)) throw new Error('HTTPS requires CA, client certificate and key');
   if (base.protocol === 'http:' && tls) throw new Error('Client TLS credentials require HTTPS');
   const url = `${base.href.replace(/\/$/, '')}/${testAeName}/bubbleState`;
@@ -98,7 +101,7 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
           const epoch = Date.parse(value);
           return Number.isFinite(epoch) && new Date(epoch).toISOString().slice(0,19) === value.slice(0,19);
         };
-        if (!cin || cin.rn !== 'synthetic-receipt' || !r || typeof r !== 'object' || Array.isArray(r)
+        if (!cin || cin.rn !== receiptName || !r || typeof r !== 'object' || Array.isArray(r)
             || r.version !== 1 || r.gatewayId !== 'app-isolated' || r.deviceId !== 'synthetic-keyring'
             || r.commandId !== 'synthetic-command-1' || r.payloadHash !== '0'.repeat(64)
             || !['APPLIED','REJECTED','TIMEOUT','INDETERMINATE'].includes(r.status)

@@ -10,6 +10,7 @@ import { Aedes } from 'aedes';
 import mqtt from 'mqtt';
 import { GatewayBridge } from '../../../pc-mobius/src/gateway-bridge.mjs';
 import { createVerifiedObservation } from './observation-bridge.mjs';
+import { createVerifiedReceipt } from './receipt-bridge.mjs';
 
 const exec = promisify(execFile);
 const temporaryRoot = fileURLToPath(new URL('../../../app/build/', import.meta.url));
@@ -19,7 +20,8 @@ const helper = fileURLToPath(new URL('../keyring-outbox-check.py', import.meta.u
 export async function checkOutboxDependencies() { await access(python); }
 
 /** Real KEYRING outbox/transport and CORE on an ephemeral mTLS broker. */
-export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObservation = false }) {
+export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObservation = false, verifyReceipt = false }) {
+  if (verifyReceipt && !verifyObservation) throw Error('Receipt outbox check requires observation confirmation');
   await mkdir(temporaryRoot, { recursive: true });
   const dir = await mkdtemp(join(temporaryRoot, 'keyring-outbox-'));
   let broker, server, subscriber;
@@ -38,12 +40,14 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObs
     broker = await Aedes.createBroker();
     server = tls.createServer({ca, cert, key, requestCert:true, rejectUnauthorized:true, minVersion:'TLSv1.3'}, broker.handle);
     let ingress = 0, subscribed = false, mqttError, authorizedTls13 = 0, observationVerified = 0, observationEvidence;
+    let receiptVerified = 0, receiptEvidence, commandIngress = 0;
     server.on('secureConnection', socket => { if (socket.authorized && socket.getProtocol() === 'TLSv1.3') authorizedTls13++; });
     broker.on('subscribe', (subs, client) => {
       if (client?.id === 'app-core-outbox' && subs.some(sub => sub.topic === 'privacy-bubble/gateway/app-isolated/telemetry' && sub.qos === 1)) subscribed = true;
     });
     broker.on('publish', (packet, client) => {
       if (client?.id === 'pb-gateway-app-isolated' && packet.topic === 'privacy-bubble/gateway/app-isolated/telemetry' && packet.qos === 1) ingress++;
+      if (packet.topic === 'privacy-bubble/gateway/app-isolated/command') commandIngress++;
     });
     await new Promise((resolve, reject) => server.once('error', reject).listen(0, '127.0.0.1', resolve));
     const port = server.address().port;
@@ -58,17 +62,24 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObs
     if (verifyObservation) {
       const requestTopic = `/oneM2M/req/${aeId}/Mobius4/json`;
       const responseTopic = `/oneM2M/resp/${aeId}/Mobius4/json`;
-      let pendingObservation = false;
+      const pending = new Set();
       subscriber.on('message', (topic, payload) => {
-        if (topic !== requestTopic || pendingObservation || observationVerified) return;
-        pendingObservation = true;
-        createVerifiedObservation({origin, aeId, aeName, wire:payload.toString('utf8')})
+        if (topic !== requestTopic) return;
+        const wire = payload.toString('utf8');
+        let target;
+        try { target = JSON.parse(wire)?.to; } catch { return; }
+        const observationTarget = `/Mobius/${aeName}/observations`, receiptTarget = `/Mobius/${aeName}/receipts`;
+        const isReceipt = verifyReceipt && target === receiptTarget;
+        if ((!isReceipt && target !== observationTarget) || pending.has(target)
+            || (isReceipt ? receiptVerified : observationVerified)) return;
+        pending.add(target);
+        (isReceipt ? createVerifiedReceipt : createVerifiedObservation)({origin, aeId, aeName, wire})
           .then(async result => {
             await subscriber.publishAsync(responseTopic, JSON.stringify(result.reply), {qos:1, retain:false});
-            observationEvidence = result.evidence;
-            observationVerified++;
+            if (isReceipt) { receiptEvidence = result.evidence; receiptVerified++; }
+            else { observationEvidence = result.evidence; observationVerified++; }
           }).catch(() => { /* No success response when CSE confirmation is unavailable. */ })
-          .finally(() => { pendingObservation = false; });
+          .finally(() => { pending.delete(target); });
       });
       await subscriber.subscribeAsync(requestTopic, {qos:1});
     }
@@ -87,14 +98,15 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObs
       if (performance.now() >= subscribedUntil) throw Error('CORE subscription timeout');
       await delay(25);
     }
-    const result = await exec(python, ['-I','-B',helper,source,dir,aeName,aeId,String(port), ...(verifyObservation ? ['verified-observation'] : [])], {timeout:30000,maxBuffer:65536});
+    const result = await exec(python, ['-I','-B',helper,source,dir,aeName,aeId,String(port), ...(verifyReceipt ? ['verified-receipt'] : verifyObservation ? ['verified-observation'] : [])], {timeout:30000,maxBuffer:65536});
     const outbox = JSON.parse(result.stdout);
     const until = performance.now() + 8000;
     while (bridge.receipts.length === 0 && performance.now() < until) await delay(25);
     if (ingress !== 1 || authorizedTls13 < 2 || bridge.receipts.length !== 1 || bridge.receipts[0].status !== 'APPLIED' || updates.length !== 1
-        || (verifyObservation && observationVerified !== 1)) throw Error('Gateway delivery did not reach CORE');
+        || (verifyObservation && observationVerified !== 1) || (verifyReceipt && (receiptVerified !== 1 || commandIngress !== 0))) throw Error('Gateway delivery did not reach CORE');
     return {receipt:bridge.receipts[0], updates, outbox:{...outbox, brokerIngress:ingress, mtls:true, missingClientCertRejected:true,
-      ...(verifyObservation ? {observationReadbackVerified:true,observationEvidence} : {})}};
+      ...(verifyObservation ? {observationReadbackVerified:true,observationEvidence} : {}),
+      ...(verifyReceipt ? {receiptReadbackVerified:true,receiptEvidence,commandIngress} : {})}};
   } finally {
     if (subscriber) await subscriber.endAsync(true);
     if (broker) await new Promise(resolve => broker.close(resolve));

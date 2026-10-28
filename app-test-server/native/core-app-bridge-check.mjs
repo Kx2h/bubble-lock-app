@@ -6,14 +6,15 @@ import { isDeepStrictEqual } from 'node:util';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox', '--observation-cin', '--receipt-cin'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1 || (process.argv.includes('--observation-cin') && !process.argv.includes('--keyring-outbox')) || (process.argv.includes('--receipt-cin') && !process.argv.includes('--observation-cin'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox [--observation-cin [--receipt-cin]]]]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox', '--observation-cin', '--receipt-cin', '--receipt-outbox'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1 || (process.argv.includes('--observation-cin') && !process.argv.includes('--keyring-outbox')) || ((process.argv.includes('--receipt-cin') || process.argv.includes('--receipt-outbox')) && !process.argv.includes('--observation-cin')) || (process.argv.includes('--receipt-cin') && process.argv.includes('--receipt-outbox'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox [--observation-cin [--receipt-cin | --receipt-outbox]]]]');
 const phone = process.argv.includes('--phone');
 const useMqtt = process.argv.includes('--mqtt');
 const reconnect = process.argv.includes('--mqtt-reconnect');
 const useKeyring = process.argv.includes('--keyring');
 const useOutbox = process.argv.includes('--keyring-outbox');
 const verifyObservation = process.argv.includes('--observation-cin');
-const verifyReceipt = process.argv.includes('--receipt-cin');
+const receiptOutbox = process.argv.includes('--receipt-outbox');
+const verifyReceipt = process.argv.includes('--receipt-cin') || receiptOutbox;
 // Optional port 0 permits collision-free host tests. The device default remains 8787.
 const configuredPort = process.env.APP_CORE_TEST_PROXY_PORT ?? '8787';
 if (!/^(0|[1-9][0-9]{0,4})$/.test(configuredPort) || Number(configuredPort) > 65535) throw Error('Invalid test proxy port');
@@ -71,7 +72,7 @@ try {
   const telemetry = projection ? projection.telemetry : {deviceId:'synthetic-keyring',sequence:1,timestamp:new Date().toISOString(),state:true,batteryPct:90,rssiDbm:-50,schemaVersion:'1.0.0'};
   let receipt, updates, mqttEvidence, outboxEvidence;
   if (useOutbox) {
-    ({receipt, updates, outbox:outboxEvidence} = await outboxModule.runKeyringOutbox({origin:cse.origin,aeId,aeName,source:keyringSource,verifyObservation}));
+    ({receipt, updates, outbox:outboxEvidence} = await outboxModule.runKeyringOutbox({origin:cse.origin,aeId,aeName,source:keyringSource,verifyObservation,verifyReceipt:receiptOutbox}));
   } else if (useMqtt) {
     const { runMqttUpdate } = await import('./mqtt/run.mjs');
     ({receipt, updates, ...mqttEvidence} = await runMqttUpdate({origin:cse.origin,aeId,aeName,telemetry,reconnect}));
@@ -90,7 +91,7 @@ try {
   ok(after,200,'2000');
   const expectedState = !reconnect;
   if (after.parsed?.['pb:binarySwitch']?.state !== expectedState) throw Error('Updated state absent');
-  if (verifyReceipt) {
+  if (verifyReceipt && !receiptOutbox) {
     const python = fileURLToPath(new URL('../../../../.local/keyring-gateway-venv/bin/python', import.meta.url));
     const helper = fileURLToPath(new URL('./keyring-receipt-fixture.py', import.meta.url));
     const generated = await promisify(execFile)(python, ['-I','-B',helper,keyringSource], {timeout:10000,maxBuffer:65536});
@@ -102,7 +103,7 @@ try {
     if (read.parsed?.['m2m:cin']?.rn !== 'synthetic-receipt' || !isDeepStrictEqual(read.parsed?.['m2m:cin']?.con, fixture)) throw Error('Synthetic receipt readback mismatch');
     results.push({syntheticReceiptStored:true,contentMatched:true});
   }
-  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName,enableSyntheticObservation:verifyObservation,enableSyntheticReceipt:verifyReceipt});
+  proxy = createServer({mobiusUrl:base,originator:aeId,testAeName:aeName,enableSyntheticObservation:verifyObservation,enableSyntheticReceipt:verifyReceipt,syntheticReceiptSource:receiptOutbox ? 'outbox' : 'direct'});
   await new Promise((resolve,reject)=>proxy.once('error',reject).listen(phone ? proxyPort : 0,'127.0.0.1',resolve));
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
@@ -117,7 +118,7 @@ try {
     const receipt = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/receipt`);
     const payload = await receipt.json();
     if (receipt.status !== 200 || payload.mode !== 'synthetic' || payload.commandId !== 'synthetic-command-1' || payload.status !== 'INDETERMINATE') throw Error('APP adapter did not retrieve the synthetic receipt');
-    results.push({syntheticReceipt:'verified',requestStatus:receipt.status});
+    results.push({syntheticReceipt:'verified',requestStatus:receipt.status,source:receiptOutbox ? 'outbox' : 'direct'});
   }
   results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {}), ...(outboxEvidence ? {outbox:outboxEvidence} : {}), ...(projection ? {keyring:{nullMeasurementsSkipped:projection.nullMeasurementsSkipped,duplicateSkipped:projection.duplicateSkipped,reopenPreserved:projection.reopenPreserved,wireSequences:projection.wireSequences}} : {})});
   if (phone) {
