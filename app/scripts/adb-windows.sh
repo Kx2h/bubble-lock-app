@@ -6,9 +6,23 @@ workspace=$(cd -- "$script_dir/../../../.." && pwd)
 adb_exe=${ADB_WINDOWS_PATH:-"$workspace/.local/android-windows/platform-tools/adb.exe"}
 args=("$@")
 for ((i=0; i<${#args[@]}; i++)); do
-  if [[ ${args[i]} == install && $((i+1)) -eq $((${#args[@]}-1)) ]]; then
-    args[i+1]=$(wslpath -w "${args[i+1]}")
-    break
-  fi
+  case ${args[i]} in
+    -s|-t|-H|-P|-L|--one-device) i=$((i+1)) ;;
+    -a|-d|-e|--exit-on-write-error) ;;
+    install)
+      apk_index=$((${#args[@]}-1))
+      if (( apk_index > i )); then
+        apk=${args[apk_index]}
+        case $apk in
+          [[:alpha:]]:[\\/]*|\\\\*|-) ;;
+          *)
+            if [[ -f $apk ]]; then args[apk_index]=$(wslpath -w "$apk"); fi
+            ;;
+        esac
+      fi
+      break
+      ;;
+    *) break ;;
+  esac
 done
 exec "$adb_exe" -P "${ADB_WINDOWS_PORT:-5038}" "${args[@]}"
