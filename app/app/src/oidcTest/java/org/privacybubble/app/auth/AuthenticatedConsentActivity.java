@@ -42,9 +42,9 @@ public final class AuthenticatedConsentActivity extends Activity {
     private OidcBrowserFlow.Session session;
     private TextView status;
     private CheckBox choice;
-    private Button login, logout, load, approve, revoke, retry, discard;
+    private Button login, logout, refreshSession, load, approve, revoke, retry, discard;
     private volatile boolean destroyed;
-    private boolean busy, known, active, uncertain, storageFailure, resumed;
+    private boolean busy, known, active, uncertain, storageFailure, resumed, accessExpired;
     private int revision;
     private String instance;
     private Pending pending;
@@ -63,6 +63,7 @@ public final class AuthenticatedConsentActivity extends Activity {
         status = new TextView(this); status.setTextSize(16); layout.addView(status);
         login = button(layout, "합성 인증 시작", v -> begin());
         logout = button(layout, "합성 세션 종료", v -> endSession());
+        refreshSession = button(layout, "합성 세션 갱신", v -> refreshSession());
         load = button(layout, "합성 상태 조회", v -> load());
         choice = new CheckBox(this); choice.setText("이 합성 동작을 직접 선택합니다"); layout.addView(choice);
         approve = button(layout, "합성 승인", v -> { if (choice.isChecked()) mutate(true); });
@@ -99,6 +100,15 @@ public final class AuthenticatedConsentActivity extends Activity {
     }
     private void render() {
         main.removeCallbacks(expiryTick);
+        if (session != null && !busy && !accessExpired) {
+            try { session.subject(); }
+            catch (IllegalStateException expired) {
+                accessExpired = true; known = false; current = null; review = null;
+                main.removeCallbacks(reviewTick); choice.setChecked(false);
+                status.setText("합성 접근 토큰 만료 · 세션 갱신 또는 종료 후 다시 인증하세요"
+                        + (uncertain ? "\n이전 합성 처리 결과 미확정 · 새 변경 차단" : ""));
+            }
+        }
         if (known && active && current != null && ConsentGrantExpiry.needsServerCheck(
                 System.currentTimeMillis(), Instant.parse(current.expires).toEpochMilli())) {
             // Device time only prompts a fresh server read; it cannot revoke or establish a grant.
@@ -112,16 +122,18 @@ public final class AuthenticatedConsentActivity extends Activity {
             status.setText("합성 검토 확인 만료 또는 상태 변경 · 다시 조회하고 확인하세요");
             known = false;
         }
-        boolean loggedIn = session != null && !destroyed;
-        login.setEnabled(!busy && !loggedIn);
-        logout.setEnabled(!busy && loggedIn);
+        boolean hasSession = session != null && !destroyed;
+        boolean loggedIn = hasSession && !accessExpired;
+        login.setEnabled(!busy && !hasSession);
+        logout.setEnabled(!busy && hasSession);
+        refreshSession.setEnabled(!busy && hasSession);
         load.setEnabled(!busy && loggedIn && !storageFailure);
         choice.setEnabled(!busy && loggedIn && !storageFailure && (known || pending != null));
         approve.setEnabled(!busy && loggedIn && known && !active && !uncertain && choice.isChecked() && review != null);
         revoke.setEnabled(!busy && loggedIn && known && active && !uncertain && choice.isChecked() && review != null);
         retry.setEnabled(!busy && loggedIn && uncertain && pending != null && choice.isChecked());
         discard.setEnabled(!busy && (uncertain || storageFailure));
-        if (resumed && known && active && !destroyed) main.postDelayed(expiryTick, 1000);
+        if (resumed && !destroyed && ((known && active) || (hasSession && !accessExpired))) main.postDelayed(expiryTick, 1000);
     }
     private void checkReview() { if (destroyed || review == null) return; render(); if (review != null) main.postDelayed(reviewTick, 1000); }
     private static boolean reviewMatches(ConsentReviewGate review, Snapshot snapshot) {
@@ -142,7 +154,7 @@ public final class AuthenticatedConsentActivity extends Activity {
                             @Override public void onAuthenticated(OidcBrowserFlow.Session received) {
                                 try {
                                     if (!"synthetic-test-user".equals(received.subject())) throw new IllegalStateException();
-                                    session = received; busy = false;
+                                    session = received; accessExpired = false; busy = false;
                                     status.setText(uncertain ? "합성 인증 완료 · 이전 요청 결과 미확정, 새 변경 차단" : "합성 인증 완료 · 서버 상태를 조회하세요");
                                 } catch (RuntimeException failure) { received.close(); session = null; busy = false; status.setText("합성 인증 실패"); }
                                 render();
@@ -219,8 +231,36 @@ public final class AuthenticatedConsentActivity extends Activity {
     }
     private void endSession() {
         if (busy || session == null) return;
-        session.close(); session = null; known = false; choice.setChecked(false);
+        session.close(); session = null; accessExpired = false; known = false; current = null; choice.setChecked(false);
         status.setText(uncertain ? "합성 세션 종료 · 이전 요청 결과 미확정" : "합성 세션 종료 · 실제 권한 없음"); render();
+    }
+    private void refreshSession() {
+        if (busy || session == null || destroyed) return;
+        final OidcBrowserFlow.Session refreshing = session;
+        choice.setChecked(false); review = null; known = false; current = null;
+        busy = true; status.setText("합성 세션 갱신 중…"); render();
+        worker.execute(() -> {
+            try {
+                refreshing.refresh();
+                if (!"synthetic-test-user".equals(refreshing.subject())) throw new IllegalStateException();
+                runOnUiThread(() -> {
+                    if (!live()) return;
+                    busy = false; accessExpired = false;
+                    status.setText(uncertain ? "합성 세션 갱신 완료 · 이전 요청 결과 미확정"
+                            : "합성 세션 갱신 완료 · 서버 상태를 다시 조회하세요");
+                    render();
+                });
+            } catch (Exception failure) {
+                refreshing.close();
+                runOnUiThread(() -> {
+                    if (!live()) return;
+                    session = null; accessExpired = false; busy = false; known = false;
+                    status.setText(uncertain ? "합성 세션 갱신 실패 · 재인증 필요 · 이전 요청 결과 미확정"
+                            : "합성 세션 갱신 실패 · 다시 인증하세요");
+                    render();
+                });
+            }
+        });
     }
     private void discardMarker() {
         if (busy || !(uncertain || storageFailure)) return;
