@@ -11,6 +11,19 @@ import org.junit.Test;
 
 public class RotatingSessionTest {
     private RotatingSession.Response ok(String access, String refresh) { return new RotatingSession.Response(access, refresh, "Bearer", 60, null, false); }
+    @Test public void subjectFollowsIdTokenRulesRatherThanBearerSyntax() throws Exception {
+        String subject = "part one";
+        RotatingSession session = new RotatingSession(subject, "a1", "r1", 2000, () -> 1000, old -> ok("a2", "r2"));
+        assertEquals(subject, session.subject());
+        session.refresh();
+        assertEquals(subject, session.subject());
+        String boundary = "a".repeat(255);
+        assertEquals(boundary, new RotatingSession(boundary, "a1", "r1", 2000, () -> 1000, old -> ok("a2", "r2")).subject());
+        for (String invalid : new String[]{"", " a", "a ", "a".repeat(256), "a한"}) {
+            assertThrows(IllegalArgumentException.class, () -> new RotatingSession(invalid, "a1", "r1", 2000, () -> 1000, old -> ok("a2", "r2")));
+        }
+        assertThrows(IllegalArgumentException.class, () -> new RotatingSession(subject, "a 1", "r1", 2000, () -> 1000, old -> ok("a2", "r2")));
+    }
     @Test public void rotatesAndAllowsRefreshAfterAccessExpiry() throws Exception {
         AtomicLong now = new AtomicLong(1000);
         AtomicInteger count = new AtomicInteger();

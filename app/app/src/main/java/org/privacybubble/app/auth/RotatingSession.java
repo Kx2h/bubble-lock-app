@@ -28,7 +28,7 @@ final class RotatingSession implements AutoCloseable {
         this(subject, access, refresh, expires, clock, exchange, false);
     }
     RotatingSession(String subject, String access, String refresh, long expires, Clock clock, Exchange exchange, boolean consentScope) {
-        if (!printable(subject, 512) || !printable(access, 16384) || !printable(refresh, 16384)
+        if (!validSubject(subject) || !printable(access, 16384) || !printable(refresh, 16384)
                 || access.equals(refresh) || clock == null || exchange == null || expires <= clock.elapsedMillis()) throw new IllegalArgumentException("Invalid session");
         this.subject = subject; this.access = access; this.refresh = refresh; this.expires = expires;
         this.clock = clock; this.exchange = exchange; this.consentScope = consentScope;
@@ -75,6 +75,12 @@ final class RotatingSession implements AutoCloseable {
     private static boolean printable(String s, int max) {
         if (s == null || s.isEmpty() || s.length() > max) return false;
         for (int i=0; i<s.length(); i++) if (s.charAt(i) < 33 || s.charAt(i) > 126) return false;
+        return true;
+    }
+    /** Match the already verified ID-token subject constraints, not bearer-token syntax. */
+    private static boolean validSubject(String value) {
+        if (value == null || value.isEmpty() || value.length() > 255 || !value.equals(value.trim())) return false;
+        for (int i = 0; i < value.length(); i++) if (value.charAt(i) > 0x7f) return false;
         return true;
     }
     static boolean syntheticScope(String value) { return syntheticScope(value, false); }
