@@ -36,6 +36,9 @@ public final class TransportProbeActivity extends Activity {
             String message;
             try {
                 HttpsApiTransport tls = transport(18791);
+                rejectPath(tls, "/../admin");
+                rejectPath(tls, "/..");
+                rejectPath(tls, "/../../admin");
                 rejectPath(tls, "/a/%252e%252e/b");
                 rejectPath(tls, "/a/%252f/b");
                 rejectPath(tls, "/a/%255c/b");
@@ -49,7 +52,7 @@ public final class TransportProbeActivity extends Activity {
                 require(counts.getInt("writes") == 1 && counts.getInt("lost") == 1 && counts.getInt("redirected") == 0);
                 rejected(transport(18792)); // TLS 1.2 only
                 rejected(transport(18793)); // correct CA, incorrect DNS name
-                message = "PASS: double-encoded paths rejected; TLS 1.3, HTTP responses, redirect not followed, lost write response; TLS 1.2 and wrong hostname rejected. Synthetic only.";
+                message = "PASS: root and double-encoded traversal rejected; TLS 1.3, HTTP responses, redirect not followed, lost write response; TLS 1.2 and wrong hostname rejected. Synthetic only.";
             } catch (Exception error) { message = "FAIL: synthetic transport probe (" + error.getClass().getSimpleName() + ")"; }
             String result = message; runOnUiThread(() -> view.setText(result));
         }).start();

@@ -90,6 +90,11 @@ public final class HttpsApiTransport {
                 || !path.normalize().equals(path) || raw.toLowerCase(Locale.ROOT).matches(".*%(25|2e|2f|5c|0a|0d).*")) {
             throw new IllegalArgumentException("Invalid path");
         }
+        // URI.normalize() retains leading ".." segments instead of removing them.
+        // Reject them explicitly even when they cannot change the target origin.
+        for (String segment : raw.split("/", -1)) {
+            if (segment.equals(".") || segment.equals("..")) throw new IllegalArgumentException("Invalid path");
+        }
         return origin.resolve(path);
     }
 

@@ -4,6 +4,8 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10/R17. `HttpsApiTransport`는 향�
 
 호출자는 미리 신뢰한 HTTPS origin을 제공하고, 상대 경로와 쿼리, `GET`/`POST`/`PUT`/`DELETE`, 계약에서 정한 헤더와 바이트 본문을 직접 구성한다. token·request ID·correlation·idempotency·API 버전의 이름과 의미는 계약이 정해지면 caller에서 정의한다. GET 본문과 다른 origin, redirect, 경로 traversal, 일부 모호한 인코딩 및 위험한 헤더는 거부한다. 경로의 `%25`도 거부해 이중 디코딩에서 구분자나 상위 경로로 바뀌는 것을 방지하므로 퍼센트 문자를 포함하는 경로는 지원하지 않는다. 쿼리 값은 별도 계약에 따라 caller가 구성한다. 정상·오류 HTTP status와 최대 64 KiB 본문을 반환하고, 같은 이름의 응답 헤더가 반복되면 해당 헤더를 노출하지 않는다. 요청 본문도 64 KiB 이내다. 민감한 URL·헤더·본문·예외를 로그에 남기지 않는 것은 호출자의 책임이다.
 
+경로의 `.`·`..` 세그먼트는 URL 정규화가 루트 앞의 `..`를 보존하는 경우에도 거부한다. 상대 경로를 서버가 어떻게 해석하고 어떤 권한으로 처리하는지는 서버 계약과 인가 정책에서 별도로 검증해야 한다.
+
 프로세스의 `HttpsURLConnection` 기본 socket factory와 hostname verifier를 사용하고 TLS 1.3만 허용한다. 이 클래스는 프로세스 전역 기본값을 고정하지 않으므로 다른 코드가 기본 factory나 verifier를 바꾸면 플랫폼 기본 trust·hostname 검증을 보장하지 못한다. 실제 연동 전 전역 변경 여부를 확인해야 한다. 이 클래스 자체에는 별도의 trust 우회 또는 테스트 TLS 주입 경로가 없다. Android minSdk 26 기기에서 TLS 1.3이 제공되지 않으면 연결이 실패하며 낮은 TLS 버전으로 대체하지 않는다. 신뢰할 서버 origin의 provisioning과 인증된 API 호출 정책은 실제 연동 전에 확정해야 한다.
 
 호출은 애플리케이션 계층에서 한 번만 시도하고 자동 redirect를 따르지 않는다. 네트워크 계층 전체에서 재전송이 절대 발생하지 않는다는 보장은 없으므로 서버의 idempotency 계약이 필요하다. mutation을 전송한 뒤 timeout·연결 실패가 발생하면 서버의 처리 여부는 **미확정**이며, caller는 성공이나 실패를 추정하거나 새 키로 자동 재전송해서는 안 된다. 상태조회·재시도 및 확인 UI는 서버 계약에 따라 별도로 구현해야 한다.

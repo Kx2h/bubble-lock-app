@@ -22,7 +22,7 @@ public final class HttpsApiTransportTest {
         invalid(() -> new HttpsApiTransport(URI.create("http://localhost")));
         invalid(() -> new HttpsApiTransport(URI.create("https://user@localhost")));
         invalid(() -> new HttpsApiTransport(URI.create("https://localhost/base")));
-        for (String path : new String[]{"//attacker/x", "https://attacker/x", "/a/../b", "/a/%2e%2e/b", "/a/%2f/b", "/a/%252e%252e/b", "/a/%252f/b", "/a/%255c/b", "/a#fragment"})
+        for (String path : new String[]{"//attacker/x", "https://attacker/x", "/../admin", "/..", "/../../admin", "/a/../b", "/./admin", "/a/%2e%2e/b", "/a/%2f/b", "/a/%252e%252e/b", "/a/%252f/b", "/a/%255c/b", "/a#fragment"})
             invalid(() -> client.request("GET", path, Collections.emptyMap(), null));
         invalid(() -> client.request("PATCH", "/ok", Collections.emptyMap(), null));
         invalid(() -> client.request("GET", "/ok", Collections.singletonMap("Host", "attacker"), null));
