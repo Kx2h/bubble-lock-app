@@ -77,3 +77,17 @@ git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7
 이 시험은 KEYRING 코드의 validator·SQLite·projection을 호출하지만 전체 Gateway daemon이나 outbox의 실제 전송 루프는 실행하지 않는다. Node 합성 송신자가 projection을 읽어 MQTT로 전달한다. `--mqtt-reconnect`는 두 번째 projection을 KEYRING 코드에서 생성하지 않으므로 `--keyring`과 함께 사용할 수 없다. 실제 BLE, Pi, 키링, 배터리·RSSI 관측, 인증 및 운영 권한의 증거가 아니다. checkout이 없는 경우 별도 단위시험은 skip되지만 `--keyring` 실경로 시험은 CSE 자원 생성 전에 실패한다.
 
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
+
+### KEYRING outbox와 mTLS 전송 시험
+
+`--mqtt --keyring-outbox`는 고정된 KEYRING 코드의 `Gateway.observation`, 실제 SQLite outbox 처리 루프 및 `TransportHub`를 호출한다. 연결 전 합성 관측 항목 두 개가 재시도 상태로 남는지 확인하고, 별도 loopback TLS 1.3 broker에 클라이언트 인증서로 연결한 뒤 CORE telemetry 항목이 PUBACK 후 제거되는지 확인한다. broker ingress와 CORE의 HTTP UPDATE·RSC·요청 ID, 독립 CSE readback 및 APP 중계를 각각 확인한다. 인증서 없는 접속은 broker가 거절하는지도 검사한다. 이때 일반 observation 항목은 시험 대상 CSE container의 MQTT 응답·HTTPS 서버가 없어 미전달 상태로 남는다. PUBACK은 broker 수신만 뜻하며 CORE 처리나 물리 실행을 보장하지 않는다.
+
+```sh
+python3 -m venv "$WORKSPACE/.local/keyring-gateway-venv"
+PIP_CACHE_DIR="$WORKSPACE/.local/pip-cache" "$WORKSPACE/.local/keyring-gateway-venv/bin/pip" install -r app-test-server/native/keyring-outbox-requirements.txt
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring-outbox
+# 공기계 시험: 빈 8787과 기존 reverse가 준비된 경우
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring-outbox --phone
+```
+
+테스트용 CA·서버·클라이언트 개인키와 SQLite는 작업 폴더의 임시 디렉터리에만 생성하며 정상 종료와 처리된 오류 시 삭제한다. 기기나 시스템 인증서 신뢰는 바꾸지 않는다. 강제 종료 시 임시 파일이 남을 수 있다. 이 시험은 전체 Gateway daemon, BLE·실물 Pi·키링, MQTT ACL, 운영 인증이나 오프라인 데이터의 종단 간 복구를 증명하지 않는다.
