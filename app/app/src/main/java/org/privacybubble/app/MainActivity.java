@@ -22,6 +22,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -148,7 +150,10 @@ public final class MainActivity extends Activity {
                     if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
                     String observation = json.optString("observation", "unknown");
                     String source = "unobserved".equals(observation) ? "초기값 · 장치 관측 전" : "관측 여부 미확인";
-                    result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source + "\n요청 ID: " + json.optString("requestId", "없음");
+                    String checkedAt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date());
+                    result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source
+                        + "\n조회 시각: " + checkedAt + " (기기 시간)\n자동 갱신되지 않습니다."
+                        + "\n요청 ID: " + json.optString("requestId", "없음");
                 } catch (Exception e) { result = "조회 실패 · 테스트 프록시와 adb reverse 연결을 확인하세요."; }
                 finally { if (connection != null) connection.disconnect(); }
                 final String completed = result;

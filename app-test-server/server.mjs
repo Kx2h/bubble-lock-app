@@ -29,7 +29,7 @@ function httpsRead(url, headers, tls) {
     }, async (response) => {
       try {
         const body = await readBounded(response);
-        resolve({ status: response.statusCode, body });
+        resolve({ status: response.statusCode, body, requestId: response.headers['x-m2m-ri'], resultCode: response.headers['x-m2m-rsc'] });
       } catch (error) {
         response.destroy();
         reject(error);
@@ -60,9 +60,12 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
         response = await httpsRead(url, headers, tls);
       } else {
         const upstream = await fetchImpl(url, { headers, signal: AbortSignal.timeout(5000), redirect: 'error' });
-        response = { status: upstream.status, body: await readBounded(upstream.body) };
+        response = { status: upstream.status, body: await readBounded(upstream.body), requestId: upstream.headers.get('x-m2m-ri'), resultCode: upstream.headers.get('x-m2m-rsc') };
       }
-      if (response.status < 200 || response.status >= 300) return send(502, { mode: 'test', error: 'mobius_http_error', upstreamStatus: response.status, requestId });
+      if (response.status !== 200) return send(502, { mode: 'test', error: 'mobius_http_error', upstreamStatus: response.status, requestId });
+      // A successful HTTP response is insufficient: the oneM2M binding must
+      // report a successful RETRIEVE and correlate it to this exact request.
+      if (response.requestId !== requestId || response.resultCode !== '2000') return send(502, { mode: 'test', error: 'invalid_mobius_headers', requestId });
       let data;
       try { data = JSON.parse(response.body.toString('utf8')); }
       catch { return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId }); }
