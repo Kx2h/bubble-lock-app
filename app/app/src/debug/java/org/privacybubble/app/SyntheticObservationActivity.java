@@ -16,10 +16,10 @@ import java.util.concurrent.Executors;
 /** Explicit, read-only view of the fixed isolated test fixture; never operational data. */
 public final class SyntheticObservationActivity extends Activity {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final TestRefreshState requestState = new TestRefreshState();
     private TextView status;
     private Button load;
-    private boolean stopped;
-    private int generation;
+    private boolean destroyed;
 
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -36,12 +36,15 @@ public final class SyntheticObservationActivity extends Activity {
         load = new Button(this); load.setText("합성 관측 조회"); load.setAllCaps(false); load.setOnClickListener(v -> fetch()); body.addView(load);
         scroll.addView(body); setContentView(scroll);
     }
-    @Override protected void onStart() { super.onStart(); stopped = false; }
-    @Override protected void onStop() { stopped = true; generation++; load.setEnabled(true); status.setText("화면 이탈 · 다시 조회하세요"); super.onStop(); }
-    @Override protected void onDestroy() { stopped = true; generation++; worker.shutdownNow(); super.onDestroy(); }
+    @Override protected void onStart() { super.onStart(); requestState.foreground(); renderLoad(); }
+    @Override protected void onStop() { requestState.background(); renderLoad(); status.setText("화면 이탈 · 다시 조회하세요"); super.onStop(); }
+    @Override protected void onDestroy() { destroyed = true; worker.shutdownNow(); super.onDestroy(); }
+    private void renderLoad() { load.setEnabled(requestState.isForeground() && !requestState.isInFlight()); }
     private void fetch() {
-        if (stopped || !load.isEnabled()) return;
-        int ticket = ++generation; load.setEnabled(false); status.setText("합성 관측 조회 중…");
+        if (destroyed) return;
+        long ticket = requestState.begin();
+        if (ticket < 0) return;
+        renderLoad(); status.setText("합성 관측 조회 중…");
         worker.execute(() -> {
             String text;
             try {
@@ -67,7 +70,12 @@ public final class SyntheticObservationActivity extends Activity {
                         + "\n조회 시각: " + DateFormat.getDateTimeInstance().format(new Date()) + " (기기 시간)";
             } catch (Exception failure) { text = "합성 관측을 확인할 수 없습니다 · 시험 중계와 CSE를 확인하세요"; }
             final String result = text;
-            runOnUiThread(() -> { if (!stopped && ticket == generation && !isFinishing()) { status.setText(result); load.setEnabled(true); } });
+            runOnUiThread(() -> {
+                if (destroyed) return;
+                boolean current = requestState.finish(ticket);
+                if (current && !isFinishing()) status.setText(result);
+                renderLoad();
+            });
         });
     }
 }
