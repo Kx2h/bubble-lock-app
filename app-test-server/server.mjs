@@ -56,12 +56,13 @@ function httpsRead(url, headers, tls) {
 }
 
 // Local, read-only adapter for the PC-MOBIUS-CORE v1 test contract.
-export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', fetchImpl = fetch, tls } = {}) {
+export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', originator = 'pb-core-admin-local', testAeName = 'privacy-bubble-test-ae', fetchImpl = fetch, tls } = {}) {
   const base = new URL(mobiusUrl);
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) throw new Error('Invalid Mobius URL');
+  if (typeof testAeName !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(testAeName)) throw new Error('Invalid test AE name');
   if (base.protocol === 'https:' && (!tls?.ca || !tls?.cert || !tls?.key)) throw new Error('HTTPS requires CA, client certificate and key');
   if (base.protocol === 'http:' && tls) throw new Error('Client TLS credentials require HTTPS');
-  const url = `${base.href.replace(/\/$/, '')}/privacy-bubble-test-ae/bubbleState`;
+  const url = `${base.href.replace(/\/$/, '')}/${testAeName}/bubbleState`;
   return http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
@@ -107,5 +108,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const paths = [process.env.TLS_CA_FILE, process.env.TLS_CERT_FILE, process.env.TLS_KEY_FILE];
   if (paths.some(Boolean) && !paths.every(Boolean)) throw new Error('Set all TLS_CA_FILE, TLS_CERT_FILE and TLS_KEY_FILE');
   const tls = paths.every(Boolean) ? { ca: readFileSync(paths[0]), cert: readFileSync(paths[1]), key: readFileSync(paths[2]) } : undefined;
-  createServer({ mobiusUrl: process.env.MOBIUS4_URL, originator: process.env.MOBIUS4_ORIGINATOR, tls }).listen(port, '127.0.0.1', () => console.log(`Test adapter listening on 127.0.0.1:${port}`));
+  createServer({ mobiusUrl: process.env.MOBIUS4_URL, originator: process.env.MOBIUS4_ORIGINATOR, testAeName: process.env.MOBIUS4_TEST_AE, tls }).listen(port, '127.0.0.1', () => console.log(`Test adapter listening on 127.0.0.1:${port}`));
 }

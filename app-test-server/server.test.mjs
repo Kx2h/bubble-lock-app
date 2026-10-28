@@ -31,6 +31,22 @@ test('maps CORE contract and creates independent request identifiers', async () 
     assert.equal(calls[0].options.headers['X-M2M-RI'], first.requestId);
   });
 });
+test('selects only a simple test AE name without permitting path injection', async () => {
+  for (const name of ['', '../other', 'a/b', 'a?x', 'a#b', '%2f', 'a'.repeat(65), 42]) {
+    assert.throws(() => createServer({ testAeName: name }), /Invalid test AE name/);
+  }
+  let requested;
+  const server = createServer({testAeName: 'app-test_01', fetchImpl: async (url, options) => {
+    requested = url;
+    return validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource() }), options);
+  }});
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/api/test/bubble-state`);
+    assert.equal(response.status, 200);
+    assert.equal(requested, 'http://127.0.0.1:7599/Mobius/app-test_01/bubbleState');
+  } finally { await new Promise(resolve => server.close(resolve)); }
+});
 test('reports the bootstrap label separately and never infers observation', async () => {
   for (const [labels, expected] of [
     [['dev-bootstrap', 'unobserved'], true],

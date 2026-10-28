@@ -27,3 +27,17 @@ Bootstrap은 KEYRING 시험 구성의 AE와 ty=28 `pb:binarySwitch`를 생성하
 2026-10-28 독립 테스트 폴더에서 setup, start, bootstrap(201/2001), 재실행(409/4105), stop과 데이터 보존 후 재시작을 확인했다. 살아 있는 CSE의 PID 파일이 없을 때 stop이 DB 중단을 거부하는 것도 확인했다. 실제 앱 시험용으로 별도 수동 기동한 서버와 이 재현 시험은 구분한다. mTLS, MQTT, 실물 Gateway·키링 및 운영 API 통합은 이 시험의 범위가 아니다.
 
 `evidence/bootstrap-created.json`은 신규 격리 DB에서 실제 자원 생성 결과이고, `evidence/restart-test.log` 및 `evidence/pid-loss-test.log`는 재시작과 안전 중지 거부 결과이다. `sha256sum -c app-test-server/native/evidence/SHA256SUMS`로 무결성을 확인할 수 있다. 독립 검증 서비스는 종료했고 DB 파일은 보존했다. 앱 실기기 시험에서 사용한 기존 서버는 별도이며 이 증거와 혼동하지 않는다.
+
+## CORE 브릿지와 APP 연결 시험
+
+기존 CSE `127.0.0.1:50545`에서 아래 명령은 고유 AE를 CSE에 등록하고 별도의 `bubbleState`를 생성한다. 합성 telemetry를 실제 CORE `GatewayBridge`에 입력해 HTTP UPDATE와 독립 CSE readback 및 APP 중계를 확인한 뒤, 생성한 AE의 이름과 ID가 일치할 때만 그 AE를 삭제하고 404를 확인한다. 기존 bootstrap 자원은 수정하지 않는다. MQTT client는 시험용이며 실제 broker, Pi, BLE, 키링, 인증·승인 또는 운영 연동 증거가 아니다.
+
+```sh
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs
+"$WORKSPACE/.local/node/bin/node" --test app-test-server/native/core-app-bridge-check.test.mjs app-test-server/server.test.mjs
+# 휴대폰으로 조회할 때: 8787 포트가 비어 있고 해당 기기의 reverse가 준비된 경우에만
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --phone
+# ready 출력 뒤 기기에서 상태 조회하고, 터미널에서 Enter를 눌러 정리한다.
+```
+
+기본 주소가 아닌 격리 CSE는 `APP_CORE_TEST_CSE_URL=http://127.0.0.1:<port>/Mobius`로 지정한다. HTTP loopback만 허용한다. 스크립트는 AE 생성 요청 직전에 고유 이름을 출력한다. 생성 응답이 유실되거나 신원이 맞지 않으면 `cleanup: manual-review`를 출력하고 자동 삭제하지 않는다. 강제 종료 시에도 자동 삭제를 보장하지 않으므로 출력의 AE 이름과 CSE 상태를 직접 확인하고, 소유권이 확정되지 않으면 다른 자원을 삭제하지 않는다. `--phone`은 기존 reverse를 생성·삭제하지 않으며 이미 사용 중인 8787 포트를 덮어쓰지 않는다. 실패 시 종료 코드는 0이 아니고 `cleanup` 결과를 확인해야 한다. 실기기 결과는 [APP 증거](../../app/evidence/core-bridge-cse-app.md)에 별도 기록한다.
