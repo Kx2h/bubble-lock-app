@@ -19,21 +19,15 @@ import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ResponseTypeValues;
 
 import org.json.JSONObject;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.net.ssl.HttpsURLConnection;
 
 /** One in-memory browser transaction. No caller is configured until the team provisions an IdP. */
 public final class OidcBrowserFlow implements AutoCloseable {
     private static final AtomicBoolean ACTIVE = new AtomicBoolean();
-    private static final int MAX_BODY = 65536;
     private final Activity activity;
     private final OidcProvider provider;
     private final String clientId;
@@ -199,11 +193,11 @@ public final class OidcBrowserFlow implements AutoCloseable {
     private JSONObject exchange(String code) throws Exception {
         String form = "grant_type=authorization_code&code=" + enc(code) + "&client_id=" + enc(clientId)
                 + "&redirect_uri=" + enc(OidcRedirect.REDIRECT) + "&code_verifier=" + enc(request.codeVerifier);
-        return postForm(provider.tokenEndpoint, form);
+        return new JSONObject(OidcTokenTransport.postForm(provider.tokenEndpoint, form));
     }
     private static RotatingSession.Response rotate(OidcProvider provider, String clientId, String refreshToken, IdTokenVerifier.Identity identity) throws Exception {
         long started = System.currentTimeMillis() / 1000;
-        JSONObject token = postForm(provider.tokenEndpoint, "grant_type=refresh_token&client_id=" + enc(clientId) + "&refresh_token=" + enc(refreshToken));
+        JSONObject token = new JSONObject(OidcTokenTransport.postForm(provider.tokenEndpoint, "grant_type=refresh_token&client_id=" + enc(clientId) + "&refresh_token=" + enc(refreshToken)));
         Object access = token.opt("access_token"), refresh = token.opt("refresh_token"), type = token.opt("token_type"), duration = token.opt("expires_in");
         Object scope = token.opt("scope");
         if (!(access instanceof String) || !(refresh instanceof String) || !(type instanceof String) || !(duration instanceof Number)
@@ -217,28 +211,6 @@ public final class OidcBrowserFlow implements AutoCloseable {
         }
         // The optional ID token was verified above; failures close the rotating session without retry.
         return new RotatingSession.Response((String) access, (String) refresh, (String) type, (long) seconds, (String) scope, false);
-    }
-    private static JSONObject postForm(java.net.URI endpoint, String form) throws Exception {
-        byte[] body = form.getBytes(StandardCharsets.UTF_8);
-        final long deadline = System.nanoTime() + 10_000_000_000L;
-        HttpsURLConnection conn = (HttpsURLConnection) endpoint.toURL().openConnection();
-        conn.setInstanceFollowRedirects(false); conn.setConnectTimeout(5000); conn.setReadTimeout(5000);
-        conn.setRequestMethod("POST"); conn.setDoOutput(true); conn.setUseCaches(false);
-        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        conn.setRequestProperty("Accept", "application/json"); conn.setFixedLengthStreamingMode(body.length);
-        try {
-            try (OutputStream out = conn.getOutputStream()) { out.write(body); }
-            if (conn.getResponseCode() != 200 || System.nanoTime() - deadline >= 0) throw new IllegalArgumentException("Token exchange failed");
-            try (InputStream in = conn.getInputStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[4096]; int n;
-                while ((n = in.read(buffer)) != -1) {
-                    if (System.nanoTime() - deadline >= 0 || out.size() + n > MAX_BODY) throw new IllegalArgumentException("Invalid token response");
-                    out.write(buffer, 0, n);
-                }
-                if (System.nanoTime() - deadline >= 0) throw new IllegalArgumentException("Token exchange timed out");
-                return new JSONObject(new String(out.toByteArray(), StandardCharsets.UTF_8));
-            }
-        } finally { conn.disconnect(); }
     }
     private static String enc(String input) throws Exception { return URLEncoder.encode(input, "UTF-8"); }
     private void fail() { if (!closed) { close(); callback.onFailure(); } }

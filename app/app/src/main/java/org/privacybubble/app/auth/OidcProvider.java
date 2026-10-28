@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
+import org.privacybubble.app.net.Tls13SocketFactory;
 
 /** Trust boundary for a provisioned OIDC issuer. No login is performed here. */
 public final class OidcProvider {
@@ -94,6 +95,7 @@ public final class OidcProvider {
     private static String fetch(String url) throws Exception {
         final long deadline = System.nanoTime() + TOTAL_TIMEOUT_NANOS;
         HttpsURLConnection conn = (HttpsURLConnection) secureUri(url).toURL().openConnection();
+        Tls13SocketFactory.configure(conn);
         conn.setInstanceFollowRedirects(false);
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);

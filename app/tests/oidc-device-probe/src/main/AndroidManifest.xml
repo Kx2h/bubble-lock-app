@@ -8,5 +8,6 @@
             </intent-filter>
         </activity>
         <activity android:name="org.privacybubble.app.api.TransportProbeActivity" android:exported="true" />
+        <activity android:name="org.privacybubble.app.auth.TlsBaselineProbeActivity" android:exported="true" />
     </application>
 </manifest>

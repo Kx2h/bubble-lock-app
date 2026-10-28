@@ -6,6 +6,7 @@ import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
+import https from 'node:https';
 import { createMockIdp } from './server.mjs';
 const run = promisify(execFile);
 const dir = dirname(fileURLToPath(import.meta.url));
@@ -27,7 +28,7 @@ test('Java OidcProvider and IdTokenVerifier use verified HTTPS for mock code exc
     execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-keyout','server.key','-out','server.pem','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost'],{cwd:temp,stdio:'ignore'});
     const [cert,key] = await Promise.all(['server.pem','server.key'].map(p => readFile(resolve(temp,p))));
     await run(resolve(javaHome,'bin/keytool'), ['-importcert','-noprompt','-alias','mock','-file',resolve(temp,'server.pem'),'-keystore',resolve(temp,'test.p12'),'-storetype','PKCS12','-storepass','mock-password'], {timeout:15000});
-    await run(resolve(javaHome,'bin/javac'), ['-cp',jar,'-d',temp,resolve(src,'OidcProvider.java'),resolve(src,'IdTokenVerifier.java'),resolve(src,'OidcRedirect.java'),resolve(dir,'HostJavaIntegration.java')], {timeout:30000});
+    await run(resolve(javaHome,'bin/javac'), ['-cp',jar,'-d',temp,resolve(src,'OidcProvider.java'),resolve(src,'IdTokenVerifier.java'),resolve(src,'OidcRedirect.java'),resolve(src,'OidcTokenTransport.java'),resolve(app,'app/src/main/java/org/privacybubble/app/net/Tls13SocketFactory.java'),resolve(dir,'HostJavaIntegration.java'),resolve(dir,'TlsBaselineTest.java')], {timeout:30000});
     const port = await portNumber(), issuer = `https://localhost:${port}`;
     server = createMockIdp({issuer,cert,key});
     await new Promise((r,j) => server.once('error',j).listen(port,'127.0.0.1',r));
@@ -51,6 +52,30 @@ test('Java OidcProvider and IdTokenVerifier use verified HTTPS for mock code exc
     }
   } finally {
     if (server?.listening) await new Promise(r => server.close(r));
+    await rm(temp,{recursive:true,force:true});
+  }
+});
+
+test('OIDC discovery and token transport enforce TLS 1.3 without disabling certificate checks', async () => {
+  await mkdir(resolve(app,'build'), {recursive:true});
+  const temp = await mkdtemp(resolve(app,'build/oidc-tls-'));
+  let tls12, tls13;
+  try {
+    execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-keyout','server.key','-out','server.pem','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost'],{cwd:temp,stdio:'ignore'});
+    const [cert,key] = await Promise.all(['server.pem','server.key'].map(p => readFile(resolve(temp,p))));
+    await run(resolve(javaHome,'bin/keytool'), ['-importcert','-noprompt','-alias','mock','-file',resolve(temp,'server.pem'),'-keystore',resolve(temp,'test.p12'),'-storetype','PKCS12','-storepass','mock-password'], {timeout:15000});
+    await run(resolve(javaHome,'bin/javac'), ['-cp',jar,'-d',temp,resolve(src,'OidcProvider.java'),resolve(src,'IdTokenVerifier.java'),resolve(src,'OidcTokenTransport.java'),resolve(app,'app/src/main/java/org/privacybubble/app/net/Tls13SocketFactory.java'),resolve(dir,'TlsBaselineTest.java')], {timeout:30000});
+    let requests12 = 0, requests13 = 0;
+    tls12 = https.createServer({key,cert,minVersion:'TLSv1.2',maxVersion:'TLSv1.2'}, (_req,res) => { requests12++; res.writeHead(200).end('{}'); });
+    tls13 = https.createServer({key,cert,minVersion:'TLSv1.3',maxVersion:'TLSv1.3'}, (_req,res) => { requests13++; res.writeHead(200).end('{}'); });
+    await Promise.all([new Promise((r,j)=>tls12.once('error',j).listen(0,'127.0.0.1',r)), new Promise((r,j)=>tls13.once('error',j).listen(0,'127.0.0.1',r))]);
+    const javaArgs = [`-Djavax.net.ssl.trustStore=${resolve(temp,'test.p12')}`,'-Djavax.net.ssl.trustStoreType=PKCS12','-Djavax.net.ssl.trustStorePassword=mock-password','-cp',`${temp}:${jar}`,'org.privacybubble.app.auth.TlsBaselineTest',`https://localhost:${tls12.address().port}`,`https://localhost:${tls13.address().port}`];
+    const result = await run(resolve(javaHome,'bin/java'), javaArgs, {timeout:20000});
+    assert.match(result.stdout, /OIDC TLS baseline passed/);
+    assert.equal(requests12, 0);
+    assert.equal(requests13, 1);
+  } finally {
+    await Promise.all([tls12, tls13].filter(s => s?.listening).map(s => new Promise(r => s.close(r))));
     await rm(temp,{recursive:true,force:true});
   }
 });

@@ -28,7 +28,7 @@ test('HTTPS verifies trust, hostname, TLS version, bounded responses and does no
   try {
     await run('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', keyPath, '-out', certPath, '-days', '1', '-subj', '/CN=localhost', '-addext', 'subjectAltName=DNS:localhost']);
     await run(resolve(javaHome, 'bin/keytool'), ['-importcert', '-noprompt', '-alias', 'test', '-file', certPath, '-keystore', trust, '-storetype', 'PKCS12', '-storepass', 'test-only']);
-    await run(resolve(javaHome, 'bin/javac'), ['-d', dir, resolve(app, 'app/src/main/java/org/privacybubble/app/api/HttpsApiTransport.java'), resolve(app, 'tests/api-transport/HttpsApiTransportTest.java')]);
+    await run(resolve(javaHome, 'bin/javac'), ['-d', dir, resolve(app, 'app/src/main/java/org/privacybubble/app/net/Tls13SocketFactory.java'), resolve(app, 'app/src/main/java/org/privacybubble/app/api/HttpsApiTransport.java'), resolve(app, 'tests/api-transport/HttpsApiTransportTest.java')]);
     const cert = await readFile(certPath), key = await readFile(keyPath);
     let writes = 0, redirected = 0;
     const listener = (req, res) => {

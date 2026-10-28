@@ -19,14 +19,18 @@ def stageTestCa = tasks.register('stageTestCa', Copy) {
 }
 def stageAuth = tasks.register('stageAuth', Copy) {
     from file('../../app/src/main/java/org/privacybubble/app/auth')
-    include 'OidcProvider.java', 'IdTokenVerifier.java', 'OidcRedirect.java'
+    include 'OidcProvider.java', 'IdTokenVerifier.java', 'OidcRedirect.java', 'OidcTokenTransport.java'
     into "$buildDir/generated/probe-java/org/privacybubble/app/auth"
 }
 def stageApiTransport = tasks.register('stageApiTransport', Copy) {
     from file('../../app/src/main/java/org/privacybubble/app/api/HttpsApiTransport.java')
     into "$buildDir/generated/probe-java/org/privacybubble/app/api"
 }
-tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageTestCa, stageAuth, stageApiTransport }
+def stageTlsFactory = tasks.register('stageTlsFactory', Copy) {
+    from file('../../app/src/main/java/org/privacybubble/app/net/Tls13SocketFactory.java')
+    into "$buildDir/generated/probe-java/org/privacybubble/app/net"
+}
+tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageTestCa, stageAuth, stageApiTransport, stageTlsFactory }
 dependencies { implementation 'com.nimbusds:nimbus-jose-jwt:9.47' }
 
 // This separate APK exists only for synthetic local testing, never release distribution.

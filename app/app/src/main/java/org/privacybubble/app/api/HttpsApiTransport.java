@@ -4,9 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Arrays;
@@ -16,9 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import org.privacybubble.app.net.Tls13SocketFactory;
 
 /** HTTPS transport boundary; the caller owns API semantics and trusted-origin provisioning. */
 public final class HttpsApiTransport {
@@ -47,7 +42,7 @@ public final class HttpsApiTransport {
         Map<String, String> checked = validateHeaders(headers);
         long deadline = System.nanoTime() + BUDGET_NANOS;
         HttpsURLConnection connection = (HttpsURLConnection) target.toURL().openConnection();
-        connection.setSSLSocketFactory(new Tls13Factory(HttpsURLConnection.getDefaultSSLSocketFactory()));
+        Tls13SocketFactory.configure(connection);
         connection.setInstanceFollowRedirects(false);
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(8000);
@@ -150,22 +145,4 @@ public final class HttpsApiTransport {
         @Override public String toString() { return "HttpsApiResponse[redacted]"; }
     }
 
-    /** Restricts the process-default factory to TLS 1.3 without replacing hostname verification. */
-    private static final class Tls13Factory extends SSLSocketFactory {
-        private final SSLSocketFactory delegate;
-        Tls13Factory(SSLSocketFactory delegate) { this.delegate = delegate; }
-        private Socket restrict(Socket socket) throws IOException {
-            if (!(socket instanceof SSLSocket)) { socket.close(); throw new SSLException("TLS unavailable"); }
-            try { ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.3"}); return socket; }
-            catch (IllegalArgumentException e) { socket.close(); throw new SSLException("TLS 1.3 unavailable"); }
-        }
-        @Override public String[] getDefaultCipherSuites() { return delegate.getDefaultCipherSuites(); }
-        @Override public String[] getSupportedCipherSuites() { return delegate.getSupportedCipherSuites(); }
-        @Override public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException { return restrict(delegate.createSocket(socket, host, port, autoClose)); }
-        @Override public Socket createSocket(String host, int port) throws IOException { return restrict(delegate.createSocket(host, port)); }
-        @Override public Socket createSocket(String host, int port, InetAddress local, int localPort) throws IOException { return restrict(delegate.createSocket(host, port, local, localPort)); }
-        @Override public Socket createSocket(InetAddress host, int port) throws IOException { return restrict(delegate.createSocket(host, port)); }
-        @Override public Socket createSocket(InetAddress host, int port, InetAddress local, int localPort) throws IOException { return restrict(delegate.createSocket(host, port, local, localPort)); }
-        @Override public Socket createSocket() throws IOException { return restrict(delegate.createSocket()); }
-    }
 }

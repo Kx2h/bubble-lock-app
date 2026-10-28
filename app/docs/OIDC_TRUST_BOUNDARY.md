@@ -6,6 +6,8 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
 `OidcProvider.discover(trustedIssuer)`는 사전에 신뢰한 HTTPS issuer만 사용하여 discovery를 읽고 문서의 issuer가 정확히 같은지 확인한다. 인증 endpoint, token endpoint, JWKS URI는 HTTPS여야 하며 redirect를 따라가지 않는다. 현재 보수적인 호환 범위는 응답 타입 `code`, ID 토큰 `RS256`, PKCE `S256`를 명시적으로 광고하는 provider와 쿼리 없는 endpoint이다. 응답은 64 KiB로 제한하며 네트워크 작업은 호출자가 백그라운드 스레드에서 수행해야 한다. 개발자가 issuer를 사용자의 임의 입력이나 리다이렉트에서 받아서는 안 된다.
 
+앱이 직접 수행하는 discovery·JWKS 조회와 authorization code·refresh token 교환은 공통 TLS 1.3 socket factory를 사용하며, 이를 지원하지 않는 기기나 서버와의 연결은 실패한다. 현재 Android 최소 버전은 26이므로 일부 기기에서 사용할 수 없으며 낮은 TLS 버전으로 자동 대체하지 않는다. 이 설정은 외부 브라우저의 TLS 협상을 제어하지 않는다. factory와 hostname verifier는 프로세스의 HTTPS 기본값을 사용하므로 다른 코드가 해당 전역 기본값을 변경하면 플랫폼 기본 신뢰 검증을 보장하지 않는다. 시스템 시계나 브라우저·서버 정책의 검증은 별도 범위다.
+
 `OidcProvider.verifyIdToken(...)`은 검증된 discovery의 JWKS를 플랫폼 TLS 검증으로 가져온 뒤 서명과 `iss`, 단일 `aud`, 선택된 경우 `azp`, `sub`, `exp`, `iat`, `nbf`, 거래별 nonce를 검증한다. `sub`는 대소문자를 구분하는 최대 255 ASCII 문자로 제한하며 초기 인증과 갱신에 동일한 규칙을 적용한다. 신뢰되지 않은 다중 audience, 모호한 `kid`, 개인키가 포함된 JWK, 잘못된 key use와 RS256 외 알고리즘은 거부한다. 결과는 검증된 subject만 반환한다. 값이나 토큰을 로그·receipt에 남기면 안 된다. `IdTokenVerifier`는 신뢰된 JWKS를 입력받는 하위 계층으로, 네트워크에서 가져온 임의 JSON을 인증 근거로 직접 전달해서는 안 된다.
 
 공개 `verifyIdToken` 경로는 JWKS 수신 후 시스템 시각으로 토큰을 검증한다. 기존 4인자 호출은 호환을 위해 유지하지만 전달된 시각은 무시하고, 새 코드는 3인자 호출을 사용한다. 따라서 호출자가 과거나 미래 시각을 지정해 검증을 우회할 수 없지만, 시스템 시각 자체가 잘못된 상황은 별도 신뢰 시간 대책이 필요하다. 하위 `IdTokenVerifier`는 명시적으로 전달된 시각을 사용하므로 직접 호출자는 검증 시점의 시각을 제공해야 한다.

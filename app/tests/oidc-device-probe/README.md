@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · R10
 
-This is a **separate debug-only test APK**, package `org.privacybubble.oidcprobe`, for a synthetic local IdP. It copies only the existing APP `OidcProvider`, `OidcRedirect` and `IdTokenVerifier` sources at build time; it does not modify the normal app. Its own debug network configuration trusts the public test CA generated under the workspace `.local/oidc-mock`. No system or browser trust setting is changed. Release build variants are disabled.
+This is a **separate debug-only test APK**, package `org.privacybubble.oidcprobe`, for a synthetic local IdP. It copies APP OIDC verification, token transport and common TLS factory sources at build time; it does not modify the normal app. Its own debug network configuration trusts the public test CA generated under the workspace `.local/oidc-mock`. No system or browser trust setting is changed. Release build variants are disabled.
 
 The probe itself makes HTTPS requests: it discovers the mock provider, submits a synthetic consent form directly, exchanges a PKCE S256 code and verifies the ID token and rejection of an incorrect nonce. **This is not an external browser or AppAuth test, actual user authentication, or operational approval.** The production app's TLS or authentication behavior cannot be inferred from this probe's debug trust configuration.
 
@@ -46,6 +46,7 @@ In another shell, verify the probe package and each of the three reverse ports a
 "$ADB" -s "$SERIAL" install "$PWD/app/tests/oidc-device-probe/build/outputs/apk/debug/OidcDeviceProbe-debug.apk"
 for port in 18791 18792 18793; do "$ADB" -s "$SERIAL" reverse --no-rebind "tcp:$port" "tcp:$port"; done
 "$ADB" -s "$SERIAL" shell am start -n org.privacybubble.oidcprobe/org.privacybubble.app.api.TransportProbeActivity
+"$ADB" -s "$SERIAL" shell am start -n org.privacybubble.oidcprobe/org.privacybubble.app.auth.TlsBaselineProbeActivity
 "$ADB" -s "$SERIAL" uninstall org.privacybubble.oidcprobe
 for port in 18791 18792 18793; do "$ADB" -s "$SERIAL" reverse --remove "tcp:$port"; done
 ```

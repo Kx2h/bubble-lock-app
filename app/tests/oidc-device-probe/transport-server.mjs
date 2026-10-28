@@ -5,6 +5,12 @@ const cert = readFileSync(process.env.MOCK_OIDC_CERT), key = readFileSync(proces
 const wrongCert = readFileSync(process.env.PROBE_WRONG_CERT), wrongKey = readFileSync(process.env.PROBE_WRONG_KEY);
 let writes = 0, lost = 0, redirected = 0;
 function handler(req, res) {
+  if (req.url === '/.well-known/openid-configuration' && req.method === 'GET') {
+    const issuer = `https://${req.headers.host}`;
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({issuer, authorization_endpoint:issuer+'/authorize', token_endpoint:issuer+'/token-baseline', jwks_uri:issuer+'/jwks', response_types_supported:['code'], id_token_signing_alg_values_supported:['RS256'], code_challenge_methods_supported:['S256']}));
+  }
+  if (req.url === '/token-baseline' && req.method === 'POST') { req.resume(); req.on('end', () => res.end('{}')); return; }
   if (req.url === '/ok' && req.method === 'GET') return res.end('ok');
   if (req.url === '/redirect' && req.method === 'GET') { res.writeHead(302, {location:'/redirect-target'}); return res.end(); }
   if (req.url === '/redirect-target') { redirected++; return res.end(); }
