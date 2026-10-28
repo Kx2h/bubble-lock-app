@@ -2,7 +2,7 @@
 
 ## 개발 기준 문서
 
-이 문서는 Privacy Bubble Keyring의 구현 기준, 담당자 분배, 프로토콜 계약, Rubric 추적, 시험 수용 조건을 하나의 기준으로 묶는다. 네 명의 구현 담당자가 이 문서를 기준으로 모듈을 개발하고, Red 검증·Blue 보완·Green 독립 설계 검토 사이클에 결과를 연결한다.
+이 문서는 Privacy Bubble Keyring의 구현 기준, 담당자 분배, 프로토콜 계약, Rubric 추적, 시험 수용 조건을 하나의 기준으로 묶는다. 다섯 명의 구현 담당자가 이 문서를 기준으로 모듈을 개발하고, Red 검증·Blue 보완·Green 독립 설계 검토 사이클에 결과를 연결한다.
 
 현재 목표는 Rubric 17개 항목에서 Expert 수준(항목별 5점, 총 85점)에 도달하는 것이다. Green은 oneM2M 표준제정위원장 관점의 AI 독립 검토 역할로 고정한다. 설계 검토 점수는 실제 구현·시험·공개 활동·면접 증거와 별도 관리하며, 실제 증거는 각 gate의 receipt로 수집한다.
 
@@ -30,12 +30,12 @@
 - 현재 공통 문서 기준: `DOC-REV 1.0.0` on `codex/project-plan`
 - 원격 반영은 팀 통합 승인과 Red 검증을 거친 뒤 진행한다.
 
-### 네 에이전트의 역할 선언
+### 다섯 에이전트의 역할 선언
 
 각 개발자는 작업 시작 메시지·branch 설명·Pull Request 본문에 아래 형식으로 자신의 역할을 먼저 밝힌다.
 
 ```text
-ROLE: PC-MOBIUS | APP | WEB-DASHBOARD | KEYRING
+ROLE: PC-MOBIUS-CORE | PC-MOBIUS-INTEGRATION | APP | WEB-DASHBOARD | KEYRING
 DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md
 DOC-REV: <문서 개정 식별자>
 RUBRIC: <담당 R01~R17>
@@ -50,12 +50,28 @@ DEPENDENCIES: <다른 역할에 전달할 계약>
 
 | 역할 | branch 예시 | 담당 영역 | 주 Rubric |
 |---|---|---|---|
-| PC-MOBIUS | `feature/pc-mobius` | Mobius CSE·API·DB·MEC·handover·FL·MCP·시험 runner | R01, R03, R06, R07, R10~R17 |
+| PC-MOBIUS-CORE | `feature/pc-mobius-core` | Mobius CSE·oneM2M resource·SDT·Group·Subscription·MQTT/HTTP binding·DB 정본 | R01, R02, R03, R06, R07, R11 |
+| PC-MOBIUS-INTEGRATION | `feature/pc-mobius-integration` | API/Auth·ACP/grant·MEC·callback·handover·FL·MCP·통합시험·release evidence | R03, R06, R10, R12~R17 |
 | APP | `feature/app` | Guardian/Visitor 앱·OIDC·consent·승인·알림·상태 | R03, R09, R10, R14, R17 |
 | WEB-DASHBOARD | `feature/web-dashboard` | 운영 화면·resource tree·실시간 event·audit·evidence | R03~R09, R12, R15, R16, R17 |
 | KEYRING | `feature/keyring` | PCB·firmware·BLE·Raspberry Pi Gateway·device receipt | R01~R03, R05, R10~R12, R15 |
 
-Role 4의 KEYRING 담당은 키링 PCB·펌웨어와 Raspberry Pi Gateway를 하나의 현장 엣지 묶음으로 관리한다. PC-MOBIUS 담당은 중앙 Mobius IN-CSE와 정책·API·MEC·오케스트레이션을 관리한다.
+Role 5의 KEYRING 담당은 키링 PCB·펌웨어와 Raspberry Pi Gateway를 하나의 현장 엣지 묶음으로 관리한다. PC-MOBIUS-CORE 담당은 중앙 Mobius IN-CSE와 oneM2M wire/resource 정본을 관리한다. PC-MOBIUS-INTEGRATION 담당은 정책·API·MEC·handover·FL·MCP·통합 증거를 관리한다.
+
+### 다섯 명의 시간·업무 배분
+
+현재 620시간 기본 작업 계획의 역할 키를 다음처럼 매핑한다. 예비 155시간과 여유 30시간은 기존 gate·통합시험·장애 복구에 공동 사용한다.
+
+| 담당 | 기존 역할 키 | 기본 계획 시간 | 핵심 결과 |
+|---|---:|---:|---|
+| PC-MOBIUS-CORE | A | 159h | CSE·oneM2M·SDT·Group·Subscription·MQTT/HTTP·DB |
+| PC-MOBIUS-INTEGRATION | D | 103h | Auth/ACP·MEC·callback·handover·FL·MCP·통합시험 |
+| APP | C 일부 | 99h | Guardian/Visitor 앱·승인·consent·알림·상태 |
+| WEB-DASHBOARD | E | 130h | 운영 UI·event·audit·evidence·Article/영상 지원 |
+| KEYRING | B | 129h | PCB·firmware·BLE·Raspberry Pi Gateway·실물시험 |
+| **합계** |  | **620h** | 25개 작업과 26개 수용시험 |
+
+APP 담당의 서버 연동·인증 일부는 PC-MOBIUS-INTEGRATION과 공동 수행하며, Rubric·API·receipt owner는 각 기능별로 한 명을 지정한다.
 
 ### 동시에 개발하는 작업 규칙
 
@@ -64,17 +80,18 @@ Role 4의 KEYRING 담당은 키링 PCB·펌웨어와 Raspberry Pi Gateway를 하
 3. 공통 계약 변경은 `contracts/` 또는 `interfaces/`의 schema·OpenAPI·oneM2M resource 예시와 함께 Pull Request에 포함한다.
 4. 각 Pull Request는 담당 Rubric, protocol, test ID, expected/actual, receipt hash를 연결한다.
 5. 공유 파일은 지정 owner가 변경하고, 다른 역할은 Pull Request comment로 변경 요청을 남긴다.
-6. API·payload·topic·resource URI 변경은 PC-MOBIUS가 canonical contract를 갱신하고 앱·웹·키링이 같은 revision을 반영한다.
-7. 매 통합 시점에 `integration/privacy-bubble`에서 네 역할의 branch를 순서대로 검증하고 end-to-end receipt를 생성한다.
-8. 통합 순서는 `PC-MOBIUS 계약 → KEYRING/Gateway → APP·WEB client → 통합시험 → Red 검증 → Blue 보완 → Green 검토`로 운영한다.
-9. 각 에이전트는 완료 보고에 구현 파일, 실행 명령, 시험 결과, 로그 hash, 다음 역할에 전달할 계약을 함께 적는다.
-10. 실제 비밀키·개인정보·운영 credential은 저장소의 예시 환경변수와 local secret store로 관리하고, 문서에는 schema·rotation receipt만 남긴다.
+6. oneM2M resource·SDT·MQTT/HTTP binding 변경은 PC-MOBIUS-CORE가 canonical contract를 갱신하고 PC-MOBIUS-INTEGRATION·앱·웹·키링이 같은 revision을 반영한다.
+7. API/Auth·ACP/grant·MEC·handover·FL·MCP 변경은 PC-MOBIUS-INTEGRATION이 계약을 갱신하고 PC-MOBIUS-CORE가 resource/DB 영향 범위를 교차 확인한다.
+8. 매 통합 시점에 `integration/privacy-bubble`에서 다섯 역할의 branch를 순서대로 검증하고 end-to-end receipt를 생성한다.
+9. 통합 순서는 `PC-MOBIUS-CORE contract → PC-MOBIUS-INTEGRATION contract → KEYRING/Gateway → APP·WEB client → 통합시험 → Red 검증 → Blue 보완 → Green 검토`로 운영한다.
+10. 각 에이전트는 완료 보고에 구현 파일, 실행 명령, 시험 결과, 로그 hash, 다음 역할에 전달할 계약을 함께 적는다.
+11. 실제 비밀키·개인정보·운영 credential은 저장소의 예시 환경변수와 local secret store로 관리하고, 문서에는 schema·rotation receipt만 남긴다.
 
 ### Pull Request 본문 템플릿
 
 ```markdown
 ## ROLE
-PC-MOBIUS | APP | WEB-DASHBOARD | KEYRING
+PC-MOBIUS-CORE | PC-MOBIUS-INTEGRATION | APP | WEB-DASHBOARD | KEYRING
 
 ## DOC / RUBRIC
 - Document: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md
@@ -130,19 +147,22 @@ bubble_lock/
 
 | 제공자 | 소비자 | 전달물 | 수용 조건 |
 |---|---|---|---|
-| KEYRING | PC-MOBIUS | BLE payload, Gateway MQTT/HTTPS payload, ACK/readback | schema hash·deviceId·sequence·commandId 일치 |
-| PC-MOBIUS | APP | auth/session·consent·command·status API | OpenAPI revision·idempotency·receipt 일치 |
-| PC-MOBIUS | WEB-DASHBOARD | resource tree·event stream·audit/evidence API | event sequence·role scope·resync 확인 |
-| APP | PC-MOBIUS | approvalHash·grant·incident intent | principal·scope·TTL·grantRevision 일치 |
-| WEB-DASHBOARD | PC-MOBIUS | 운영 action·조회·evidence query | operator ACP·audit receipt 생성 |
-| PC-MOBIUS | KEYRING | desired state·deadline·epoch·commandId | device journal·ACK·readback 일치 |
+| KEYRING | PC-MOBIUS-CORE | BLE payload, Gateway MQTT/HTTPS payload, ACK/readback | schema hash·deviceId·sequence·commandId 일치 |
+| PC-MOBIUS-CORE | PC-MOBIUS-INTEGRATION | resource·DB·wire contract | revision·migration·event schema 일치 |
+| PC-MOBIUS-CORE | APP | oneM2M API·session·status API | OpenAPI revision·idempotency·receipt 일치 |
+| PC-MOBIUS-CORE | WEB-DASHBOARD | resource tree·event stream API | event sequence·role scope·resync 확인 |
+| PC-MOBIUS-INTEGRATION | APP | auth·consent·approval·notification API | principal·scope·TTL·grantRevision 일치 |
+| PC-MOBIUS-INTEGRATION | WEB-DASHBOARD | policy·audit·handover·evidence API | operator ACP·audit receipt 생성 |
+| APP | PC-MOBIUS-INTEGRATION | approvalHash·grant·incident intent | consent revision·purpose·expiry 일치 |
+| WEB-DASHBOARD | PC-MOBIUS-INTEGRATION | 운영 action·조회·evidence query | role scope·audit receipt 생성 |
+| PC-MOBIUS-INTEGRATION | KEYRING | desired state·deadline·epoch·commandId | device journal·ACK·readback 일치 |
 
 ### 동시 개발 체크포인트
 
 - 매일 작업 시작 시 역할 선언과 branch 상태를 기록한다.
 - 인터페이스 변경 시 같은 날 계약 JSON·테스트 fixture·문서 링크를 갱신한다.
 - 통합 전 각 역할은 자신의 모듈 시험과 receipt hash를 제출한다.
-- 통합 후 PC-MOBIUS 담당이 end-to-end test를 실행하고, Red가 독립 교차검증을 수행한다.
+- 통합 후 PC-MOBIUS-CORE와 PC-MOBIUS-INTEGRATION이 end-to-end test를 공동 실행하고, Red가 독립 교차검증을 수행한다.
 - Green 검토용 후보는 HTML·contracts·calendar·fixtures·source manifest를 하나의 revision packet으로 고정한다.
 
 ## 1. 제품 개념
@@ -165,7 +185,7 @@ Privacy Bubble Keyring은 키링의 근접 관측, 라즈베리파이 현장 Gat
 키링 PCB·펌웨어
   │ BLE GATT
   ▼
-라즈베리파이 Gateway (Role 4가 함께 담당)
+라즈베리파이 Gateway (Role 5가 함께 담당)
   │ MQTT 3.1.1 oneM2M binding baseline 또는 Mobius probe로 확정한 지원 버전
   │ HTTPS REST + TLS/mTLS
   ▼
@@ -200,7 +220,7 @@ Privacy Bubble Keyring은 키링의 근접 관측, 라즈베리파이 현장 Gat
 
 ### 라즈베리파이 Gateway의 범위
 
-Role 4가 PCB·펌웨어와 함께 구현한다.
+Role 5가 PCB·펌웨어와 함께 구현한다.
 
 - BLE scan·pairing·GATT characteristic 수집
 - 키링 device identity·firmware revision·배터리·RSSI·timestamp 수집
@@ -317,29 +337,29 @@ Mobius broker capability probe 결과를 release manifest에 기록하고 oneM2M
 
 | 항목 | Expert 구현 기준 | 주 담당 | 협업 |
 |---|---|---|---|
-| R01 | Group/fan-out, member ACP, 실제 ACK/readback, retry | PC Mobius | 키링·앱 |
-| R02 | BLE·MQTT·HTTPS·WebSocket의 조건별 사용과 패킷 시험 | 키링 | PC·앱·웹 |
-| R03 | 키링→Gateway→CSE→복수 앱의 사건 흐름 | PC Mobius | 전원 |
-| R04 | HW·자원·프로토콜·효과·재현을 담은 Article | 웹 | PC |
+| R01 | Group/fan-out, member ACP, 실제 ACK/readback, retry | PC-MOBIUS-CORE | 키링·앱 |
+| R02 | BLE·MQTT·HTTPS·WebSocket의 조건별 사용과 패킷 시험 | KEYRING | PC-MOBIUS-CORE·앱·웹 |
+| R03 | 키링→Gateway→CSE→복수 앱의 사건 흐름 | PC-MOBIUS-CORE | PC-MOBIUS-INTEGRATION·앱·웹·키링 |
+| R04 | HW·자원·프로토콜·효과·재현을 담은 Article | WEB-DASHBOARD | PC-MOBIUS-INTEGRATION |
 | R05 | 실물·모의·실측을 구분한 5분 미만 영상 | 키링 | 전원 |
-| R06 | 독립 GitHub, build/deploy/test/replay와 release SHA | PC Mobius | 전원 |
-| R07 | oneM2M 도입 효과를 코드·설정·지연으로 비교 | PC Mobius | 웹 |
+| R06 | 독립 GitHub, build/deploy/test/replay와 release SHA | PC-MOBIUS-INTEGRATION | 전원 |
+| R07 | oneM2M 도입 효과를 코드·설정·지연으로 비교 | PC-MOBIUS-CORE | WEB-DASHBOARD |
 | R08 | 공개 기술 질문·응답·재현 commit·후속 기여 | 웹 | PC |
 | R09 | 구성원별 구조 설명·장치 교체·회수·전환 리허설 | 앱 | 전원 |
-| R10 | TLS/mTLS, OIDC, MQTT ACL, ACP, grant 수명·회수 | PC Mobius | 앱·키링 |
-| R11 | TS-0023 SDT, schema, discovery, 공급자·클라이언트 교체 | PC Mobius | 키링 |
-| R12 | 위치/health 기반 handover, 상태·구독·보안 맥락 복원 | PC Mobius | 키링·웹 |
-| R13 | 프로젝트 지리·host inventory·MEC/VM orchestration | PC Mobius | 웹 |
-| R14 | ESTIMED VM, dynamic selection, resilient multi-round FL | PC Mobius | 앱 |
-| R15 | BLE 관측·MEC UE 위치·oneM2M 정책·geofence | PC Mobius | 키링·앱 |
-| R16 | Location·RNIS 두 MEC 서비스의 양방향 trace | PC Mobius | 웹 |
-| R17 | 복수 MCP 서버, 승인 hash, persistent run, resume | PC Mobius | 앱·웹 |
+| R10 | TLS/mTLS, OIDC, MQTT ACL, ACP, grant 수명·회수 | PC-MOBIUS-INTEGRATION | 앱·키링 |
+| R11 | TS-0023 SDT, schema, discovery, 공급자·클라이언트 교체 | PC-MOBIUS-CORE | 키링 |
+| R12 | 위치/health 기반 handover, 상태·구독·보안 맥락 복원 | PC-MOBIUS-INTEGRATION | 키링·웹 |
+| R13 | 프로젝트 지리·host inventory·MEC/VM orchestration | PC-MOBIUS-INTEGRATION | WEB-DASHBOARD |
+| R14 | ESTIMED VM, dynamic selection, resilient multi-round FL | PC-MOBIUS-INTEGRATION | APP |
+| R15 | BLE 관측·MEC UE 위치·oneM2M 정책·geofence | PC-MOBIUS-INTEGRATION | 키링·앱 |
+| R16 | Location·RNIS 두 MEC 서비스의 양방향 trace | PC-MOBIUS-INTEGRATION | WEB-DASHBOARD |
+| R17 | 복수 MCP 서버, 승인 hash, persistent run, resume | PC-MOBIUS-INTEGRATION | 앱·웹 |
 
 R04~R09는 구현 결과를 Article·영상·GitHub·공개 토론·면접 evidence로 연결한다. 각 항목은 `rubricId → sectionId → contract → testId → owner → gate → receipt` 순서로 추적한다.
 
 ## 5. 작업 패키지와 산출물
 
-### PC Mobius 담당 산출물
+### PC-MOBIUS-CORE 담당 산출물
 
 - Mobius runtime configuration과 Docker/실행 명령
 - oneM2M resource tree·SDT registry·XSD lineage
@@ -353,6 +373,16 @@ R04~R09는 구현 결과를 Article·영상·GitHub·공개 토론·면접 evide
 - MCP server 3종
 - API OpenAPI/JSON Schema·integration tests
 - release manifest·replay command·runtime receipt
+
+### PC-MOBIUS-INTEGRATION 담당 산출물
+
+- API gateway·OIDC/mTLS·principal/originator binding
+- ACP·grant·consent·approval·audit policy service
+- MEC Location/RNIS adapter·callback ingress·reconcile
+- Edge-A/Edge-B handover coordinator·epoch·rollback
+- ESTIMED VM FL coordinator·artifact serving fence
+- MCP oneM2M/MEC/Audit server와 persistent run DB
+- integration runner·fault fixtures·release evidence·replay report
 
 ### 앱 담당 산출물
 
