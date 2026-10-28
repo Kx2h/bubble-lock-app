@@ -6,6 +6,8 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10. 2026-10-29 Android 14 공기계�
 
 fixture는 `/api/test/receipt`에 고정 합성 ID·미확인 시각/readback과 `INDETERMINATE` 또는 `REJECTED` 값을 반환했다. `requestId`는 매 요청 바뀌고, 실패 모드는 503을 반환했다. 로컬 제어 파일만으로 응답 모드를 바꿨으며 실제 외부 서비스는 사용하지 않았다.
 
+사용한 fixture의 응답 논리를 [저장소 재현 도구](../tests/fixtures/receipt-monitor.md)로 옮겼다. 저장소 버전은 제어 경로와 알 수 없는 모드 처리를 보완했으며, 그 버전으로 공기계 시험을 반복하지는 않았다. 호스트 시험으로 최초·동일·변화·실패·복구 응답을 확인했다.
+
 - 자동 조회 시작 뒤 첫 성공은 비교 기준 설정 안내였고 변경 안내가 아니었다 ([화면](receipt-monitor-first.png)).
 - 같은 내용의 반복 성공은 표시 내용 변화 없음으로 구분됐다. 요청 ID와 기기 조회 시각은 바뀌어도 변경으로 판정하지 않았다 ([화면](receipt-monitor-same.png)).
 - 연속 성공 조회 사이에서 표시 내용을 바꾸자 화면에 합성 표시 내용 변화 안내가 나왔다 ([화면](receipt-monitor-changed.png)). 이는 새로운 사건이나 시간순 진척을 뜻하지 않는다.
