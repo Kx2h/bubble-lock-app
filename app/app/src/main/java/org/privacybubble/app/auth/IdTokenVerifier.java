@@ -170,7 +170,7 @@ public final class IdTokenVerifier {
         if (audience == null || audience.size() != 1 || !clientId.equals(audience.get(0))) fail();
         Object azp = claims.getClaim("azp");
         if (azp != null && (!(azp instanceof String) || !clientId.equals(azp))) fail();
-        requireText(claims.getSubject(), 512);
+        requireSubject(claims.getSubject());
         Date exp = claims.getExpirationTime(), issued = claims.getIssueTime(), notBefore = claims.getNotBeforeTime();
         long nowMillis = nowEpochSeconds * 1000;
         if (exp == null || issued == null || exp.getTime() <= nowMillis
@@ -182,6 +182,12 @@ public final class IdTokenVerifier {
 
     private static void requireText(String value, int maxLength) {
         if (value == null || value.isEmpty() || value.length() > maxLength || !value.equals(value.trim())) fail();
+    }
+
+    /** OpenID Connect limits the case-sensitive subject to 255 ASCII characters. */
+    private static void requireSubject(String value) {
+        requireText(value, 255);
+        for (int i = 0; i < value.length(); i++) if (value.charAt(i) > 0x7f) fail();
     }
 
     private static void fail() { throw new IllegalArgumentException("ID token validation failed"); }

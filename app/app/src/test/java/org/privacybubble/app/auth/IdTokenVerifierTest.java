@@ -55,6 +55,13 @@ public class IdTokenVerifierTest {
         String jwt = sign(claims().claim("azp", CLIENT).build(), key, "key-1");
         assertEquals("person-1", verify(jwt, jwks(key.toPublicJWK())));
     }
+    @Test public void subjectMustBeAtMost255AsciiCharacters() throws Exception {
+        String subject = "Aa" + "x".repeat(253);
+        assertEquals(subject, verify(sign(claims().subject(subject).build(), key, "key-1"), jwks(key.toPublicJWK())));
+        reject(claims().subject(subject + "x").build());
+        reject(claims().subject("subject-한글").build());
+        reject(claims().subject("subject-\ud83d\ude00").build());
+    }
     @Test public void rejectsWrongIssuerAudienceAndAzp() throws Exception {
         reject(claims().issuer("https://attacker.example.test").build());
         reject(claims().audience("other").claim("azp", CLIENT).build());
