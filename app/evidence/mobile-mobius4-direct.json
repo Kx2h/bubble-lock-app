@@ -1,0 +1,13 @@
+{
+  "mode": "local-mobius4-cse",
+  "timestamp": "2026-10-28T10:25:27.208Z",
+  "requestId": "app-direct-0500e791-78c3-4160-82ff-644eefc30adc",
+  "httpStatus": 200,
+  "responseRequestId": "app-direct-0500e791-78c3-4160-82ff-644eefc30adc",
+  "oneM2MStatus": "2000",
+  "state": false,
+  "labels": [
+    "dev-bootstrap",
+    "unobserved"
+  ]
+}

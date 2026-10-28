@@ -1,0 +1,11 @@
+TEST: restart and preserve existing resources
+waiting for server to start.... done
+server started
+NOTICE:  extension "postgis" already exists, skipping
+CREATE EXTENSION
+Mobius HTTP loopback port 50546 is ready.
+{"scope":"empty-resource-provisioning","receipts":[{"ty":2,"status":409,"rsc":"4105","requestId":"app-setup-4ca6e93f-115c-4d2a-a0f1-0ea4c7cd1215","responseRequestId":"app-setup-4ca6e93f-115c-4d2a-a0f1-0ea4c7cd1215"},{"ty":28,"status":409,"rsc":"4105","requestId":"app-setup-9c1d639a-ec19-41e4-ae57-e6cd89fdceed","responseRequestId":"app-setup-9c1d639a-ec19-41e4-ae57-e6cd89fdceed"}]}
+Receipt: [isolated-test-workspace]/.local/mobius-runtime/bootstrap-receipt.Q8M8a113.json
+waiting for server to shut down.... done
+server stopped
+Stopped the local runtime; data preserved.

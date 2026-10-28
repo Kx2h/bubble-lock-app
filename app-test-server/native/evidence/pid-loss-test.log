@@ -1,0 +1,12 @@
+waiting for server to start.... done
+server started
+NOTICE:  extension "postgis" already exists, skipping
+CREATE EXTENSION
+Mobius HTTP loopback port 50546 is ready.
+Mobius port is still active without a verified stopped PID; refusing to stop PostgreSQL.
+PASS: stop refused while CSE PID is missing and port is active
+{"scope":"empty-resource-provisioning","receipts":[{"ty":2,"status":409,"rsc":"4105","requestId":"app-setup-ee401e00-a7c5-474a-bfcd-39e5bd751549","responseRequestId":"app-setup-ee401e00-a7c5-474a-bfcd-39e5bd751549"},{"ty":28,"status":409,"rsc":"4105","requestId":"app-setup-a41a68e0-6d40-48a8-84ec-90e85554868b","responseRequestId":"app-setup-a41a68e0-6d40-48a8-84ec-90e85554868b"}]}
+Receipt: [isolated-test-workspace]/.local/mobius-runtime/bootstrap-receipt.vQ1Wsnov.json
+waiting for server to shut down.... done
+server stopped
+Stopped the local runtime; data preserved.

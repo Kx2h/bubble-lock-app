@@ -26,3 +26,5 @@ node app-test-server/server.mjs
 ```
 
 이 인터페이스는 테스트 상태만 표시한다. KEYRING bootstrap의 `false`는 `dev-bootstrap`, `unobserved`로 표시된 초기값으로, 실제 장치 관측을 뜻하지 않는다. HTTPS/HTTP의 응답 본문은 최대 64 KiB이며 timeout, 인증 실패 및 잘못된 응답은 502로 표시한다. 테스트는 임시 인증서를 생성하므로 `openssl`이 필요하다.
+
+실제 Mobius4를 프로젝트 폴더 아래에 격리해 준비하는 절차는 [native/README.md](native/README.md)를 참고한다. 이 native 환경은 HTTP loopback 전용이며 위 KEYRING mTLS 구성과 별개다.

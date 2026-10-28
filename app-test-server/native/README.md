@@ -1,0 +1,29 @@
+# 격리된 Mobius4 소스 시험 환경
+
+ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10 · 기준 CORE `91a281b`, KEYRING `c2ad489`.
+
+이 구성은 Ubuntu 24.04 amd64에서 별도 PostgreSQL 16/PostGIS 3.4 데이터베이스와 IoTKETI Mobius4 `e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8`를 작업 폴더의 `.local` 아래에 둔다. 시스템 패키지나 기존 Docker daemon, 이미지, 볼륨을 수정하지 않는다. Node 22는 별도로 `$WORKSPACE/.local/node`에 준비해야 한다. Ubuntu APT 저장소에 스크립트에 고정된 버전이 남아 있어야 최초 설치가 가능하다. root로 실행할 경우 workspace 소유자가 root가 아니어야 한다.
+
+```sh
+# 저장소 루트에서; 작업 폴더의 절대 경로를 지정
+export WORKSPACE=/absolute/path/to/mobius4
+app-test-server/native/setup.sh
+app-test-server/native/start.sh
+app-test-server/native/bootstrap.sh
+# 중계 서버를 별도 터미널에서 실행 (config에는 local 관리자 identity가 있다)
+MOBIUS4_URL=http://127.0.0.1:50545/Mobius \
+MOBIUS4_ORIGINATOR="$("$WORKSPACE/.local/node/bin/node" -p 'require(process.argv[1]).cse.admin' "$WORKSPACE/.local/mobius-runtime/config.json")" \
+  "$WORKSPACE/.local/node/bin/node" app-test-server/server.mjs
+# 시험을 끝낸 후 중계 서버를 종료하고
+app-test-server/native/stop.sh
+```
+
+`MOBIUS_PORT`를 최초 `setup.sh`에 지정했다면 중계 URL도 같은 포트로 바꾼다. setup은 기존 runtime/source 경로를 절대 덮어쓰지 않는다. 시작은 포트 충돌을 거부한다. stop은 PID의 프로세스와 소스 경로를 확인하며, PID가 없거나 유효하지 않은 상태에서 CSE 포트가 열려 있으면 PostgreSQL을 중단하지 않는다. 정상 중지는 DB 데이터를 보존한다. 설치 실패 시 남은 파일을 자동 삭제하지 않는다. `config.json`, 로그와 DB는 Git에 추가하거나 공개하지 않는다. 인증 정보, 녹화 화면과 로그에는 개인정보가 포함될 수 있다.
+
+Bootstrap은 KEYRING 시험 구성의 AE와 ty=28 `pb:binarySwitch`를 생성하고 라벨 `dev-bootstrap`, `unobserved`를 사용한다. 존재하는 자원은 덮어쓰지 않고 409/4105를 기록한다. 매 실행은 `.local/mobius-runtime/bootstrap-receipt.*.json`에 별도 receipt를 남긴다. 초기 `false`는 실제 센서 관측이 아니다. CORE 소유의 `oneM2M-test-contract.v1.json`은 현재 flexContainer CREATE를 ty=4로 기록하므로 그대로 수정하지 않았고, KEYRING 쪽 ty=28과의 차이는 팀 인수인계가 필요하다.
+
+서버의 HTTP 바인딩을 로컬 소스 checkout에서 `127.0.0.1`로 제한하고, KEYRING의 specialization registry를 이 디렉터리의 고정 fixture로 복사한다. PostgreSQL은 해당 runtime의 권한 제한된 Unix socket에서만 수신하며 MQTT와 TLS는 이 환경에서 비활성화한다. 이는 임시 로컬 조회 실험에만 적합하고 운영 인증·권한 또는 실제 Gateway 경로가 아니다. 고정된 upstream npm 의존성의 2026-10-28 설치에서 취약점 경고가 있었으며 외부 네트워크에 노출해서는 안 된다.
+
+2026-10-28 독립 테스트 폴더에서 setup, start, bootstrap(201/2001), 재실행(409/4105), stop과 데이터 보존 후 재시작을 확인했다. 살아 있는 CSE의 PID 파일이 없을 때 stop이 DB 중단을 거부하는 것도 확인했다. 실제 앱 시험용으로 별도 수동 기동한 서버와 이 재현 시험은 구분한다. mTLS, MQTT, 실물 Gateway·키링 및 운영 API 통합은 이 시험의 범위가 아니다.
+
+`evidence/bootstrap-created.json`은 신규 격리 DB에서 실제 자원 생성 결과이고, `evidence/restart-test.log` 및 `evidence/pid-loss-test.log`는 재시작과 안전 중지 거부 결과이다. `sha256sum -c app-test-server/native/evidence/SHA256SUMS`로 무결성을 확인할 수 있다. 독립 검증 서비스는 종료했고 DB 파일은 보존했다. 앱 실기기 시험에서 사용한 기존 서버는 별도이며 이 증거와 혼동하지 않는다.

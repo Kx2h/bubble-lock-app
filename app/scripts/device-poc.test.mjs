@@ -17,16 +17,27 @@ async function fixture(run) {
   const fake = resolve(dir, 'adb');
   await writeFile(fake, `#!/usr/bin/env bash
 printf '%s\\n' "$*" >> "$LOG"
+if [[ "$*" == devices ]]; then
+  if [[ \${LIST_FAIL:-0} == 1 ]]; then exit 1; fi
+  printf 'List of devices attached\\r\\n%s\\t%s\\r\\n' "\${LIST_SERIAL:-selected}" "\${LIST_STATE:-device}"
+  if [[ \${LIST_DUPLICATE:-0} == 1 ]]; then printf 'selected\\tunauthorized\\r\\n'; fi
+  exit 0
+fi
 shift 2
 case "$*" in
   'get-state') echo "\${DEVICE_STATE:-device}" ;;
-  'shell pm path org.privacybubble.app') if [[ \${INSTALLED:-0} == 1 ]]; then echo 'package:/data/app/test.apk'; fi ;;
-  'reverse --list') if [[ \${MAPPED:-0} == 1 ]]; then echo 'selected tcp:8787 tcp:8787'; fi ;;
+  'shell pm path org.privacybubble.app') if [[ \${INSTALLED:-0} == 1 || -f "$STATE.installed" ]]; then echo 'package:/data/app/test.apk'; fi ;;
+  'shell sha256sum /data/app/test.apk') echo "\${APK_DIGEST:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}  /data/app/test.apk" ;;
+  'reverse --list') if [[ \${MAPPED:-0} == 1 || -f "$STATE.mapped" ]]; then echo 'selected tcp:8787 tcp:8787'; fi ;;
+  'reverse --no-rebind tcp:8787 tcp:8787') touch "$STATE.mapped" ;;
+  'reverse --remove tcp:8787') rm -f "$STATE.mapped" ;;
+  'uninstall org.privacybubble.app') rm -f "$STATE.installed" ;;
+  install*) touch "$STATE.installed" ;;
 esac
 `);
   await chmod(fake, 0o755);
   const log = resolve(dir, 'calls');
-  const invoke = (args, env = {}) => spawnSync('bash', [resolve(scripts, 'device-poc.sh'), ...args], { encoding: 'utf8', env: { ...process.env, ADB: fake, LOG: log, ...env } });
+  const invoke = (args, env = {}) => spawnSync('bash', [resolve(scripts, 'device-poc.sh'), ...args], { encoding: 'utf8', env: { ...process.env, ADB: fake, LOG: log, STATE: resolve(dir, 'state'), ...env } });
   const calls = async () => (await readFile(log, 'utf8')).trim().split('\n');
   try { await run({ invoke, calls }); } finally { await rm(dir, { recursive: true, force: true }); }
 }
@@ -35,27 +46,49 @@ test('install selects one device and refuses to overwrite an existing app', asyn
   const result = invoke(['selected', 'install'], { INSTALLED: '1' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /refusing to replace/);
-  assert.ok((await calls()).every(line => line.startsWith('-s selected ')));
+  assert.ok((await calls()).every(line => line === 'devices' || line.startsWith('-s selected ')));
   assert.ok(!(await calls()).some(line => line.includes(' install ')));
 }));
 
 test('launch sets up the reverse port only when available', async () => fixture(async ({ invoke, calls }) => {
   assert.equal(invoke(['selected', 'launch'], { INSTALLED: '1' }).status, 0);
   const lines = await calls();
-  assert.ok(lines.includes('-s selected reverse tcp:8787 tcp:8787'));
+  assert.ok(lines.includes('-s selected reverse --no-rebind tcp:8787 tcp:8787'));
   assert.ok(lines.includes('-s selected shell am start -n org.privacybubble.app/.MainActivity'));
 }));
 
 test('existing reverse mapping and unauthorized device stop the workflow', async () => fixture(async ({ invoke, calls }) => {
   assert.notEqual(invoke(['selected', 'launch'], { INSTALLED: '1', MAPPED: '1' }).status, 0);
   assert.ok(!(await calls()).some(line => line.includes('am start')));
-  assert.notEqual(invoke(['selected', 'install'], { DEVICE_STATE: 'unauthorized' }).status, 0);
+  // Regression: get-state may report device while the devices list is unauthorized.
+  assert.notEqual(invoke(['selected', 'install'], { LIST_STATE: 'unauthorized', DEVICE_STATE: 'device' }).status, 0);
+}));
+
+test('does not confuse another serial or a list failure with authorization', async () => fixture(async ({ invoke, calls }) => {
+  assert.notEqual(invoke(['selected', 'install'], { LIST_SERIAL: 'selected-other' }).status, 0);
+  assert.notEqual(invoke(['selected', 'install'], { LIST_FAIL: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'install'], { LIST_DUPLICATE: '1' }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' install ')));
 }));
 
 test('cleanup targets only the app and the specified reverse port', async () => fixture(async ({ invoke, calls }) => {
-  assert.equal(invoke(['selected', 'cleanup'], { INSTALLED: '1', MAPPED: '1' }).status, 0);
+  assert.equal(invoke(['selected', 'install']).status, 0);
+  assert.equal(invoke(['selected', 'launch']).status, 0);
+  assert.equal(invoke(['selected', 'cleanup']).status, 0);
   const lines = await calls();
   assert.ok(lines.includes('-s selected uninstall org.privacybubble.app'));
   assert.ok(lines.includes('-s selected reverse --remove tcp:8787'));
   assert.ok(!lines.some(line => line.includes('--remove-all') || line.includes('shell rm')));
+}));
+
+test('cleanup refuses an app not installed by this script or changed after installation', async () => fixture(async ({ invoke, calls }) => {
+  assert.notEqual(invoke(['selected', 'cleanup'], { INSTALLED: '1' }).status, 0);
+  assert.equal(invoke(['selected', 'install']).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { APK_DIGEST: '1'.repeat(64) }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+}));
+
+test('cleanup does not remove an unowned reverse mapping', async () => fixture(async ({ invoke, calls }) => {
+  assert.equal(invoke(['selected', 'cleanup'], { MAPPED: '1' }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes('reverse --remove')));
 }));

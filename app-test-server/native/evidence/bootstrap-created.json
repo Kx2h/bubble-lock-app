@@ -1,0 +1,19 @@
+{
+  "scope": "empty-resource-provisioning",
+  "receipts": [
+    {
+      "ty": 2,
+      "status": 201,
+      "rsc": "2001",
+      "requestId": "app-setup-b952d3b9-062b-49aa-bfef-900ae21a126a",
+      "responseRequestId": "app-setup-b952d3b9-062b-49aa-bfef-900ae21a126a"
+    },
+    {
+      "ty": 28,
+      "status": 201,
+      "rsc": "2001",
+      "requestId": "app-setup-4deccd26-7952-408c-a85c-b9b70b9a14f8",
+      "responseRequestId": "app-setup-4deccd26-7952-408c-a85c-b9b70b9a14f8"
+    }
+  ]
+}

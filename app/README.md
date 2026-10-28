@@ -24,7 +24,7 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 
 2026-10-28 빌드는 성공했으나 AGP 8.5.2가 SDK 35에 대해 검증 범위 경고를 출력했습니다. `evidence/android-build.log`는 빌드 로그이며 실제 휴대폰 시험을 의미하지 않습니다. ADB 기기 미연결로 설치와 동적 시험은 아직 수행하지 않았습니다. CORE 계약 및 테스트 중계의 자동시험 로그와 hash는 `evidence/`에 있습니다.
 
-실기기 PoC용 도구는 기기 serial을 명시해야 하며 기존 앱과 포트가 있으면 설치·연결을 덮어쓰지 않습니다. `cleanup`은 지정 기기의 이 앱 및 앱 데이터와 일치하는 `tcp:8787` reverse 연결을 제거합니다. 이미 사용 중인 앱이나 포트인 경우 정리 명령을 실행하지 마세요.
+실기기 PoC용 도구는 기기 serial을 명시해야 하며 기존 앱과 포트가 있으면 설치·연결을 덮어쓰지 않습니다. `cleanup`은 이 도구가 해당 기기에 설치한 APK의 SHA-256이 여전히 일치할 때만 앱과 앱 데이터를 제거하며, 도구가 생성한 `tcp:8787` reverse 연결만 제거합니다. 소유 기록은 무시되는 로컬 `app/.local/device-poc/`에 저장됩니다. 기록이 없거나 설치된 APK의 해시를 읽을 수 없으면 자동 삭제하지 않으므로 기기 상태를 직접 확인해야 합니다. 이 기록을 지우기 전에 정리하세요.
 
 ```sh
 # 저장소 루트에서, PC 테스트 중계 실행 후
@@ -36,4 +36,13 @@ app/scripts/device-poc.sh <serial> launch
 # 시험 후 명시적으로 앱/앱 데이터 및 포트 제거
 app/scripts/device-poc.sh <serial> cleanup
 node --test app/scripts/device-poc.test.mjs
+```
+
+이 도구를 거치지 않고 직접 ADB로 설치한 앱과 포트에는 소유 기록이 없으므로 `cleanup`이 자동으로 제거하지 않습니다. 기록을 별도로 삭제하거나 작업 폴더를 옮겨 기록을 잃은 경우에도 마찬가지입니다. `gradle clean`은 이 기록을 삭제하지 않습니다. 직접 설치한 PoC를 제거할 때는 먼저 지정 기기와 앱·포트의 상태를 확인한 후, 제거 대상이 맞으면 아래 명령을 실행하세요. 앱 삭제는 앱 전용 데이터도 함께 삭제합니다.
+
+```sh
+"$ADB" -s "$SERIAL" shell pm path org.privacybubble.app
+"$ADB" -s "$SERIAL" reverse --list
+"$ADB" -s "$SERIAL" uninstall org.privacybubble.app
+"$ADB" -s "$SERIAL" reverse --remove tcp:8787
 ```
