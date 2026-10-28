@@ -2,3 +2,6 @@ pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal()
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = 'PrivacyBubble'
 include ':app'
+
+include ':appauth-patched'
+project(':appauth-patched').projectDir = file('vendor/appauth')

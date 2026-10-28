@@ -1,0 +1,18 @@
+plugins { id 'com.android.application' version '8.5.2' }
+
+android {
+    namespace 'org.privacybubble.oidcsurrogate'
+    compileSdk 35
+    defaultConfig { applicationId 'org.privacybubble.oidcsurrogate'; minSdk 26; targetSdk 35; versionCode 1; versionName '0.1' }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    sourceSets { debug.res.srcDir "$buildDir/generated/test-res" }
+}
+androidComponents { beforeVariants(selector().withBuildType('release')) { it.enable = false } }
+
+def stageTestCa = tasks.register('stageTestCa', Copy) {
+    from file('../../../../../.local/oidc-mock/ca.pem')
+    into "$buildDir/generated/test-res/raw"
+    rename { 'oidc_test_ca.pem' }
+    doFirst { if (!file('../../../../../.local/oidc-mock/ca.pem').isFile()) throw new GradleException('Create the workspace-only mock CA first') }
+}
+tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageTestCa }

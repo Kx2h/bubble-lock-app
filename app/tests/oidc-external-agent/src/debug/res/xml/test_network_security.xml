@@ -1,0 +1,5 @@
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Only this temporary debug APK trusts the generated synthetic test CA. -->
+    <debug-overrides><trust-anchors><certificates src="@raw/oidc_test_ca" /></trust-anchors></debug-overrides>
+</network-security-config>

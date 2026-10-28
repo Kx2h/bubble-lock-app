@@ -14,8 +14,12 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R10
 
 ## 비활성 브라우저 흐름
 
-`OidcBrowserFlow`는 AppAuth 0.11.1의 외부 브라우저 호출과 code/S256 PKCE를 사용한다. 신뢰된 issuer의 discovery 결과와 사전 등록된 client ID를 코드로 제공한 호출자가 `start(requestCode)`를 호출하고 `onActivityResult(requestCode, resultCode, data)`를 전달해야 한다. 현재 앱에는 이 호출자가 없으며 임의 주소나 계정으로 시작하는 UI도 없다. 시험용 redirect는 `org.privacybubble.app:/oauth2redirect`다. 디버그 빌드에만 이 redirect receiver가 등록되며 release 빌드에서는 제거하고 흐름 시작도 거부한다. 이 URI는 운영 등록값이 아니고, custom scheme은 운영체제가 소유권을 검증하지 않으므로 운영에서는 공급자 계약과 검증된 App Links 등을 결정해야 한다.
+`OidcBrowserFlow`는 AppAuth 0.11.1의 외부 브라우저 호출과 code/S256 PKCE를 사용한다. 신뢰된 issuer의 discovery 결과와 사전 등록된 client ID를 코드로 제공한 호출자가 `start(requestCode)`를 호출하고 `onActivityResult(requestCode, resultCode, data)`를 전달해야 한다. 운영 UI에는 호출자가 없으며 임의 주소나 계정으로 시작할 수 없다. 별도 opt-in debug 빌드의 합성 시험 Activity만 localhost 테스트 공급자에 이 흐름을 호출한다. 시험용 redirect는 `org.privacybubble.app:/oauth2redirect`다. 디버그 빌드에만 이 redirect receiver가 등록되며 release 빌드에서는 제거하고 흐름 시작도 거부한다. 이 URI는 운영 등록값이 아니고, custom scheme은 운영체제가 소유권을 검증하지 않으므로 운영에서는 공급자 계약과 검증된 App Links 등을 결정해야 한다.
 
 각 거래의 state·nonce·PKCE verifier는 AppAuth가 생성하며 S256만 허용한다. 결과 URI는 정확한 scheme/path, 중복 없는 state·code 및 요청과 같은 `iss`를 요구한다. 이 보수적인 구현은 RFC 9207의 응답 issuer를 생략하는 공급자를 거부한다. 코드는 리다이렉트를 따르지 않는 HTTPS POST로 한 번 교환하며 응답은 64 KiB, 토큰 수명은 `expires_in` 1초~7일로 제한한다. 서명·issuer·audience·nonce가 검증되기 전에는 세션을 반환하지 않는다. 세션은 메모리에만 있으며 만료 후 접근을 거부하고 `close()`로 참조를 폐기한다. refresh·revoke·권한 매핑 및 영속 저장은 없다.
 
-호출자는 결과를 받은 뒤 또는 Activity 파괴 시 `close()`해야 한다. 화면 회전이나 프로세스 종료 후 거래 상태를 복구하지 않고 취소하므로 새 거래가 필요하다. 오류는 민감한 내용을 반환하지 않는다. 단, AppAuth 0.11.1 자체는 state가 불일치할 때 state 값을 Android WARN 로그에 출력할 수 있다. 실서비스에 연결하기 전 이 로그 문제와 검증된 redirect·신뢰 issuer 등록 정책을 해결해야 한다. JWT/redirect 단위시험 및 APK 빌드만 실행했으며, 브라우저 왕복·인가 코드 교환·서버 인증서·휴대폰 OIDC 시험은 수행하지 않았다.
+호출자는 결과를 받은 뒤 또는 Activity 파괴 시 `close()`해야 한다. 화면 회전이나 프로세스 종료 후 거래 상태를 복구하지 않고 취소하므로 새 거래가 필요하다. 오류는 민감한 내용을 반환하지 않는다. 원본 AppAuth 0.11.1은 state 불일치 시 값을 WARN 로그에 출력할 수 있어, 고정된 소스 모듈의 해당 로그 인자를 제거하고 합성 기기 시험으로 확인했다. 다른 로그 전체의 안전성을 보증하지 않는다. 실서비스 연결 전 검증된 redirect와 신뢰 issuer 등록 정책을 해결해야 한다. [패치 근거](APPAUTH_STATE_LOG_ASSESSMENT.md). 합성 Android 시험의 결과와 한계는 별도 evidence에 기록하며, 실제 외부 브라우저·실제 IdP 또는 운영 인증을 뜻하지 않는다.
+
+### Opt-in 합성 시험 빌드
+
+`-PoidcTestCa=<workspace>/.local/oidc-mock/ca.pem`을 명시한 debug 빌드에만 localhost 전용 테스트 CA와 `OidcSyntheticActivity`가 포함된다. 앱은 이 시험에서 고정된 합성 issuer·client만 사용하고, 별도 UID의 `org.privacybubble.oidcsurrogate` 패키지를 앱과 동일한 서명 인증서인 경우에만 선택한다. 이는 합성 테스트 에이전트로, 일반 브라우저나 실제 사용자 인증의 증거가 아니다. 입력된 CA 경로는 작업 폴더의 고정 파일과 일치해야 한다. 기본 debug에는 이 CA와 Activity가 없고, release는 opt-in 설정 여부와 관계없이 테스트 Activity와 CA를 포함하지 않으며 `OIDC_TEST_ENABLED=false`다. 기존 네트워크 정책의 debug 전용 127.0.0.1 HTTP 예외는 유지한다. 시험 후 CA 포함 APK를 기본 debug APK로 교체하고 임시 에이전트와 18443 포트를 정리한다.

@@ -2,12 +2,17 @@ package org.privacybubble.app.auth;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import org.privacybubble.app.BuildConfig;
 
+import net.openid.appauth.AppAuthConfiguration;
+import net.openid.appauth.browser.BrowserDescriptor;
+import net.openid.appauth.browser.BrowserMatcher;
 import net.openid.appauth.AuthorizationRequest;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
@@ -32,6 +37,7 @@ public final class OidcBrowserFlow implements AutoCloseable {
     private final OidcProvider provider;
     private final String clientId;
     private final Callback callback;
+    private final BrowserMatcher browserMatcher;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private AuthorizationService service;
@@ -66,8 +72,29 @@ public final class OidcBrowserFlow implements AutoCloseable {
 
     /** provider MUST originate from pre-provisioned trusted issuer discovery, never a redirect. */
     public OidcBrowserFlow(Activity activity, OidcProvider provider, String clientId, Callback callback) {
+        this(activity, provider, clientId, callback, null);
+    }
+
+    private OidcBrowserFlow(Activity activity, OidcProvider provider, String clientId, Callback callback, BrowserMatcher browserMatcher) {
         if (activity == null || provider == null || callback == null || clientId == null || clientId.isEmpty() || clientId.length() > 512 || !clientId.equals(clientId.trim())) throw new IllegalArgumentException("Invalid configuration");
         this.activity = activity; this.provider = provider; this.clientId = clientId; this.callback = callback;
+        this.browserMatcher = browserMatcher;
+    }
+
+    /** Debug opt-in synthetic provider only; never select a surrogate for real credentials. */
+    @SuppressWarnings("deprecation")
+    public static OidcBrowserFlow forSyntheticTest(Activity activity, OidcProvider provider, String clientId, Callback callback) {
+        if (!BuildConfig.DEBUG || !BuildConfig.OIDC_TEST_ENABLED || activity == null || provider == null
+                || !"https://localhost:18443".equals(provider.issuer)
+                || !"privacy-bubble-android-test".equals(clientId)) throw new IllegalStateException("Synthetic test unavailable");
+        try {
+            Signature[] signatures = activity.getPackageManager().getPackageInfo(activity.getPackageName(), PackageManager.GET_SIGNATURES).signatures;
+            if (signatures == null || signatures.length != 1) throw new IllegalStateException("Unexpected app signature");
+            java.util.Set<String> expected = BrowserDescriptor.generateSignatureHashes(signatures);
+            BrowserMatcher matcher = descriptor -> "org.privacybubble.oidcsurrogate".equals(descriptor.packageName)
+                    && expected.equals(descriptor.signatureHashes) && !descriptor.useCustomTab;
+            return new OidcBrowserFlow(activity, provider, clientId, callback, matcher);
+        } catch (PackageManager.NameNotFoundException e) { throw new IllegalStateException("App signature unavailable"); }
     }
 
     /** Called on the main thread. The caller must forward onActivityResult and call close on destroy. */
@@ -83,7 +110,8 @@ public final class OidcBrowserFlow implements AutoCloseable {
                     .setScope("openid").build();
             if (request.state == null || request.nonce == null || request.codeVerifier == null
                     || !"S256".equals(request.codeVerifierChallengeMethod)) throw new IllegalStateException("PKCE unavailable");
-            service = new AuthorizationService(activity);
+            service = browserMatcher == null ? new AuthorizationService(activity)
+                    : new AuthorizationService(activity, new AppAuthConfiguration.Builder().setBrowserMatcher(browserMatcher).build());
             activity.startActivityForResult(service.getAuthorizationRequestIntent(request), resultCode);
         } catch (RuntimeException e) { fail(); }
     }

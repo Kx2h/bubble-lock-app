@@ -1,0 +1,24 @@
+plugins { id 'com.android.library' }
+
+// Upstream AppAuth Android 0.11.1 source, with the documented state-log patch.
+android {
+    namespace 'net.openid.appauth'
+    compileSdk 35
+    defaultConfig { minSdk 26 }
+    sourceSets {
+        main.manifest.srcFile 'AndroidManifest.xml'
+        main.java.srcDirs = ['java']
+        main.aidl.srcDirs = ['java']
+        main.res.srcDirs = ['res']
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api 'androidx.browser:browser:1.3.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+}

@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries><package android:name="org.privacybubble.app" /></queries>
+    <application android:label="Synthetic OIDC test agent" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
+        <!-- Broad scheme filter is required by AppAuth's browser detection. The Activity
+             accepts only the fixed localhost test issuer, rejects every other URL, and is
+             installed temporarily; never configure it as the phone's default browser. -->
+        <activity android:name=".SyntheticAgentActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

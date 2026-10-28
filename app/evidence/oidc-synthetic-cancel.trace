@@ -1,0 +1,3 @@
+Synthetic traced IdP ready
+GET /.well-known/openid-configuration
+GET /authorize

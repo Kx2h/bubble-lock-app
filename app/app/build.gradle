@@ -1,5 +1,14 @@
 plugins { id 'com.android.application' }
 
+// Explicitly opt in to a workspace-only synthetic IdP CA in debug builds.
+def oidcTestCa = providers.gradleProperty('oidcTestCa').orNull
+if (oidcTestCa != null) {
+    def allowed = file("${rootDir}/../../../.local/oidc-mock/ca.pem").canonicalFile
+    if (!allowed.isFile() || file(oidcTestCa).canonicalFile != allowed) {
+        throw new GradleException('oidcTestCa must be the workspace .local/oidc-mock/ca.pem')
+    }
+}
+
 android {
     namespace 'org.privacybubble.app'
     compileSdk 35
@@ -12,6 +21,17 @@ android {
         versionName '0.1.0'
         manifestPlaceholders = [appAuthRedirectScheme: 'org.privacybubble.app']
     }
+    buildTypes {
+        debug { buildConfigField 'boolean', 'OIDC_TEST_ENABLED', (oidcTestCa != null).toString() }
+        release { buildConfigField 'boolean', 'OIDC_TEST_ENABLED', 'false' }
+    }
+    if (oidcTestCa != null) {
+        sourceSets.debug {
+            manifest.srcFile 'src/oidcTest/AndroidManifest.xml'
+            java.srcDir 'src/oidcTest/java'
+            res.setSrcDirs(['src/oidcTest/res', "$buildDir/generated/oidc-test/res"])
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -20,6 +40,15 @@ android {
 
 dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
-    implementation 'net.openid:appauth:0.11.1'
+    implementation project(':appauth-patched')
     testImplementation 'junit:junit:4.13.2'
+}
+
+if (oidcTestCa != null) {
+    def stageOidcTestCa = tasks.register('stageOidcTestCa', Copy) {
+        from file(oidcTestCa)
+        into "$buildDir/generated/oidc-test/res/raw"
+        rename { 'oidc_test_ca.pem' }
+    }
+    tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageOidcTestCa }
 }
