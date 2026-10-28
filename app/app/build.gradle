@@ -3,12 +3,14 @@ plugins { id 'com.android.application' }
 android {
     namespace 'org.privacybubble.app'
     compileSdk 35
+    buildFeatures { buildConfig true }
     defaultConfig {
         applicationId 'org.privacybubble.app'
         minSdk 26
         targetSdk 35
         versionCode 1
         versionName '0.1.0'
+        manifestPlaceholders = [appAuthRedirectScheme: 'org.privacybubble.app']
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -18,5 +20,6 @@ android {
 
 dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
+    implementation 'net.openid:appauth:0.11.1'
     testImplementation 'junit:junit:4.13.2'
 }
