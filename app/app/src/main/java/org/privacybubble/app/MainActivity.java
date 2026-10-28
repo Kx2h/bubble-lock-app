@@ -16,12 +16,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -136,17 +132,9 @@ public final class MainActivity extends Activity {
             inFlight = true; message = "조회 중…"; notifyListener();
             worker.execute(() -> {
                 String result;
-                HttpURLConnection connection = null;
                 try {
-                    connection = (HttpURLConnection) new URL("http://127.0.0.1:8787/api/test/bubble-state").openConnection();
-                    connection.setConnectTimeout(5000); connection.setReadTimeout(8000); connection.setInstanceFollowRedirects(false); connection.setRequestMethod("GET");
-                    if (connection.getResponseCode() != 200) throw new IllegalStateException("HTTP " + connection.getResponseCode());
-                    ByteArrayOutputStream data = new ByteArrayOutputStream();
-                    try (InputStream input = connection.getInputStream()) {
-                        byte[] buffer = new byte[1024]; int n;
-                        while ((n = input.read(buffer)) != -1) { data.write(buffer, 0, n); if (data.size() > 16384) throw new IllegalStateException("응답 크기 초과"); }
-                    }
-                    JSONObject json = new JSONObject(new String(data.toByteArray(), StandardCharsets.UTF_8));
+                    String body = new TestStateClient(new URL("http://127.0.0.1:8787/api/test/bubble-state"), 250).read();
+                    JSONObject json = new JSONObject(body);
                     if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
                     String observation = json.optString("observation", "unknown");
                     String source = "unobserved".equals(observation) ? "초기값 · 장치 관측 전" : "관측 여부 미확인";
@@ -154,8 +142,10 @@ public final class MainActivity extends Activity {
                     result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source
                         + "\n조회 시각: " + checkedAt + " (기기 시간)\n자동 갱신되지 않습니다."
                         + "\n요청 ID: " + json.optString("requestId", "없음");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    result = "조회가 취소되었습니다.";
                 } catch (Exception e) { result = "조회 실패 · 테스트 프록시와 adb reverse 연결을 확인하세요."; }
-                finally { if (connection != null) connection.disconnect(); }
                 final String completed = result;
                 main.post(() -> {
                     if (closed) return;

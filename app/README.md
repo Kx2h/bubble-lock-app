@@ -22,7 +22,7 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 "$WORKSPACE/.local/gradle-8.7/bin/gradle" --no-daemon :app:assembleDebug
 ```
 
-2026-10-28 빌드는 성공했으나 AGP 8.5.2가 SDK 35에 대해 검증 범위 경고를 출력했습니다. `evidence/android-build.log`는 빌드 로그이며 실제 휴대폰 시험을 의미하지 않습니다. ADB 기기 미연결로 설치와 동적 시험은 아직 수행하지 않았습니다. CORE 계약 및 테스트 중계의 자동시험 로그와 hash는 `evidence/`에 있습니다.
+2026-10-28 빌드는 성공했으나 AGP 8.5.2가 SDK 35에 대해 검증 범위 경고를 출력했습니다. `evidence/android-build.log`는 빌드 로그이며 실제 휴대폰 시험을 의미하지 않습니다. 이후 실제 기기와 임시 Mobius4 조회 시험을 수행했으며 결과와 hash는 `evidence/`에 있습니다. 인증 공급자와의 실기기 로그인은 아직 시험하지 않았습니다.
 
 실기기 PoC용 도구는 기기 serial을 명시해야 하며 기존 앱과 포트가 있으면 설치·연결을 덮어쓰지 않습니다. `cleanup`은 이 도구가 해당 기기에 설치한 APK의 SHA-256이 여전히 일치할 때만 앱과 앱 데이터를 제거하며, 도구가 생성한 `tcp:8787` reverse 연결만 제거합니다. 소유 기록은 무시되는 로컬 `app/.local/device-poc/`에 저장됩니다. 기록이 없거나 설치된 APK의 해시를 읽을 수 없으면 자동 삭제하지 않으므로 기기 상태를 직접 확인해야 합니다. 이 기록을 지우기 전에 정리하세요.
 
@@ -46,3 +46,9 @@ node --test app/scripts/device-poc.test.mjs
 "$ADB" -s "$SERIAL" uninstall org.privacybubble.app
 "$ADB" -s "$SERIAL" reverse --remove tcp:8787
 ```
+
+OIDC는 아직 로그인 UI나 토큰 교환에 연결되지 않았습니다. 신뢰된 issuer의 HTTPS discovery/JWKS와 RS256 ID 토큰 검증 경계는 [OIDC 검증 준비](docs/OIDC_TRUST_BOUNDARY.md)에 설명되어 있으며 Nimbus JOSE+JWT 9.47이 필요합니다. `:app:testDebugUnitTest`의 JVM 단위시험은 검증 경계에 대한 시험이고 실제 IdP 또는 휴대폰 로그인 시험은 아닙니다.
+
+로컬 테스트 상태 조회는 연결 오류와 HTTP 503·504에서 한 번 재시도합니다. HTTP 403·502와 잘못된 응답은 재시도하지 않습니다. 실제 사용자 인증이나 서버 권한에 적용되는 재시도 정책은 아닙니다. 저장소 루트에서 `app/scripts/test-client.sh`로 JVM 클라이언트 시험을 실행할 수 있습니다.
+
+기기에서 읽기 재시도를 재현할 때는 실제 중계를 중지하고 `node app/tests/fixtures/retry-mock.mjs`를 실행한 뒤 기존 reverse 연결로 상태 조회를 한 번 누릅니다. 이 fixture는 첫 GET에 503, 다음 GET에 200을 반환하는 모의 서버입니다. 완료 후 실행한 fixture를 종료합니다. 실제 Mobius4나 키링 데이터가 아닙니다.

@@ -15,3 +15,8 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+
+dependencies {
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
+    testImplementation 'junit:junit:4.13.2'
+}
