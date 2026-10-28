@@ -41,17 +41,20 @@ final class RotatingSession implements AutoCloseable {
     /** Blocking; never call on the UI thread. A refresh is never retried. */
     void refresh() throws IOException {
         final String previous;
+        final String previousAccess;
         final long started;
         synchronized (this) {
             if (closed || inFlight) throw new IllegalStateException("Session unavailable");
             inFlight = true;
             previous = refresh;
+            previousAccess = access;
             started = clock.elapsedMillis();
         }
         try {
             Response value = exchange.rotate(previous);
             if (value == null || !printable(value.access, 16384) || !printable(value.refresh, 16384)
                     || value.refresh.equals(previous) || value.refresh.equals(value.access)
+                    || value.access.equals(previous) || value.refresh.equals(previousAccess)
                     || !"bearer".equalsIgnoreCase(value.type) || value.seconds < 1 || value.seconds > 604800
                     || value.idTokenPresent || (value.scope != null && !syntheticScope(value.scope, consentScope))) throw new IllegalArgumentException();
             long deadline = Math.addExact(started, Math.multiplyExact(value.seconds, 1000));

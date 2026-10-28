@@ -39,7 +39,8 @@ public class RotatingSessionTest {
     }
     @Test public void malformedOrAmbiguousResponsePermanentlyClosesWithoutRetry() {
         for (RotatingSession.Response bad : new RotatingSession.Response[]{
-            ok("a2", "r1"), ok("a2", null), ok("r2", "r2"), new RotatingSession.Response("a2", "r2", "basic", 60, null, false),
+            ok("a2", "r1"), ok("a2", null), ok("r2", "r2"), ok("r1", "r2"), ok("a2", "a1"),
+            new RotatingSession.Response("a2", "r2", "basic", 60, null, false),
             new RotatingSession.Response("a2", "r2", "bearer", 0, null, false), new RotatingSession.Response("a2", "r2", "bearer", 60, "openid admin", false),
             new RotatingSession.Response("a2", "r2", "bearer", 60, null, true)
         }) {
