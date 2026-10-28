@@ -87,7 +87,7 @@ public final class HttpsApiTransport {
         try { path = URI.create(relative); } catch (RuntimeException e) { throw new IllegalArgumentException("Invalid path"); }
         String raw = path.getRawPath();
         if (path.isAbsolute() || path.getRawAuthority() != null || path.getRawFragment() != null || raw == null
-                || !path.normalize().equals(path) || raw.toLowerCase(Locale.ROOT).matches(".*%(2e|2f|5c|0a|0d).*")) {
+                || !path.normalize().equals(path) || raw.toLowerCase(Locale.ROOT).matches(".*%(25|2e|2f|5c|0a|0d).*")) {
             throw new IllegalArgumentException("Invalid path");
         }
         return origin.resolve(path);

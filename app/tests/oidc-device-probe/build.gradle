@@ -22,7 +22,11 @@ def stageAuth = tasks.register('stageAuth', Copy) {
     include 'OidcProvider.java', 'IdTokenVerifier.java', 'OidcRedirect.java'
     into "$buildDir/generated/probe-java/org/privacybubble/app/auth"
 }
-tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageTestCa, stageAuth }
+def stageApiTransport = tasks.register('stageApiTransport', Copy) {
+    from file('../../app/src/main/java/org/privacybubble/app/api/HttpsApiTransport.java')
+    into "$buildDir/generated/probe-java/org/privacybubble/app/api"
+}
+tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageTestCa, stageAuth, stageApiTransport }
 dependencies { implementation 'com.nimbusds:nimbus-jose-jwt:9.47' }
 
 // This separate APK exists only for synthetic local testing, never release distribution.

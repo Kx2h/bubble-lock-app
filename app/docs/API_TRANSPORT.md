@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10/R17. `HttpsApiTransport`는 향후 PC-MOBIUS-INTEGRATION의 실제 계약을 연결하기 위한 전송 경계다. 아직 앱 UI나 운영 서비스에서 호출하지 않는다. 이 코드만으로 인증·인가·동의·명령·receipt가 구현되거나 서버 계약이 확정된 것은 아니다.
 
-호출자는 미리 신뢰한 HTTPS origin을 제공하고, 상대 경로와 쿼리, `GET`/`POST`/`PUT`/`DELETE`, 계약에서 정한 헤더와 바이트 본문을 직접 구성한다. token·request ID·correlation·idempotency·API 버전의 이름과 의미는 계약이 정해지면 caller에서 정의한다. GET 본문과 다른 origin, redirect, 경로 traversal, 일부 모호한 인코딩 및 위험한 헤더는 거부한다. 정상·오류 HTTP status와 최대 64 KiB 본문을 반환하고, 같은 이름의 응답 헤더가 반복되면 해당 헤더를 노출하지 않는다. 요청 본문도 64 KiB 이내다. 민감한 URL·헤더·본문·예외를 로그에 남기지 않는 것은 호출자의 책임이다.
+호출자는 미리 신뢰한 HTTPS origin을 제공하고, 상대 경로와 쿼리, `GET`/`POST`/`PUT`/`DELETE`, 계약에서 정한 헤더와 바이트 본문을 직접 구성한다. token·request ID·correlation·idempotency·API 버전의 이름과 의미는 계약이 정해지면 caller에서 정의한다. GET 본문과 다른 origin, redirect, 경로 traversal, 일부 모호한 인코딩 및 위험한 헤더는 거부한다. 경로의 `%25`도 거부해 이중 디코딩에서 구분자나 상위 경로로 바뀌는 것을 방지하므로 퍼센트 문자를 포함하는 경로는 지원하지 않는다. 쿼리 값은 별도 계약에 따라 caller가 구성한다. 정상·오류 HTTP status와 최대 64 KiB 본문을 반환하고, 같은 이름의 응답 헤더가 반복되면 해당 헤더를 노출하지 않는다. 요청 본문도 64 KiB 이내다. 민감한 URL·헤더·본문·예외를 로그에 남기지 않는 것은 호출자의 책임이다.
 
 프로세스의 `HttpsURLConnection` 기본 socket factory와 hostname verifier를 사용하고 TLS 1.3만 허용한다. 이 클래스는 프로세스 전역 기본값을 고정하지 않으므로 다른 코드가 기본 factory나 verifier를 바꾸면 플랫폼 기본 trust·hostname 검증을 보장하지 못한다. 실제 연동 전 전역 변경 여부를 확인해야 한다. 이 클래스 자체에는 별도의 trust 우회 또는 테스트 TLS 주입 경로가 없다. Android minSdk 26 기기에서 TLS 1.3이 제공되지 않으면 연결이 실패하며 낮은 TLS 버전으로 대체하지 않는다. 신뢰할 서버 origin의 provisioning과 인증된 API 호출 정책은 실제 연동 전에 확정해야 한다.
 
