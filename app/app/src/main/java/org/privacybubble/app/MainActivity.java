@@ -117,6 +117,14 @@ public final class MainActivity extends Activity {
                 intent.setClassName(this, "org.privacybubble.app.SyntheticConsentActivity");
                 startActivity(intent);
             }));
+            if (BuildConfig.OIDC_TEST_ENABLED) {
+                section("인증된 합성 동의 시험", "별도 합성 인증 서버와 동의 서버를 사용합니다. 실제 로그인이나 권한 부여가 아닙니다.");
+                body.addView(button("인증된 합성 동의 화면 열기", v -> {
+                    android.content.Intent intent = new android.content.Intent();
+                    intent.setClassName(this, "org.privacybubble.app.auth.AuthenticatedConsentActivity");
+                    startActivity(intent);
+                }));
+            }
             section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
             testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
             testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);

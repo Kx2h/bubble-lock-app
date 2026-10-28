@@ -1,5 +1,7 @@
 # 인증된 합성 consent 연결 시험
 
+별도 opt-in APK의 메인 화면에서 `인증된 합성 동의 화면 열기`를 눌러 이동한다. 일반 debug 및 release 빌드에는 이 진입 버튼과 시험 Activity가 없다. 모의 서버와 앱 전용 localhost CA 구성은 [HTTPS mock 서버 실행](../tests/auth-consent-mock/README.md)을 따른다.
+
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03/R10. 이 화면은 테스트용 IdP·별도 합성 에이전트·테스트 서버에서만 동작하는 opt-in debug PoC다. 실제 브라우저, 사용자 인증, 운영 consent/grant/ACP, 위치 또는 기기 제어의 증거가 아니다. 기존 인증 없는 debug consent 화면과 별도이다.
 
 `AuthenticatedConsentActivity`는 고정 합성 issuer/client와 명시적 합성 scope로 OIDC 세션을 얻고, 고정 HTTPS localhost 서버만 호출한다. CA는 opt-in APK의 localhost에만 한정되며 시스템·브라우저 신뢰를 바꾸지 않는다. access token은 메모리와 HTTPS Authorization 헤더에서만 사용하며 파일, Intent, receipt 또는 로그에 넣지 않는다. 서버는 합성 bearer의 issuer·audience·subject·scope 및 수명을 별도로 확인해야 한다. 이 검증은 아직 PC-MOBIUS-INTEGRATION의 운영 인증 계약이 아니다.
