@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -31,6 +34,8 @@ public final class AuthenticatedConsentActivity extends Activity {
     private static final String MARKER = "unresolved_mutation";
     private static final int AUTH_CODE = 4811;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final Handler main = new Handler(Looper.getMainLooper());
+    private final Runnable reviewTick = this::checkReview;
     private SharedPreferences preferences;
     private OidcBrowserFlow flow;
     private OidcBrowserFlow.Session session;
@@ -42,6 +47,8 @@ public final class AuthenticatedConsentActivity extends Activity {
     private int revision;
     private String instance;
     private Pending pending;
+    private Snapshot current;
+    private ConsentReviewGate review;
 
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -51,20 +58,27 @@ public final class AuthenticatedConsentActivity extends Activity {
         layout.setOrientation(LinearLayout.VERTICAL); layout.setPadding(24, 24, 24, 24);
         TextView heading = new TextView(this); heading.setTextSize(20);
         heading.setText("합성 인증 동의 시험 · 실제 사용자 또는 권한이 아닙니다"); layout.addView(heading);
-        TextView detail = new TextView(this); detail.setText("대상: synthetic-visitor\n목적: synthetic-location-check\n범위: test.location.read\n유효기간: 120초\n합성 서버만 사용합니다."); layout.addView(detail);
+        TextView detail = new TextView(this); detail.setText("대상: synthetic-visitor\n요청 revision: 1\n목적: synthetic-location-check\n범위: test.location.read\n승인 시 유효기간: 120초\n합성 서버만 사용합니다. 검토 확인은 60초간 유효합니다."); layout.addView(detail);
         status = new TextView(this); status.setTextSize(16); layout.addView(status);
         login = button(layout, "합성 인증 시작", v -> begin());
         logout = button(layout, "합성 세션 종료", v -> endSession());
         load = button(layout, "합성 상태 조회", v -> load());
         choice = new CheckBox(this); choice.setText("이 합성 동작을 직접 선택합니다"); layout.addView(choice);
-        approve = button(layout, "합성 승인", v -> { if (choice.isChecked()) { choice.setChecked(false); mutate(true); } });
-        revoke = button(layout, "합성 회수", v -> { if (choice.isChecked()) { choice.setChecked(false); mutate(false); } });
+        approve = button(layout, "합성 승인", v -> { if (choice.isChecked()) mutate(true); });
+        revoke = button(layout, "합성 회수", v -> { if (choice.isChecked()) mutate(false); });
         retry = button(layout, "미확정 합성 요청 재전송", v -> { if (choice.isChecked()) { choice.setChecked(false); resend(); } });
         discard = button(layout, "합성 미확정 표시 삭제", v -> new AlertDialog.Builder(this)
                 .setTitle("합성 기록 삭제")
                 .setMessage("표시만 삭제합니다. 이전 요청 결과는 확인할 수 없으며 실제 권한에는 영향이 없습니다.")
                 .setNegativeButton("취소", null).setPositiveButton("삭제", (dialog, which) -> discardMarker()).show());
-        choice.setOnCheckedChangeListener((button, checked) -> render());
+        choice.setOnCheckedChangeListener((button, checked) -> {
+            main.removeCallbacks(reviewTick);
+            if (checked && known && current != null && !uncertain) {
+                review = new ConsentReviewGate(current.instance, current.status, current.revision, current.expires, SystemClock.elapsedRealtime());
+                main.postDelayed(reviewTick, 1000);
+            } else review = null;
+            render();
+        });
         scroll.addView(layout); setContentView(scroll);
         status.setText(storageFailure ? "합성 기록을 읽을 수 없습니다." : uncertain ? "이전 합성 요청 결과 미확정 · 새 변경 차단" : "인증 전 · 실제 권한 없음");
         render();
@@ -73,15 +87,27 @@ public final class AuthenticatedConsentActivity extends Activity {
         Button b = new Button(this); b.setText(text); b.setAllCaps(false); b.setOnClickListener(listener); layout.addView(b); return b;
     }
     private void render() {
+        if (review != null && !reviewMatches(review, current)) {
+            review = null; main.removeCallbacks(reviewTick); choice.setChecked(false);
+            status.setText("합성 검토 확인 만료 또는 상태 변경 · 다시 조회하고 확인하세요");
+            known = false;
+        }
         boolean loggedIn = session != null && !destroyed;
         login.setEnabled(!busy && !loggedIn);
         logout.setEnabled(!busy && loggedIn);
         load.setEnabled(!busy && loggedIn && !storageFailure);
         choice.setEnabled(!busy && loggedIn && !storageFailure && (known || pending != null));
-        approve.setEnabled(!busy && loggedIn && known && !active && !uncertain && choice.isChecked());
-        revoke.setEnabled(!busy && loggedIn && known && active && !uncertain && choice.isChecked());
+        approve.setEnabled(!busy && loggedIn && known && !active && !uncertain && choice.isChecked() && review != null);
+        revoke.setEnabled(!busy && loggedIn && known && active && !uncertain && choice.isChecked() && review != null);
         retry.setEnabled(!busy && loggedIn && uncertain && pending != null && choice.isChecked());
         discard.setEnabled(!busy && (uncertain || storageFailure));
+    }
+    private void checkReview() { if (destroyed || review == null) return; render(); if (review != null) main.postDelayed(reviewTick, 1000); }
+    private static boolean reviewMatches(ConsentReviewGate review, Snapshot snapshot) {
+        if (review == null || snapshot == null) return false;
+        long expiry = "active".equals(snapshot.status) ? Instant.parse(snapshot.expires).toEpochMilli() : Long.MAX_VALUE;
+        return review.matches(snapshot.instance, snapshot.status, snapshot.revision, snapshot.expires,
+                SystemClock.elapsedRealtime(), System.currentTimeMillis(), expiry);
     }
     private void begin() {
         if (busy || session != null) return; busy = true; status.setText("합성 인증 서버 연결 중…"); render();
@@ -116,6 +142,7 @@ public final class AuthenticatedConsentActivity extends Activity {
     }
     private void load() {
         if (busy || session == null || storageFailure) return;
+        choice.setChecked(false); review = null;
         busy = true; known = false; status.setText("합성 서버 상태 확인 중…"); render();
         worker.execute(() -> {
             try {
@@ -128,12 +155,14 @@ public final class AuthenticatedConsentActivity extends Activity {
         });
     }
     private void mutate(boolean approving) {
-        if (busy || session == null || !known || uncertain || storageFailure || approving == active) return;
+        if (busy || session == null || !known || uncertain || storageFailure || approving == active || !reviewMatches(review, current)) return;
+        ConsentReviewGate accepted = review;
+        choice.setChecked(false);
         try {
             JSONObject body = new JSONObject(); body.put("requestId", "synthetic-request-1");
             if (approving) { body.put("revision", 1); body.put("purpose", "synthetic-location-check"); body.put("scopes", new JSONArray().put("test.location.read")); body.put("ttlSeconds", 120); }
             else body.put("grantRevision", revision);
-            Pending next = new Pending(approving ? "approve" : "revoke", body.toString(), instance, approving);
+            Pending next = new Pending(approving ? "approve" : "revoke", body.toString(), instance, approving, accepted);
             // Persist only a non-identifying synthetic marker, before any network mutation.
             if (!preferences.edit().putBoolean(MARKER, true).commit()) { storageFailure = true; throw new IllegalStateException(); }
             uncertain = true; pending = next; known = false; send(next);
@@ -145,10 +174,13 @@ public final class AuthenticatedConsentActivity extends Activity {
         worker.execute(() -> {
             try {
                 String token = session.accessToken();
+                if (!op.dispatched && !op.instance.equals(validateRequest(call("request", null, null, token)))) throw new IllegalStateException();
                 Snapshot before = parseGrant(call("grant", null, null, token));
                 if (!op.instance.equals(before.instance) || destroyed || Thread.currentThread().isInterrupted()) throw new IllegalStateException();
+                if (!op.dispatched && !reviewMatches(op.review, before)) throw new IllegalStateException();
                 // Recheck that closing the Activity did not invalidate the session during preflight.
                 token = session.accessToken();
+                op.dispatched = true;
                 JSONObject ack = call(op.endpoint, op.body, op, token);
                 Snapshot accepted = parseGrant(ack);
                 if (!op.instance.equals(accepted.instance) || !op.correlation.equals(ack.opt("correlationId"))
@@ -178,6 +210,7 @@ public final class AuthenticatedConsentActivity extends Activity {
     private boolean live() { return !destroyed && !isFinishing(); }
     private void uiFailure(String message) { runOnUiThread(() -> { if (!live()) return; busy = false; known = false; status.setText(message); render(); }); }
     private void apply(Snapshot s) {
+        choice.setChecked(false); review = null; current = s;
         known = true; active = "active".equals(s.status); revision = s.revision; instance = s.instance;
         status.setText("합성 서버 상태: " + s.status + (active ? "\n합성 만료 시각: " + s.expires : "")
                 + (uncertain ? "\n이전 합성 처리 결과 미확정 · 새 변경 차단" : "") + "\n실제 권한은 없습니다.");
@@ -229,8 +262,8 @@ public final class AuthenticatedConsentActivity extends Activity {
         Instant.parse(expires); return new Snapshot(id, state, rev, expires);
     }
     private static final class Snapshot { final String instance,status,expires; final int revision; Snapshot(String i,String s,int r,String e) { instance=i;status=s;revision=r;expires=e; } }
-    private static final class Pending { final String endpoint,body,instance,key,correlation; final boolean approving; Pending(String e,String b,String i,boolean a) { endpoint=e;body=b;instance=i;approving=a;key=UUID.randomUUID().toString();correlation=UUID.randomUUID().toString(); } }
+    private static final class Pending { final String endpoint,body,instance,key,correlation; final boolean approving; final ConsentReviewGate review; boolean dispatched; Pending(String e,String b,String i,boolean a,ConsentReviewGate r) { endpoint=e;body=b;instance=i;approving=a;review=r;key=UUID.randomUUID().toString();correlation=UUID.randomUUID().toString(); } }
     @Override protected void onDestroy() {
-        destroyed = true; if (flow != null) flow.close(); if (session != null) session.close(); worker.shutdownNow(); super.onDestroy();
+        destroyed = true; main.removeCallbacks(reviewTick); if (flow != null) flow.close(); if (session != null) session.close(); worker.shutdownNow(); super.onDestroy();
     }
 }
