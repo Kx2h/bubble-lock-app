@@ -31,18 +31,23 @@ test('maps CORE contract and creates independent request identifiers', async () 
     assert.equal(calls[0].options.headers['X-M2M-RI'], first.requestId);
   });
 });
-test('preserves bootstrap unobserved label and never infers observation', async () => {
+test('reports the bootstrap label separately and never infers observation', async () => {
   for (const [labels, expected] of [
-    [['dev-bootstrap', 'unobserved'], 'unobserved'],
-    [['observed'], 'unknown'],
-    ['unobserved', 'unknown'],
-    [null, 'unknown'],
+    [['dev-bootstrap', 'unobserved'], true],
+    [['observed'], false],
+    ['unobserved', false],
+    [null, false],
   ]) {
-    await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource({ lbl: labels }) }), options), async base => {
-      const response = await fetch(`${base}/api/test/bubble-state`);
-      assert.equal(response.status, 200);
-      assert.equal((await response.json()).observation, expected);
-    });
+    for (const state of [true, false]) {
+      await withServer(async (_, options) => validResponse(JSON.stringify({ 'pb:binarySwitch': switchResource({ lbl: labels, state }) }), options), async base => {
+        const response = await fetch(`${base}/api/test/bubble-state`);
+        assert.equal(response.status, 200);
+        const body = await response.json();
+        assert.equal(body.observation, 'unknown');
+        assert.equal(body.bootstrapLabelPresent, expected);
+        assert.equal(body.state, state);
+      });
+    }
   }
 });
 test('only forwards valid resource modification timestamps without timezone conversion', async () => {

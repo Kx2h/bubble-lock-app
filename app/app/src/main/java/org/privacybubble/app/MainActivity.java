@@ -29,6 +29,7 @@ public final class MainActivity extends Activity {
     private LinearLayout body;
     private TextView testStatus;
     private Button testButton;
+    private Button testAutoButton;
     private String role = "Guardian";
     private SharedPreferences settings;
 
@@ -43,6 +44,14 @@ public final class MainActivity extends Activity {
         renderTestState();
     }
     @Override public Object onRetainNonConfigurationInstance() { return testState; }
+    @Override protected void onStart() {
+        super.onStart();
+        testState.foreground();
+    }
+    @Override protected void onStop() {
+        testState.background();
+        super.onStop();
+    }
     @Override protected void onSaveInstanceState(Bundle state) {
         state.putString("role", role);
         super.onSaveInstanceState(state);
@@ -111,13 +120,17 @@ public final class MainActivity extends Activity {
             section("Mobius4 테스트", "테스트 전용 상태 조회입니다. adb reverse와 PC 테스트 프록시가 필요합니다. 실제 권한이나 승인 상태가 아닙니다.");
             testStatus = text("조회 전", 16, Color.DKGRAY); body.addView(testStatus);
             testButton = button("테스트 상태 조회", v -> fetchTestState()); body.addView(testButton);
+            testAutoButton = button("자동 갱신 시작", v -> testState.toggleAutomatic()); body.addView(testAutoButton);
             renderTestState();
         }
     }
     private void renderTestState() {
-        if (testStatus != null && testButton != null) {
-            testStatus.setText(testState.message);
-            testButton.setEnabled(!testState.inFlight);
+        if (testStatus != null && testButton != null && testAutoButton != null) {
+            testStatus.setText(testState.message + (testState.policy.isAutomatic()
+                    ? "\n전경 자동 갱신 중 · 조회 완료 10초 후 다시 확인" : "\n자동 갱신 꺼짐"));
+            testButton.setEnabled(testState.policy.isForeground() && !testState.policy.isInFlight());
+            testAutoButton.setEnabled(testState.policy.isForeground());
+            testAutoButton.setText(testState.policy.isAutomatic() ? "자동 갱신 중지" : "자동 갱신 시작");
         }
     }
     private void fetchTestState() {
@@ -128,30 +141,49 @@ public final class MainActivity extends Activity {
     private static final class TestState {
         private final ExecutorService worker = Executors.newSingleThreadExecutor();
         private final Handler main = new Handler(Looper.getMainLooper());
+        private final TestRefreshState policy = new TestRefreshState();
+        private final Runnable poll = this::fetch;
         private String message = "조회 전";
-        private boolean inFlight;
         private boolean closed;
         private Runnable listener;
 
         private void notifyListener() { if (listener != null) listener.run(); }
-        private void close() { closed = true; listener = null; worker.shutdownNow(); }
+        private void foreground() { if (!closed) { policy.foreground(); notifyListener(); } }
+        private void background() {
+            if (closed) return;
+            policy.background(); main.removeCallbacks(poll);
+            message = "화면을 떠나 상태를 확인할 수 없습니다 · 다시 조회하세요.";
+            notifyListener();
+        }
+        private void toggleAutomatic() {
+            if (closed || !policy.isForeground()) return;
+            policy.setAutomatic(!policy.isAutomatic());
+            main.removeCallbacks(poll);
+            if (policy.isAutomatic() && !policy.isInFlight()) fetch();
+            else notifyListener();
+        }
+        private void close() { closed = true; main.removeCallbacks(poll); listener = null; worker.shutdownNow(); }
         private void fetch() {
-            if (closed || inFlight) return;
-            inFlight = true; message = "조회 중…"; notifyListener();
+            if (closed) return;
+            long ticket = policy.begin();
+            if (ticket < 0) return;
+            main.removeCallbacks(poll);
+            message = "조회 중…"; notifyListener();
             worker.execute(() -> {
                 String result;
                 try {
                     String body = new TestStateClient(new URL("http://127.0.0.1:8787/api/test/bubble-state"), 250).read();
                     JSONObject json = new JSONObject(body);
                     if (!"test".equals(json.optString("mode")) || !(json.opt("state") instanceof Boolean)) throw new IllegalStateException("잘못된 테스트 응답");
-                    String observation = json.optString("observation", "unknown");
-                    String source = "unobserved".equals(observation) ? "초기값 · 장치 관측 전" : "관측 여부 미확인";
+                    boolean bootstrap = TestObservation.bootstrapPresent(json.has("observation"), json.opt("observation"),
+                            json.has("bootstrapLabelPresent"), json.opt("bootstrapLabelPresent"));
+                    String source = bootstrap ? "bootstrap 표식 존재 · 실제 관측 여부 미확인" : "실제 관측 여부 미확인";
                     String resourceTime = TestResourceTimestamp.rawOrNull(json.opt("resourceLastModifiedRaw"));
                     String checkedAt = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(new Date());
                     result = "테스트 상태: " + (json.getBoolean("state") ? "켜짐" : "꺼짐") + "\n" + source
                         + "\nCSE 자원 변경 시각 원문: " + (resourceTime == null ? "확인 불가" : resourceTime + " (시간대 미표기)")
                         + "\n자원 변경 시각은 기기 관측 시각이 아닙니다."
-                        + "\n조회 시각: " + checkedAt + " (기기 시간)\n자동 갱신되지 않습니다."
+                        + "\n조회 시각: " + checkedAt + " (기기 시간)"
                         + "\n요청 ID: " + json.optString("requestId", "없음");
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -160,7 +192,13 @@ public final class MainActivity extends Activity {
                 final String completed = result;
                 main.post(() -> {
                     if (closed) return;
-                    message = completed; inFlight = false; notifyListener();
+                    boolean current = policy.finish(ticket);
+                    if (current) message = completed;
+                    notifyListener();
+                    if (policy.isAutomatic()) {
+                        if (current) main.postDelayed(poll, 10_000);
+                        else fetch();
+                    }
                 });
             });
         }

@@ -91,10 +91,10 @@ export function createServer({ mobiusUrl = 'http://127.0.0.1:7599/Mobius', origi
       if (resource?.rn !== 'bubbleState'
           || resource?.cnd !== 'org.onem2m.common.moduleclass.binarySwitch'
           || typeof state !== 'boolean') return send(502, { mode: 'test', error: 'invalid_mobius_response', requestId });
-      // A label identifying bootstrap data is evidence that it is unobserved;
-      // absence of the label is not evidence that a real device observed it.
-      const observation = Array.isArray(resource.lbl) && resource.lbl.includes('unobserved') ? 'unobserved' : 'unknown';
-      return send(200, { mode: 'test', state, observation, resourceLastModifiedRaw: resourceTimestamp(resource.lt), requestId });
+      // CORE updates state without clearing the bootstrap label. Neither its
+      // presence nor absence establishes whether a device has been observed.
+      const bootstrapLabelPresent = Array.isArray(resource.lbl) && resource.lbl.includes('unobserved');
+      return send(200, { mode: 'test', state, observation: 'unknown', bootstrapLabelPresent, resourceLastModifiedRaw: resourceTimestamp(resource.lt), requestId });
     } catch {
       return send(502, { mode: 'test', error: 'mobius_unavailable', requestId });
     }
