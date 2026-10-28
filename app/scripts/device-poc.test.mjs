@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, chmod, copyFile } from 'node:f
 import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 async function fixture(run) {
@@ -26,8 +27,22 @@ fi
 shift 2
 case "$*" in
   'get-state') echo "\${DEVICE_STATE:-device}" ;;
-  'shell pm path org.privacybubble.app') if [[ \${INSTALLED:-0} == 1 || -f "$STATE.installed" ]]; then echo 'package:/data/app/test.apk'; fi ;;
-  'shell sha256sum /data/app/test.apk') echo "\${APK_DIGEST:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}  /data/app/test.apk" ;;
+  'shell pm list users')
+    if [[ \${USERS_FAIL:-0} == 1 ]]; then exit 1; fi
+    if [[ \${USERS_MALFORMED:-0} == 1 ]]; then echo 'unknown'; else
+      printf 'Users:\\r\\n    UserInfo{0:Owner:c13} running\\r\\n'
+      if [[ \${USERS_MULTIPLE:-0} == 1 ]]; then printf '    UserInfo{10:Other:10}\\r\\n'; fi
+    fi ;;
+  'shell am get-current-user') if [[ \${CURRENT_FAIL:-0} == 1 ]]; then exit 1; fi; echo "\${CURRENT_USER:-0}" ;;
+  'shell pm path org.privacybubble.app') if [[ \${INSTALLED:-0} == 1 || -f "$STATE.installed" ]]; then echo "package:\${APK_PATH:-/data/app/test.apk}"; fi ;;
+  'shell sha256sum /data/app/'*) echo "\${APK_DIGEST:-9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08}  \${APK_PATH:-/data/app/test.apk}" ;;
+  "shell run-as org.privacybubble.app sh -c "*)
+    if [[ \${OWNER_WRITE_FAIL:-0} == 1 ]]; then exit 1; fi
+    owner_pattern='printf %s ([0-9a-f]{64})'
+    if [[ "$*" =~ $owner_pattern ]]; then printf '%s' "\${BASH_REMATCH[1]}" > "$STATE.owner"; else exit 1; fi ;;
+  'shell run-as org.privacybubble.app cat .device-poc-owner')
+    if [[ \${OWNER_MISSING:-0} == 1 ]]; then exit 1; fi
+    if [[ -n \${OWNER_TOKEN:-} ]]; then printf '%s' "$OWNER_TOKEN"; else cat "$STATE.owner"; fi ;;
   'reverse --list') if [[ \${MAPPED:-0} == 1 || -f "$STATE.mapped" ]]; then echo "selected tcp:8787 \${MAPPED_TARGET:-tcp:8787}"; fi ;;
   'reverse --no-rebind tcp:8787 tcp:8787') touch "$STATE.mapped" ;;
   'reverse --remove tcp:8787') rm -f "$STATE.mapped" ;;
@@ -39,7 +54,8 @@ esac
   const log = resolve(dir, 'calls');
   const invoke = (args, env = {}) => spawnSync('bash', [resolve(scripts, 'device-poc.sh'), ...args], { encoding: 'utf8', env: { ...process.env, ADB: fake, LOG: log, STATE: resolve(dir, 'state'), ...env } });
   const calls = async () => (await readFile(log, 'utf8')).trim().split('\n');
-  try { await run({ invoke, calls }); } finally { await rm(dir, { recursive: true, force: true }); }
+  const marker = resolve(dir, '.local/device-poc', createHash('sha256').update('selected').digest('hex'), 'package.sha256');
+  try { await run({ invoke, calls, marker }); } finally { await rm(dir, { recursive: true, force: true }); }
 }
 
 test('install selects one device and refuses to overwrite an existing app', async () => fixture(async ({ invoke, calls }) => {
@@ -86,6 +102,40 @@ test('cleanup refuses an app not installed by this script or changed after insta
   assert.equal(invoke(['selected', 'install']).status, 0);
   assert.notEqual(invoke(['selected', 'cleanup'], { APK_DIGEST: '1'.repeat(64) }).status, 0);
   assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+}));
+
+test('cleanup refuses a same-APK reinstall or a changed installed path', async () => fixture(async ({ invoke, calls }) => {
+  assert.equal(invoke(['selected', 'install']).status, 0);
+  // A reinstall can have the same hash; app-private data (and our marker) is gone.
+  assert.notEqual(invoke(['selected', 'cleanup'], { OWNER_MISSING: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { OWNER_TOKEN: 'a'.repeat(64) }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { APK_PATH: '/data/app/replaced.apk' }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+  assert.equal(invoke(['selected', 'cleanup']).status, 0);
+}));
+
+test('installation without a verifiable private marker cannot be automatically removed', async () => fixture(async ({ invoke, calls }) => {
+  assert.notEqual(invoke(['selected', 'install'], { OWNER_WRITE_FAIL: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup']).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+}));
+
+test('legacy hash-only ownership is not accepted for uninstall', async () => fixture(async ({ invoke, calls, marker }) => {
+  assert.equal(invoke(['selected', 'install']).status, 0);
+  await writeFile(marker, '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\n');
+  assert.notEqual(invoke(['selected', 'cleanup']).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+}));
+
+test('install and cleanup reject multiple, unknown or non-owner Android users', async () => fixture(async ({ invoke, calls }) => {
+  for (const env of [{ USERS_MULTIPLE: '1' }, { USERS_MALFORMED: '1' }, { USERS_FAIL: '1' }, { CURRENT_USER: '10' }, { CURRENT_FAIL: '1' }]) {
+    assert.notEqual(invoke(['selected', 'install'], env).status, 0);
+  }
+  assert.equal(invoke(['selected', 'install']).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { USERS_MULTIPLE: '1' }).status, 0);
+  assert.notEqual(invoke(['selected', 'cleanup'], { USERS_FAIL: '1' }).status, 0);
+  assert.ok(!(await calls()).some(line => line.includes(' uninstall ')));
+  assert.equal(invoke(['selected', 'cleanup']).status, 0);
 }));
 
 test('cleanup does not remove an unowned reverse mapping', async () => fixture(async ({ invoke, calls }) => {
