@@ -2,12 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox]]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring', '--keyring-outbox', '--observation-cin'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring') || process.argv.includes('--keyring-outbox')) && !process.argv.includes('--mqtt')) || ['--mqtt-reconnect', '--keyring', '--keyring-outbox'].filter(arg => process.argv.includes(arg)).length > 1 || (process.argv.includes('--observation-cin') && !process.argv.includes('--keyring-outbox'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring | --keyring-outbox [--observation-cin]]]');
 const phone = process.argv.includes('--phone');
 const useMqtt = process.argv.includes('--mqtt');
 const reconnect = process.argv.includes('--mqtt-reconnect');
 const useKeyring = process.argv.includes('--keyring');
 const useOutbox = process.argv.includes('--keyring-outbox');
+const verifyObservation = process.argv.includes('--observation-cin');
 const cse = new URL(process.env.APP_CORE_TEST_CSE_URL ?? 'http://127.0.0.1:50545/Mobius');
 if (cse.protocol !== 'http:' || cse.hostname !== '127.0.0.1' || !cse.port || cse.pathname !== '/Mobius'
     || cse.username || cse.password || cse.search || cse.hash) throw Error('Test CSE must be HTTP loopback with an explicit port and /Mobius path');
@@ -46,6 +47,10 @@ try {
   aeId = candidateId;
   const child = await req('POST', resource, aeId, {'pb:binarySwitch': {rn:'bubbleState',cnd:'org.onem2m.common.moduleclass.binarySwitch',state:false,lbl:['dev-bootstrap','unobserved']}}, 28);
   ok(child,201,'2001');
+  if (verifyObservation) {
+    const container = await req('POST', resource, aeId, {'m2m:cnt':{rn:'observations'}}, 3);
+    ok(container,201,'2001');
+  }
   const before = await req('GET', `${resource}/bubbleState`, aeId);
   ok(before,200,'2000');
   if (before.parsed?.['pb:binarySwitch']?.state !== false) throw Error('Unexpected initial state');
@@ -53,7 +58,7 @@ try {
   const telemetry = projection ? projection.telemetry : {deviceId:'synthetic-keyring',sequence:1,timestamp:new Date().toISOString(),state:true,batteryPct:90,rssiDbm:-50,schemaVersion:'1.0.0'};
   let receipt, updates, mqttEvidence, outboxEvidence;
   if (useOutbox) {
-    ({receipt, updates, outbox:outboxEvidence} = await outboxModule.runKeyringOutbox({origin:cse.origin,aeId,aeName,source:keyringSource}));
+    ({receipt, updates, outbox:outboxEvidence} = await outboxModule.runKeyringOutbox({origin:cse.origin,aeId,aeName,source:keyringSource,verifyObservation}));
   } else if (useMqtt) {
     const { runMqttUpdate } = await import('./mqtt/run.mjs');
     ({receipt, updates, ...mqttEvidence} = await runMqttUpdate({origin:cse.origin,aeId,aeName,telemetry,reconnect}));

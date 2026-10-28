@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 source, directory = map(lambda p: Path(p).resolve(), sys.argv[1:3])
 ae_name, ae_id, broker_port = sys.argv[3], sys.argv[4], int(sys.argv[5])
+verify_observation = len(sys.argv) > 6 and sys.argv[6] == 'verified-observation'
 sys.path.insert(0, str(source / 'keyring/raspberry-pi-gateway/src'))
 from bubble_gateway.service import Gateway
 from bubble_gateway.state_identity import configured_binding
@@ -26,7 +27,7 @@ config = SimpleNamespace(
     api_url='https://127.0.0.1:1', cse_url='https://127.0.0.1:1',
     ca_file=directory/'ca.pem', cert_file=directory/'client.pem', key_file=directory/'client.key',
     mqtt_enabled=True, mqtt_host='127.0.0.1', mqtt_port=broker_port,
-    mqtt_keepalive=10, mqtt_wrapped_primitive=False, request_timeout=1.0,
+    mqtt_keepalive=10, mqtt_wrapped_primitive=False, request_timeout=4.0 if verify_observation else 1.0,
     core_bridge_enabled=True, ble_devices={'synthetic-keyring': 'synthetic'},
 )
 observation = {
@@ -67,16 +68,23 @@ async def main():
         await until(lambda: all(row['container'] != '@core/telemetry' for row in rows()))
         # The unrelated oneM2M observation remains pending: the test has no
         # subscription response or HTTPS endpoint for that container.
-        pending = rows()
-        assert len(pending) == 1 and pending[0]['container'] == config.observation_container
-        assert pending[0]['attempts'] >= 1
+        if verify_observation:
+            await until(lambda: not rows())
+        else:
+            pending = rows()
+            assert len(pending) == 1 and pending[0]['container'] == config.observation_container
+            assert pending[0]['attempts'] >= 1
         gateway.stop.set()
         task.cancel()
         try: await task
         except asyncio.CancelledError: pass
         task = None
-        print(json.dumps({'offlineRetained': True, 'corePubackRemoved': True,
-                          'otherObservationPending': True, 'observationsQueued': gateway.counters['observations_queued']}))
+        summary = {'offlineRetained': True, 'corePubackRemoved': True,
+                   'otherObservationPending': not verify_observation,
+                   'observationsQueued': gateway.counters['observations_queued']}
+        if verify_observation:
+            summary['observationSettled'] = True
+        print(json.dumps(summary))
     finally:
         if task is not None:
             task.cancel()

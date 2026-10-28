@@ -9,6 +9,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { Aedes } from 'aedes';
 import mqtt from 'mqtt';
 import { GatewayBridge } from '../../../pc-mobius/src/gateway-bridge.mjs';
+import { createVerifiedObservation } from './observation-bridge.mjs';
 
 const exec = promisify(execFile);
 const temporaryRoot = fileURLToPath(new URL('../../../app/build/', import.meta.url));
@@ -18,7 +19,7 @@ const helper = fileURLToPath(new URL('../keyring-outbox-check.py', import.meta.u
 export async function checkOutboxDependencies() { await access(python); }
 
 /** Real KEYRING outbox/transport and CORE on an ephemeral mTLS broker. */
-export async function runKeyringOutbox({ origin, aeId, aeName, source }) {
+export async function runKeyringOutbox({ origin, aeId, aeName, source, verifyObservation = false }) {
   await mkdir(temporaryRoot, { recursive: true });
   const dir = await mkdtemp(join(temporaryRoot, 'keyring-outbox-'));
   let broker, server, subscriber;
@@ -36,7 +37,7 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source }) {
     const [ca, cert, key, clientCert, clientKey] = await Promise.all(['ca.pem','server.pem','server.key','client.pem','client.key'].map(name => readFile(p(name))));
     broker = await Aedes.createBroker();
     server = tls.createServer({ca, cert, key, requestCert:true, rejectUnauthorized:true, minVersion:'TLSv1.3'}, broker.handle);
-    let ingress = 0, subscribed = false, mqttError, authorizedTls13 = 0;
+    let ingress = 0, subscribed = false, mqttError, authorizedTls13 = 0, observationVerified = 0, observationEvidence;
     server.on('secureConnection', socket => { if (socket.authorized && socket.getProtocol() === 'TLSv1.3') authorizedTls13++; });
     broker.on('subscribe', (subs, client) => {
       if (client?.id === 'app-core-outbox' && subs.some(sub => sub.topic === 'privacy-bubble/gateway/app-isolated/telemetry' && sub.qos === 1)) subscribed = true;
@@ -54,6 +55,23 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source }) {
     subscriber = mqtt.connect(`mqtts://127.0.0.1:${port}`, {ca, cert:clientCert, key:clientKey, servername:'localhost', rejectUnauthorized:true, minVersion:'TLSv1.3', clientId:'app-core-outbox', reconnectPeriod:0});
     subscriber.on('error', error => { mqttError = error; });
     await once(subscriber, 'connect', {signal:AbortSignal.timeout(8000)});
+    if (verifyObservation) {
+      const requestTopic = `/oneM2M/req/${aeId}/Mobius4/json`;
+      const responseTopic = `/oneM2M/resp/${aeId}/Mobius4/json`;
+      let pendingObservation = false;
+      subscriber.on('message', (topic, payload) => {
+        if (topic !== requestTopic || pendingObservation || observationVerified) return;
+        pendingObservation = true;
+        createVerifiedObservation({origin, aeId, aeName, wire:payload.toString('utf8')})
+          .then(async result => {
+            await subscriber.publishAsync(responseTopic, JSON.stringify(result.reply), {qos:1, retain:false});
+            observationEvidence = result.evidence;
+            observationVerified++;
+          }).catch(() => { /* No success response when CSE confirmation is unavailable. */ })
+          .finally(() => { pendingObservation = false; });
+      });
+      await subscriber.subscribeAsync(requestTopic, {qos:1});
+    }
     const updates = [];
     const bridge = new GatewayBridge({mqttClient:subscriber, baseUrl:origin, originator:aeId,
       resourcePath:`/Mobius/${aeName}/bubbleState`, gatewayId:'app-isolated',
@@ -69,12 +87,14 @@ export async function runKeyringOutbox({ origin, aeId, aeName, source }) {
       if (performance.now() >= subscribedUntil) throw Error('CORE subscription timeout');
       await delay(25);
     }
-    const result = await exec(python, ['-I','-B',helper,source,dir,aeName,aeId,String(port)], {timeout:30000,maxBuffer:65536});
+    const result = await exec(python, ['-I','-B',helper,source,dir,aeName,aeId,String(port), ...(verifyObservation ? ['verified-observation'] : [])], {timeout:30000,maxBuffer:65536});
     const outbox = JSON.parse(result.stdout);
     const until = performance.now() + 8000;
     while (bridge.receipts.length === 0 && performance.now() < until) await delay(25);
-    if (ingress !== 1 || authorizedTls13 < 2 || bridge.receipts.length !== 1 || bridge.receipts[0].status !== 'APPLIED' || updates.length !== 1) throw Error('Gateway delivery did not reach CORE');
-    return {receipt:bridge.receipts[0], updates, outbox:{...outbox, brokerIngress:ingress, mtls:true, missingClientCertRejected:true}};
+    if (ingress !== 1 || authorizedTls13 < 2 || bridge.receipts.length !== 1 || bridge.receipts[0].status !== 'APPLIED' || updates.length !== 1
+        || (verifyObservation && observationVerified !== 1)) throw Error('Gateway delivery did not reach CORE');
+    return {receipt:bridge.receipts[0], updates, outbox:{...outbox, brokerIngress:ingress, mtls:true, missingClientCertRejected:true,
+      ...(verifyObservation ? {observationReadbackVerified:true,observationEvidence} : {})}};
   } finally {
     if (subscriber) await subscriber.endAsync(true);
     if (broker) await new Promise(resolve => broker.close(resolve));

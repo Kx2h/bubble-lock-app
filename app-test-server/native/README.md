@@ -78,6 +78,16 @@ git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7
 
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
 
+`--mqtt --keyring-outbox --observation-cin`은 고유 AE 아래 시험용 `observations` container를 추가하고 KEYRING 원본 관측 outbox도 확인한다. 별도 mTLS MQTT 시험 어댑터는 해당 container의 CREATE만 실제 loopback CSE HTTP에 전달하며, CSE의 CREATE HTTP 201/RSC 2001/요청 ID와 별도 RETRIEVE HTTP 200/RSC 2000/요청 ID 및 CIN 이름·내용 일치를 확인한 후에만 같은 MQTT 요청 ID로 성공 응답을 보낸다. 이후 팀 Gateway의 SQLite outbox에서 해당 항목이 제거되는지 검사한다. 오류나 불일치에는 성공 응답을 보내지 않는다. CORE telemetry는 별도 경로로 이전과 같이 검증한다.
+
+```sh
+node --test app-test-server/native/mqtt/observation-bridge.test.mjs app-test-server/native/core-app-bridge-check.test.mjs
+node app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring-outbox --observation-cin
+# 기기 상태 화면 확인 시 --phone 추가; 기존 8787 reverse는 그대로 둔다.
+```
+
+이 브릿지는 임시 시험 어댑터이며 Mobius의 native MQTT binding이나 운영 중계가 아니다. CREATE 결과를 확인하지 못하거나 readback이 실패한 뒤의 기존 CIN 충돌 회복은 구현하지 않는다. 성공 확인 전에 연결이 끊겼을 때 서버 처리 여부는 불확실하고 시험은 실패한다. 실제 Pi·BLE·키링·운영 인증이나 기기가 생성한 관측을 의미하지 않는다.
+
 ### KEYRING outbox와 mTLS 전송 시험
 
 `--mqtt --keyring-outbox`는 고정된 KEYRING 코드의 `Gateway.observation`, 실제 SQLite outbox 처리 루프 및 `TransportHub`를 호출한다. 연결 전 합성 관측 항목 두 개가 재시도 상태로 남는지 확인하고, 별도 loopback TLS 1.3 broker에 클라이언트 인증서로 연결한 뒤 CORE telemetry 항목이 PUBACK 후 제거되는지 확인한다. broker ingress와 CORE의 HTTP UPDATE·RSC·요청 ID, 독립 CSE readback 및 APP 중계를 각각 확인한다. 인증서 없는 접속은 broker가 거절하는지도 검사한다. 이때 일반 observation 항목은 시험 대상 CSE container의 MQTT 응답·HTTPS 서버가 없어 미전달 상태로 남는다. PUBACK은 broker 수신만 뜻하며 CORE 처리나 물리 실행을 보장하지 않는다.
