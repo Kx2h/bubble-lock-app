@@ -27,7 +27,7 @@
 - 공통 기준 문서: 저장소 루트의 `PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md`
 - 기준 문서 개정은 `DOC-REV` 값을 커밋 메시지와 Pull Request에 기록한다.
 - 저장소의 기존 README와 커밋 이력은 프로젝트 출발점으로 보존하며, 모든 구현은 이 문서의 Rubric·프로토콜·gate 기준에 연결한다.
-- 현재 공통 문서 기준: `DOC-REV 1.1.0` on `codex/project-plan`
+- 현재 공통 문서 기준: `DOC-REV 2.0.0` on `codex/project-plan`
 - 원격 반영은 팀 통합 승인과 Red 검증을 거친 뒤 진행한다.
 
 ### 다섯 에이전트의 역할 선언
@@ -57,6 +57,12 @@ DEPENDENCIES: <다른 역할에 전달할 계약>
 | KEYRING | `feature/keyring` | PCB·firmware·BLE·Raspberry Pi Gateway·device receipt | R01~R03, R05, R10~R12, R15 |
 
 Role 5의 KEYRING 담당은 키링 PCB·펌웨어와 Raspberry Pi Gateway를 하나의 현장 엣지 묶음으로 관리한다. PC-MOBIUS-CORE 담당은 중앙 Mobius IN-CSE와 oneM2M wire/resource 정본을 관리한다. PC-MOBIUS-INTEGRATION 담당은 정책·API·MEC·handover·FL·MCP·통합 증거를 관리한다.
+
+### Raspberry Pi Gateway 아키텍처 결정
+
+Privacy Bubble의 기본 시연·통합 경로는 `키링 BLE → Raspberry Pi Gateway → MQTT/HTTPS → PC Mobius4`로 고정한다. Raspberry Pi는 BLE GATT 수집, payload schema 검증, sequence·dedup, MQTT QoS 1 전송, HTTPS 보조 전송, ACK/readback 기록을 담당한다. 키링 담당자는 Gateway daemon과 Pi 설치·재연결·전원·범위 시험을 함께 제출하고, PC-MOBIUS-CORE 담당자는 동일 event를 oneM2M subscription과 receipt로 연결한다.
+
+PC 기반 Gateway emulator는 계약·UI 개발용 사전 검증 경로로 활용하고, 최종 통합 evidence와 발표 시연은 Raspberry Pi 실물 경로로 기록한다.
 
 ### 다섯 명의 시간·업무 배분
 
@@ -208,7 +214,7 @@ Privacy Bubble Keyring은 키링의 근접 관측, 라즈베리파이 현장 Gat
 
 - Mobius IN-CSE와 oneM2M resource tree
 - AE 등록, `cnt`, `cin`, `flexContainer`, `group`, `subscription`, `acp`
-- SDT `org.onem2m.common.moduleclass.binarySwitch`, `cod:binSh`, `state:boolean`
+- SDT `org.onem2m.common.moduleclass.binarySwitch`, `pb:binarySwitch`, `state:boolean`
 - Group/fan-out, member별 ACK/readback, command receipt
 - PostgreSQL의 grants·ownership·execution·outbox·device receipt
 - OIDC/mTLS, MQTT ACL, Originator binding, grant revision·expiry·revoke
@@ -299,7 +305,7 @@ Mobius broker capability probe 결과를 release manifest에 기록하고 oneM2M
 - `AE` 등록 receipt와 AE-ID
 - `cnt`·`cin` 기반 observation/FL/audit resource
 - `flexContainer` SDT: `cnd=org.onem2m.common.moduleclass.binarySwitch`
-- wire short name: `cod:binSh`
+- wire envelope: `pb:binarySwitch`
 - datapoint: mandatory RW `state:boolean`
 - `group`과 fan-out point, member별 `macp`, member별 ACK/readback
 - `subscription`과 notification callback
@@ -365,14 +371,30 @@ R04~R09는 구현 결과를 Article·영상·GitHub·공개 토론·면접 evide
 - oneM2M resource tree·SDT registry·XSD lineage
 - MQTT broker/proxy·HTTP binding·Originator binding
 - PostgreSQL schema와 migration
-- ACP·grant·consent·audit·execution service
 - Group/fan-out·dispatch·ACK/readback
-- MEC adapter·callback ingress·reconcile
-- Edge-A/B handover coordinator
-- FL coordinator·artifact store·model serving fence
-- MCP server 3종
-- API OpenAPI/JSON Schema·integration tests
-- release manifest·replay command·runtime receipt
+- core OpenAPI/JSON Schema·resource integration tests
+- Mobius runtime release manifest·replay command·runtime receipt
+
+### PC-MOBIUS-CORE 현재 구현 기준
+
+학교 PC에서는 저장소 내부 `pc-mobius/`를 임시 통합 기준으로 사용한다. 실제 Mobius4 소스는 별도 경로로 유지하고 `MOBIUS4_ROOT` 환경변수로 연결하여, 다른 PC에서도 같은 실행 명령과 계약 fixture를 재사용한다.
+
+- `pc-mobius/contracts/oneM2M-test-contract.v1.json`: AE·flexContainer·subscription·group·discovery·MQTT/HTTP 계약과 예상 응답 코드
+- `pc-mobius/contracts/raspberrypi-gateway.v1.json`: BLE payload·MQTT topic·HTTPS 보조 전송·ACK/readback 계약
+- `pc-mobius/specializations/binarySwitch.xsd`: `org.onem2m.common.moduleclass.binarySwitch`를 위한 TS-0023 flexContainer schema
+- `pc-mobius/scripts/prepare-specialization.mjs`: Mobius4 registry에 schema를 병합하고 기존 registry 백업 생성
+- `pc-mobius/src/gateway-bridge.mjs`: Raspberry Pi MQTT telemetry·command·ACK를 oneM2M HTTP resource와 receipt로 연결
+- `pc-mobius/src/receipt-journal.mjs`: JSONL 영수증과 SHA-256 hash를 영속화하는 저장소
+- `pc-mobius/src/group-dispatcher.mjs`: oneM2M Group/fan-out·member ACK/readback·pending retry
+- `pc-mobius/src/gateway-bridge.mjs`: HTTP binding과 MQTT binding을 동일 receipt contract로 지원
+- `pc-mobius/db/migrations/001_core_receipts.sql`: gateway·dispatch·receipt·oneM2M binding PostgreSQL 정본
+- `pc-mobius/release/manifest.json`: CORE artifact·hash·replay command release 정본
+- `pc-mobius/scripts/validate-contract.mjs`: 계약 구조·헤더·응답 코드·프로토콜 경로를 자동 검증
+- `pc-mobius/scripts/run-contract.mjs`: 실행 중인 Mobius4에 HTTP 계약을 순서대로 전송하고 JSON receipt 생성
+- `pc-mobius/scripts/start-mobius4-test.ps1`: 환경변수 기반 Mobius4 실행 래퍼(포트·DB·MQTT는 Mobius4 설정으로 주입)
+- `pc-mobius/config/mobius4-test.env.example`: 학교 PC와 후속 PC에서 공통으로 쓰는 실행 변수 템플릿
+
+CORE 개발자는 모든 wire 변경을 먼저 계약 fixture와 문서 개정에 반영하고, 실행 결과를 `pc-mobius/receipts/`에 저장한다. 통합 담당자는 동일한 `DOC-REV`와 계약 파일을 기준으로 API/Auth·MEC·callback·handover·FL·MCP를 연결한다.
 
 ### PC-MOBIUS-INTEGRATION 담당 산출물
 
@@ -493,7 +515,7 @@ R04~R09는 구현 결과를 Article·영상·GitHub·공개 토론·면접 evide
 
 - 키링이 BLE로 상태를 전송한다.
 - 라즈베리파이가 MQTT 또는 HTTPS로 Mobius에 전달한다.
-- Mobius가 oneM2M 자원과 `cod:binSh/state`를 저장한다.
+- Mobius가 oneM2M 자원과 `pb:binarySwitch/state`를 저장한다.
 - 앱에서 승인한 Group 명령이 키링에 도달한다.
 - 키링이 ACK와 readback을 반환한다.
 - 웹 대시보드가 수락·전송·적용·확인 시각을 표시한다.
