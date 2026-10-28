@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
 
 const script = fileURLToPath(new URL('./core-app-bridge-check.mjs', import.meta.url));
 for (const mode of ['lost-response', 'wrong-identity']) {
@@ -32,8 +33,10 @@ for (const mode of ['lost-response', 'wrong-identity']) {
   });
 }
 
-for (const mode of ['direct', 'mqtt', 'mqtt-reconnect']) {
-  test(`${mode} mode updates only its isolated resource and cleans it up`, async () => {
+for (const mode of ['direct', 'mqtt', 'mqtt-reconnect', 'mqtt-keyring']) {
+  const pinned = fileURLToPath(new URL('../../../../.local/keyring-app-pinned/', import.meta.url));
+  test(`${mode} mode updates only its isolated resource and cleans it up`,
+    { skip: mode === 'mqtt-keyring' && !existsSync(pinned) && 'Prepare pinned KEYRING worktree' }, async () => {
     let aeName, state = false, removed = false, puts = 0;
     const cse = http.createServer(async (req, res) => {
       const reply = (status, rsc, data) => {
@@ -56,7 +59,7 @@ for (const mode of ['direct', 'mqtt', 'mqtt-reconnect']) {
     });
     await new Promise(resolve => cse.listen(0, '127.0.0.1', resolve));
     try {
-      const args = mode === 'mqtt-reconnect' ? [script, '--mqtt', '--mqtt-reconnect'] : mode === 'mqtt' ? [script, '--mqtt'] : [script];
+      const args = mode === 'mqtt-reconnect' ? [script, '--mqtt', '--mqtt-reconnect'] : mode === 'mqtt-keyring' ? [script, '--mqtt', '--keyring'] : mode === 'mqtt' ? [script, '--mqtt'] : [script];
       const child = spawn(process.execPath, args, {env:{...process.env,APP_CORE_TEST_CSE_URL:`http://127.0.0.1:${cse.address().port}/Mobius`}});
       let output = '';
       child.stdout.on('data', chunk => { output += chunk; });
@@ -71,7 +74,10 @@ for (const mode of ['direct', 'mqtt', 'mqtt-reconnect']) {
       assert.equal(puts,mode === 'mqtt-reconnect' ? 2 : 1);
       assert.equal(removed,true);
       assert.ok(result.results.some(x => x.cleanup === 'verified'));
-      if (mode === 'mqtt') assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:1});
+      if (mode === 'mqtt' || mode === 'mqtt-keyring') {
+        assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:1});
+        if (mode === 'mqtt-keyring') assert.deepEqual(summary.keyring,{nullMeasurementsSkipped:true,duplicateSkipped:true,reopenPreserved:true,wireSequences:[0,1]});
+      }
       else if (mode === 'mqtt-reconnect') {
         assert.deepEqual(summary.mqtt,{topic:'privacy-bubble/gateway/app-isolated/telemetry',qos:1,retained:false,duplicate:'DUPLICATE',updateCount:2,reconnected:true});
         assert.deepEqual(summary.reconnectUpdate,{status:200,rsc:'2004',correlated:true});

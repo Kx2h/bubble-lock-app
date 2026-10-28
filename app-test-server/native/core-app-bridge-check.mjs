@@ -2,10 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { GatewayBridge } from '../../pc-mobius/src/gateway-bridge.mjs';
 import { createServer } from '../server.mjs';
 
-if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || (process.argv.includes('--mqtt-reconnect') && !process.argv.includes('--mqtt'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect]]');
+if (process.argv.slice(2).some(arg => !['--phone', '--mqtt', '--mqtt-reconnect', '--keyring'].includes(arg)) || new Set(process.argv.slice(2)).size !== process.argv.slice(2).length || ((process.argv.includes('--mqtt-reconnect') || process.argv.includes('--keyring')) && !process.argv.includes('--mqtt')) || (process.argv.includes('--mqtt-reconnect') && process.argv.includes('--keyring'))) throw Error('Usage: node core-app-bridge-check.mjs [--phone] [--mqtt [--mqtt-reconnect | --keyring]]');
 const phone = process.argv.includes('--phone');
 const useMqtt = process.argv.includes('--mqtt');
 const reconnect = process.argv.includes('--mqtt-reconnect');
+const useKeyring = process.argv.includes('--keyring');
 const cse = new URL(process.env.APP_CORE_TEST_CSE_URL ?? 'http://127.0.0.1:50545/Mobius');
 if (cse.protocol !== 'http:' || cse.hostname !== '127.0.0.1' || !cse.port || cse.pathname !== '/Mobius'
     || cse.username || cse.password || cse.search || cse.hash) throw Error('Test CSE must be HTTP loopback with an explicit port and /Mobius path');
@@ -30,6 +31,8 @@ async function req(method, path, origin, body, ty) {
 function ok(res, status, rsc) { if (res.status !== status || res.rsc !== rsc || !res.correlated) throw Error('Unexpected oneM2M result'); }
 let proxy;
 try {
+  const keyring = useKeyring ? await import('./keyring-projection.mjs') : null;
+  const keyringSource = keyring ? await keyring.checkKeyringSource() : null;
   console.log(JSON.stringify({testAeName:aeName, note:'Retain this name if the create result is uncertain.'}));
   creationAttempted = true;
   const created = await req('POST', base, '', {'m2m:ae': {rn:aeName,api:'Nprivacy-bubble.app-isolated',rr:true}}, 2);
@@ -43,7 +46,8 @@ try {
   const before = await req('GET', `${resource}/bubbleState`, aeId);
   ok(before,200,'2000');
   if (before.parsed?.['pb:binarySwitch']?.state !== false) throw Error('Unexpected initial state');
-  const telemetry = {deviceId:'synthetic-keyring',sequence:1,timestamp:new Date().toISOString(),state:true,batteryPct:90,rssiDbm:-50,schemaVersion:'1.0.0'};
+  const projection = keyring ? await keyring.keyringProjection(keyringSource, aeName, aeId) : null;
+  const telemetry = projection ? projection.telemetry : {deviceId:'synthetic-keyring',sequence:1,timestamp:new Date().toISOString(),state:true,batteryPct:90,rssiDbm:-50,schemaVersion:'1.0.0'};
   let receipt, updates, mqttEvidence;
   if (useMqtt) {
     const { runMqttUpdate } = await import('./mqtt/run.mjs');
@@ -68,7 +72,7 @@ try {
   const answer = await fetch(`http://127.0.0.1:${proxy.address().port}/api/test/bubble-state`);
   const value = await answer.json();
   if (answer.status !== 200 || value.state !== expectedState || value.observation !== 'unknown') throw Error('APP adapter did not observe the CSE state');
-  results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {})});
+  results.push({bridge:receipt.status, update:updates[0], ...(reconnect ? {reconnectUpdate:updates[1]} : {}), stateAfter:expectedState, bootstrapLabelPresent:value.bootstrapLabelPresent, observation:value.observation, adapterStatus:answer.status, ...(mqttEvidence ? {mqtt:mqttEvidence} : {}), ...(projection ? {keyring:{nullMeasurementsSkipped:projection.nullMeasurementsSkipped,duplicateSkipped:projection.duplicateSkipped,reopenPreserved:projection.reopenPreserved,wireSequences:projection.wireSequences}} : {})});
   if (phone) {
     console.log(JSON.stringify({ready:true, aeName, port:8787, note:'Press Enter to clean up the test AE.'}));
     await new Promise(resolve=>process.stdin.once('data',resolve));

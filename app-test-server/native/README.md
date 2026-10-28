@@ -60,4 +60,20 @@ node app-test-server/native/core-app-bridge-check.mjs --mqtt --phone
 
 broker는 TCP loopback의 임의 포트에만 바인딩하며 인증·TLS·ACL·영속 저장을 사용하지 않는 시험용이다. 합성 송신자가 실제 MQTT 프로토콜을 사용하지만 물리 Pi·BLE·키링, 외부 broker, TLS/MQTT ACL 및 운영 API를 검증하지 않는다. `APPLIED`만으로 성공을 추정하지 않고 별도의 HTTP RSC·요청 ID와 CSE readback을 확인한다. Node와 의존성·캐시는 작업 폴더 아래에만 둔다. 설치한 `node_modules`는 Git에 포함하지 않는다.
 
+### KEYRING 저장소의 관측 변환 연결
+
+`--keyring`은 별도 고정 worktree의 KEYRING `d233c0f7c445be7b7505a69582a8fb0f471c57c2`에서 실제 `validate_observation`, `Store.observation` 및 CORE telemetry 변환을 실행한다. 합성 관측을 새로운 임시 SQLite outbox에 저장하고 battery 또는 RSSI가 null이면 CORE projection이 생성되지 않는지, 중복 관측이 거부되는지 확인한다. DB를 닫았다가 열어 대기 projection과 wire sequence의 보존을 확인한 뒤, 생성된 합성 payload 하나를 위 로컬 MQTT→CORE→격리 CSE→APP 경로에 전송한다. SQLite 시험 폴더는 정상 종료와 처리된 오류 시 삭제하며 강제 종료 시에는 남을 수 있다.
+
+별도 worktree가 아직 없다면 저장소 루트에서 한 번 준비한다. 기존 경로는 덮어쓰지 않는다. `--keyring`은 실행 전 해당 checkout의 HEAD와 Gateway Python 소스의 변경·추가 여부를 확인하며, 다른 revision이나 수정된 소스는 거부한다. Python 3.11 이상과 위 MQTT 의존성이 필요하다.
+
+```sh
+git worktree add --detach "$WORKSPACE/.local/keyring-app-pinned" d233c0f7c445be7b7505a69582a8fb0f471c57c2
+"$WORKSPACE/.local/node/bin/node" --test app-test-server/native/keyring-projection.test.mjs
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring
+# 빈 8787과 기존 기기의 reverse가 준비된 경우
+"$WORKSPACE/.local/node/bin/node" app-test-server/native/core-app-bridge-check.mjs --mqtt --keyring --phone
+```
+
+이 시험은 KEYRING 코드의 validator·SQLite·projection을 호출하지만 전체 Gateway daemon이나 outbox의 실제 전송 루프는 실행하지 않는다. Node 합성 송신자가 projection을 읽어 MQTT로 전달한다. `--mqtt-reconnect`는 두 번째 projection을 KEYRING 코드에서 생성하지 않으므로 `--keyring`과 함께 사용할 수 없다. 실제 BLE, Pi, 키링, 배터리·RSSI 관측, 인증 및 운영 권한의 증거가 아니다. checkout이 없는 경우 별도 단위시험은 skip되지만 `--keyring` 실경로 시험은 CSE 자원 생성 전에 실패한다.
+
 `--mqtt --mqtt-reconnect`는 브로커를 중단한 뒤 같은 loopback 포트에서 새 인스턴스를 시작한다. 기존 CORE 클라이언트의 재연결과 `GatewayBridge.start()` 재호출 뒤 브로커에서 QoS 1 재구독을 관찰하고, 새 sequence의 합성 상태를 전송하여 두 번째 HTTP UPDATE의 RSC·요청 ID와 CSE 및 앱 중계 readback을 확인한다. 연결이 끊긴 동안에는 메시지를 보내지 않으므로 오프라인 저장·유실 복구나 재시작 뒤 중복 방지를 검증하지 않는다. 기기에서 확인할 때는 `--phone`을 함께 사용한다.
