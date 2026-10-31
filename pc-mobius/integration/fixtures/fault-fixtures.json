@@ -1,0 +1,11 @@
+{
+  "fixtureVersion": "1.0.0",
+  "owner": "PC-MOBIUS-INTEGRATION",
+  "cases": [
+    { "id": "F-MQTT-DUPLICATE", "surface": "gateway", "stimulus": "duplicate eventId and sequence", "expected": "one receipt with duplicate status" },
+    { "id": "F-MEC-REPLAY", "surface": "mec", "stimulus": "same callback eventId twice", "expected": "single reconcile outcome" },
+    { "id": "F-EDGE-DRAIN", "surface": "handover", "stimulus": "target edge health update during drain", "expected": "epoch rollback with security context" },
+    { "id": "F-FL-CRASH", "surface": "fl", "stimulus": "participant process restart after checkpoint", "expected": "round recovery and artifact fence" },
+    { "id": "F-MCP-RESUME", "surface": "mcp", "stimulus": "run restart after partial execution", "expected": "persistent cursor resume and audit receipt" }
+  ]
+}

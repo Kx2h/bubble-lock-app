@@ -406,6 +406,25 @@ CORE 개발자는 모든 wire 변경을 먼저 계약 fixture와 문서 개정�
 - MCP oneM2M/MEC/Audit server와 persistent run DB
 - integration runner·fault fixtures·release evidence·replay report
 
+### PC-MOBIUS-INTEGRATION 현재 구현 기준
+
+저장소 `pc-mobius/integration/`을 통합 역할의 portable 기준으로 사용한다. CORE의 `GatewayBridge`, `ReceiptJournal`, `oneM2M-test-contract.v1.json`, `raspberrypi-gateway.v1.json`을 상위 계약으로 참조하며 동일한 `DOC-REV 2.0.0`과 owner·eventId·timestamp receipt envelope를 공유한다.
+
+- `pc-mobius/contracts/integration-contract.v1.json`: R06·R10·R12~R17 매핑, OIDC/mTLS, MEC, handover, FL, MCP 계약
+- `pc-mobius/integration/src/policy-service.mjs`: principal binding, ACP scope, consent·grant lifecycle, approval hash, audit
+- `pc-mobius/integration/src/mec-adapter.mjs`: Location/RNIS adapter, callback ingress, dedup, geofence·health reconcile
+- `pc-mobius/integration/src/handover-coordinator.mjs`: Edge-A/B 선택, drain→active, epoch, subscription·security context, rollback
+- `pc-mobius/integration/src/fl-coordinator.mjs`: ESTIMED VM dynamic selection, multi-round update, artifact fence, recovery
+- `pc-mobius/integration/src/mcp-orchestrator.mjs`: oneM2M·MEC·Audit server registry, approval hash, persistent run, checkpoint·resume
+- `pc-mobius/integration/src/api-gateway.mjs`: `/v1` API route와 idempotency 경계
+- `pc-mobius/integration/src/integration-runtime.mjs`: 위 모듈과 CORE GatewayBridge의 wiring
+- `pc-mobius/scripts/run-integration-api.mjs`: 로컬 `/v1` 통합 API 실행 프로세스
+- `pc-mobius/integration/fixtures/fault-fixtures.json`: duplicate·replay·drain·crash·resume 장애 재현 fixture
+- `pc-mobius/scripts/run-integration.mjs`: consent→grant→MEC→handover→FL→MCP 전체 데모 및 summary receipt
+- `pc-mobius/scripts/build-integration-evidence.mjs`: integration artifact SHA-256와 release manifest 생성
+
+통합 담당자는 `npm run integration:validate`, `npm test`, `npm run integration`, `npm run integration:evidence`, `npm run integration:replay -- --input=receipts/integration-demo.json` 순서로 실행 결과를 보관한다. 앱·웹·키링은 `/v1` API와 integration contract revision을 사용하고, CORE는 oneM2M resource·Gateway event·command ACK/readback receipt를 제공한다.
+
 ### 앱 담당 산출물
 
 - Guardian/Visitor 화면

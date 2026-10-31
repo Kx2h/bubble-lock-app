@@ -34,6 +34,10 @@ Node.js 검증 묶음은 `npm test`, `npm run validate`, `npm run dry-run` 명�
 
 `db/migrations/001_core_receipts.sql`은 gateway event dedup, group dispatch, receipt journal, oneM2M HTTP/MQTT binding을 PostgreSQL에 기록한다. Mobius4 companion DB에 migration을 적용하면 runtime receipt와 재처리 기준을 공유할 수 있다.
 
+## PC-MOBIUS-INTEGRATION
+
+`integration/README.md`와 `contracts/integration-contract.v1.json`은 API·OIDC/mTLS·ACP/grant·MEC Location/RNIS·handover·ESTIMED VM FL·MCP·release evidence의 통합 정본이다. CORE의 GatewayBridge와 같은 receipt contract를 사용하며 `npm run integration:validate`, `npm run integration`, `npm run integration:evidence`, `npm run integration:replay`로 검증한다.
+
 `release/manifest.json`과 `scripts/build-release-manifest.mjs`는 구현 artifact SHA-256과 실행 명령을 release evidence로 묶는다. `scripts/replay-receipt.mjs --input <receipt.json>`은 저장된 receipt의 contract·request·status 분포를 재생 검증한다.
 
 개발 흐름은 `npm test`의 fake MQTT·fake HTTP 검증 → 실제 Raspberry Pi MQTT trace → Mobius4 HTTP receipt 순서로 운영한다.

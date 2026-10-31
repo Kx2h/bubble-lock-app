@@ -10,7 +10,12 @@
     "test": "node --test test/**/*.test.mjs",
     "bridge": "node scripts/run-bridge.mjs",
     "release-manifest": "node scripts/build-release-manifest.mjs",
-    "replay-receipt": "node scripts/replay-receipt.mjs"
+    "replay-receipt": "node scripts/replay-receipt.mjs",
+    "integration": "node scripts/run-integration.mjs",
+    "integration:api": "node scripts/run-integration-api.mjs",
+    "integration:validate": "node scripts/validate-integration.mjs",
+    "integration:evidence": "node scripts/build-integration-evidence.mjs",
+    "integration:replay": "node scripts/replay-integration.mjs"
   },
   "dependencies": {
     "mqtt": "^5.14.0"

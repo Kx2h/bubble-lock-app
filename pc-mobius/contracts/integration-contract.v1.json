@@ -1,0 +1,28 @@
+{
+  "contractId": "privacy-bubble.integration.v1",
+  "contractVersion": "1.0.0",
+  "docRevision": "2.0.0",
+  "owner": "PC-MOBIUS-INTEGRATION",
+  "dependsOn": ["privacy-bubble.oneM2M.test", "privacy-bubble.raspberrypi-gateway"],
+  "standards": ["TS-0001", "TS-0004", "TS-0023", "ETSI-MEC-010", "ETSI-MEC-011"],
+  "surfaces": {
+    "api": { "basePath": "/v1", "contentType": "application/json", "idempotencyHeader": "Idempotency-Key" },
+    "auth": { "oidcIssuer": "privacy-bubble-oidc", "audience": "privacy-bubble-api", "mtls": true, "originatorBinding": true },
+    "mec": { "services": ["Location", "RNIS"], "callbackPath": "/v1/mec/callback", "dedupKey": "eventId" },
+    "handover": { "states": ["DETACHED", "DRAINING", "ACTIVE", "ROLLED_BACK"], "epoch": "uint64" },
+    "fl": { "vmRuntime": "ESTIMED", "roundStates": ["RUNNING", "RECOVERED", "COMPLETED"], "artifactFence": true },
+    "mcp": { "servers": ["oneM2M", "MEC", "Audit"], "checkpoint": true, "resume": true, "approvalHash": true }
+  },
+  "rubricMapping": {
+    "R06": "release-manifest-and-replay",
+    "R10": "auth-policy-grant",
+    "R12": "handover-coordinator",
+    "R13": "mec-host-inventory",
+    "R14": "fl-coordinator",
+    "R15": "geofence-policy-reconcile",
+    "R16": "location-rnis-bidirectional-trace",
+    "R17": "mcp-persistent-run"
+  },
+  "receiptFields": ["contractId", "docRevision", "eventId", "timestamp", "owner", "type"],
+  "acceptance": { "principalBinding": true, "grantLifecycle": true, "callbackDedup": true, "handoverEpoch": true, "flRecovery": true, "mcpResume": true }
+}
