@@ -1,0 +1,14 @@
+<resources>
+    <style name="Theme.PrivacyBubble" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/pb_accent</item><item name="colorOnPrimary">@color/pb_on_accent</item>
+        <item name="colorSecondary">@color/pb_accent</item><item name="colorOnSecondary">@color/pb_on_accent</item>
+        <item name="colorError">@color/pb_danger</item><item name="colorOutline">@color/pb_muted</item>
+        <item name="colorSurface">@color/pb_surface</item><item name="colorOnSurface">@color/pb_text</item>
+        <item name="colorSurfaceVariant">@color/pb_subtle</item><item name="colorOnSurfaceVariant">@color/pb_muted</item>
+        <item name="android:colorBackground">@color/pb_background</item>
+        <item name="android:windowBackground">@color/pb_background</item>
+        <item name="android:fontFamily">sans-serif</item><item name="android:windowActionModeOverlay">true</item>
+        <item name="android:navigationBarColor">@color/pb_surface</item>
+        <item name="android:statusBarColor">@color/pb_background</item>
+    </style>
+</resources>

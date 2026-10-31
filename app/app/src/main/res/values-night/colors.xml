@@ -1,0 +1,8 @@
+<resources>
+    <color name="pb_background">#111B16</color><color name="pb_surface">#1A2820</color>
+    <color name="pb_subtle">#26392D</color><color name="pb_text">#EBF2EC</color>
+    <color name="pb_muted">#B8C7BB</color><color name="pb_accent">#A3D8B9</color>
+    <color name="pb_on_accent">#112B1C</color><color name="pb_border">#405848</color>
+    <color name="pb_warning">#F0CD86</color><color name="pb_danger">#FFB5BA</color>
+    <color name="pb_success">#A5DBB8</color>
+</resources>

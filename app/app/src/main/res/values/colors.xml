@@ -1,0 +1,9 @@
+<resources>
+    <color name="pb_brand">#205C42</color>
+    <color name="pb_background">#F4F6F3</color><color name="pb_surface">#FFFFFF</color>
+    <color name="pb_subtle">#EAF0E9</color><color name="pb_text">#1F3027</color>
+    <color name="pb_muted">#53655A</color><color name="pb_accent">#205C42</color>
+    <color name="pb_on_accent">#FFFFFF</color><color name="pb_border">#D3DED4</color>
+    <color name="pb_warning">#805811</color><color name="pb_danger">#A13138</color>
+    <color name="pb_success">#236241</color>
+</resources>

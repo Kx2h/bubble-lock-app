@@ -1,0 +1,9 @@
+[
+  {
+    "id": "replace-with-keyring-id",
+    "name": "내 키링",
+    "ueId": "replace-with-authoritative-ue-id",
+    "principalIds": ["replace-with-verified-oidc-subject"],
+    "active": false
+  }
+]

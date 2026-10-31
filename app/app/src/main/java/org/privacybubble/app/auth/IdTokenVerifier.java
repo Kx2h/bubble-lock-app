@@ -40,7 +40,7 @@ public final class IdTokenVerifier {
         return verifyInitial(jwt, jwksJson, expectedIssuer, clientId, nonce, nowEpochSeconds).subject();
     }
 
-    /** Created only after initial ID-token validation; never serialize or log its contents. */
+    /** Created only after validation, or restored from the app's authenticated encrypted session store. Never log. */
     static final class Identity {
         private final String issuer, clientId, subject, nonce, azp;
         private final Long authTimeMillis;
@@ -54,6 +54,13 @@ public final class IdTokenVerifier {
         }
         String subject() { return subject; }
         boolean matches(String issuer, String clientId) { return this.issuer.equals(issuer) && this.clientId.equals(clientId); }
+        String exportForEncryptedStorage() {
+            java.util.Map<String,Object> context = new java.util.HashMap<>();
+            context.put("issuer",issuer); context.put("client",clientId); context.put("subject",subject); context.put("nonce",nonce);
+            context.put("azp",azp); context.put("authTime",authTimeMillis); context.put("issued",issuedMillis);
+            context.put("digest",Base64.getEncoder().encodeToString(initialTokenDigest));
+            return com.nimbusds.jose.util.JSONObjectUtils.toJSONString(context);
+        }
         @Override public String toString() { return "VerifiedIdentity[redacted]"; }
     }
 
@@ -123,6 +130,24 @@ public final class IdTokenVerifier {
 
     private static boolean sameNonce(String expected, String actual) {
         return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), actual.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** Only call with a value decrypted and authenticated by MobileSessionStore, never an Intent or response field. */
+    static Identity restoreFromEncryptedStorage(String value, String issuer, String clientId) {
+        try {
+            requireText(value,4096);
+            java.util.Map<String,Object> context=com.nimbusds.jose.util.JSONObjectUtils.parse(value);
+            if (!issuer.equals(context.get("issuer")) || !clientId.equals(context.get("client"))) fail();
+            String subject=com.nimbusds.jose.util.JSONObjectUtils.getString(context,"subject"), nonce=com.nimbusds.jose.util.JSONObjectUtils.getString(context,"nonce");
+            requireSubject(subject); requireText(nonce,512);
+            Object azp=context.get("azp"); if (azp!=null && (!(azp instanceof String) || !clientId.equals(azp))) fail();
+            long issued=com.nimbusds.jose.util.JSONObjectUtils.getLong(context,"issued"); if (issued<=0) fail();
+            Long auth=context.get("authTime")==null ? null : com.nimbusds.jose.util.JSONObjectUtils.getLong(context,"authTime");
+            if (auth!=null && (auth<0 || auth>issued+60_000)) fail();
+            byte[] fingerprint=Base64.getDecoder().decode(com.nimbusds.jose.util.JSONObjectUtils.getString(context,"digest"));
+            if (fingerprint.length!=32) fail();
+            return new Identity(issuer,clientId,subject,nonce,(String)azp,auth,issued,fingerprint);
+        } catch (Exception failure) { throw new IllegalArgumentException("Session context unavailable"); }
     }
 
     private static Date authTime(JWTClaimsSet claims) throws Exception {

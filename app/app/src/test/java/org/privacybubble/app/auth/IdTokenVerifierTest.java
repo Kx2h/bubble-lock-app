@@ -55,6 +55,22 @@ public class IdTokenVerifierTest {
         String jwt = sign(claims().claim("azp", CLIENT).build(), key, "key-1");
         assertEquals("person-1", verify(jwt, jwks(key.toPublicJWK())));
     }
+    @Test public void encryptedStoreContextRetainsStrictRefreshChecks() throws Exception {
+        String initialJwt=sign(claims().claim("auth_time",NOW-20).build(),key,"key-1");
+        IdTokenVerifier.Identity initial=IdTokenVerifier.verifyInitial(initialJwt,jwks(key.toPublicJWK()),ISSUER,CLIENT,NONCE,NOW,"access");
+        String context=initial.exportForEncryptedStorage();
+        IdTokenVerifier.Identity restored=IdTokenVerifier.restoreFromEncryptedStorage(context,ISSUER,CLIENT);
+        JWTClaimsSet.Builder current = new JWTClaimsSet.Builder().issuer(ISSUER).subject("person-1").audience(CLIENT)
+                .issueTime(new Date(NOW * 1000)).expirationTime(new Date((NOW + 120) * 1000));
+        String jwt=sign(current.build(),key,"key-1");
+        IdTokenVerifier.verifyRefresh(jwt,jwks(key.toPublicJWK()),restored,NOW,NOW,"access");
+        assertThrows(IllegalArgumentException.class,()->IdTokenVerifier.verifyRefresh(initialJwt,jwks(key.toPublicJWK()),restored,NOW,NOW,"access"));
+        String wrongAuth=sign(current.claim("auth_time",NOW-5).build(),key,"key-1");
+        assertThrows(IllegalArgumentException.class,()->IdTokenVerifier.verifyRefresh(wrongAuth,jwks(key.toPublicJWK()),restored,NOW,NOW,"access"));
+        String wrongNonce=sign(current.claim("nonce","other-nonce").build(),key,"key-1");
+        assertThrows(IllegalArgumentException.class,()->IdTokenVerifier.verifyRefresh(wrongNonce,jwks(key.toPublicJWK()),restored,NOW,NOW,"access"));
+        assertThrows(IllegalArgumentException.class,()->IdTokenVerifier.restoreFromEncryptedStorage(context,ISSUER,"other-client"));
+    }
     @Test public void subjectMustBeAtMost255AsciiCharacters() throws Exception {
         String subject = "Aa" + "x".repeat(253);
         assertEquals(subject, verify(sign(claims().subject(subject).build(), key, "key-1"), jwks(key.toPublicJWK())));

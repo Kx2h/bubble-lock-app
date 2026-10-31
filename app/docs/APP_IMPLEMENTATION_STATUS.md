@@ -1,82 +1,62 @@
-# APP 구현 상태와 실제 연동 인수 조건
+# APP 제품 구현 상태와 상용 배포 잔여 조건
 
-ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-29 (Asia/Seoul) · 감사 기준 커밋: `3c6d71b` (`feature/app`).
+ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-31 (Asia/Seoul) · APP 0.2.0 / versionCode 2.
 
-APP 운영 산출물은 아직 완료되지 않았다. 현재 구현은 Guardian/Visitor 초기 화면, 향후 연동을 위한 HTTPS/OIDC 검증 코드, 격리된 Mobius4와 합성 서버를 사용하는 debug 시험이다. 운영 로그인·권한·등록·승인·명령·실제 상태·알림은 연결되어 있지 않다. 이 판정은 [공통 구현 계획](../../PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md)의 앱 담당 업무·앱 담당 산출물·HTTPS 계약·첫 통합 데모 인수 조건과 현재 소스 및 evidence를 대조한 결과다. Rubric 점수나 전체 프로젝트 완료를 판정하지 않는다.
+현재 소스는 지도·키링 목록·설정의 제품 앱과 인증된 위치 읽기 경로를 제공한다. 이전의 “release는 대기 안내만 표시하고 API caller가 없다”는 상태는 더 이상 현재 구현을 설명하지 않는다. 새 CORE/INTEGRATION의 정책·MEC·handover·FL·MCP 구현을 인수했고, 그중 저장된 MEC 위치 이벤트를 APP 읽기 API로 연결했다. [공통 계획](../../PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md)의 전체 APP 요구와 실제 배포·실물 시험은 아래와 같이 남아 있다. 상용 release나 전체 프로젝트 완료를 선언하지 않는다.
 
-## 빌드와 실행 범위
+## 현재 실행 경로
 
-- `main` 소스에 파일이 있다는 사실만으로 운영 기능을 완료로 인정하지 않는다. `HttpsApiTransport`는 운영 호출자가 없고, `OidcBrowserFlow.start()`는 release 실행을 거부한다.
-- 기본 debug에는 테스트 상태 조회와 합성 consent·관측·receipt 화면이 있다. 합성 인증·refresh·인증된 consent 화면과 localhost 테스트 CA는 별도 opt-in debug에만 포함된다.
-- release에서는 합성 Activity와 테스트 redirect receiver를 제외한다. 현재 남는 사용자 화면은 서버 계약 대기 안내와 미연결 주소 설정이다.
-- 화면의 Guardian/Visitor 선택은 문자열 기반 화면 전환이다. 실제 로그인, 역할 검증, 서버 접근권한 변경을 수행하지 않는다. 저장한 HTTPS 주소도 요청에는 사용하지 않는다.
+```text
+배포자가 고정한 OIDC issuer/client + 브라우저 Code/PKCE
+  → Android Keystore 암호화 세션 / 단일 refresh 시도
+  → HTTPS GET /v1/keyrings
+  → RS256·issuer·audience·subject·scope 검증 / 서버 principal binding
+  → 팀 IntegrationStore의 MEC Location 이벤트 / grant·consent 확인
+  → Android 지도·목록·위치 정보의 유효기간 표시
+```
 
-근거: [앱 범위](../README.md), [메인 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java), [빌드 구분](../app/build.gradle), [release manifest](../app/src/release/AndroidManifest.xml), [OIDC 검증 경계](OIDC_TRUST_BOUNDARY.md), [API 전송 경계](API_TRANSPORT.md).
+[모바일 계약](../contracts/mobile-location.v1.json)은 APP 소유의 소비자 읽기 확장이다. 중앙 서비스의 정식 배포 계약으로 채택하려면 INTEGRATION owner 검토가 필요하다. upstream mutation runner가 허용하는 caller principal·mTLS 주장값을 이 읽기 경로의 인증 근거로 사용하지 않는다. [읽기 서비스 설명](../../pc-mobius/mobile-api/README.md)에 신뢰 설정·권한·상한·배포 경계를 고정했다.
 
-후속 수정으로 미연결 서버 설정의 입력 초안·선택 범위·피드백을 역할 전환과 화면 재생성에 전달한다. 공기계에서 초안 유지·명시 저장/삭제·재실행을 확인했고 [12개 기기 확인과 복원 기록](../evidence/settings-draft-device.md)에 범위와 해시를 고정했다. 주소의 실제 API 요청 연결은 여전히 남아 있다.
+`LocationRepository`는 현재 `HttpsApiTransport`의 실제 호출자다. 제품 로그인은 새 `MobileSignInActivity`가 담당하며 이전 opt-in `OidcBrowserFlow`와 구분한다. 일반 설정에서 issuer/client나 bearer를 임의 입력하지 않는다. 기본 미설정 release의 callback receiver는 제거되고, 신뢰 프로필을 고정한 release에만 production-auth manifest를 적용한다.
 
-## 요구별 상태
+## 요구별 현재 상태
 
-아래의 “남은 구현”은 APP 담당의 실제 개발 잔여분이다. 계약이 없다는 사유로 이 개발까지 완료 처리하지 않는다. “필수 인수 계약”의 C 번호는 다음 절과 연결한다.
-
-| 공통 계획의 APP 요구 | 현재 구현과 확인된 증거 | 운영 완료에 남은 구현 | 필수 인수 계약 |
-|---|---|---|---|
-| Guardian/Visitor 화면과 로그인 | 역할별 초기 화면은 존재한다. 화면 스스로 인증·권한 변경이 아니라고 표시한다. OIDC discovery·RS256·issuer/audience/subject/nonce·PKCE 검증 코드는 있다. 운영 로그인 UI 호출자는 없고 release 흐름 시작은 차단된다. [소스](../app/src/main/java/org/privacybubble/app/MainActivity.java), [OIDC 범위](OIDC_TRUST_BOUNDARY.md) | 실제 공급자의 로그인·취소·재인증 UI, 신뢰된 설정 연결, 서버가 인정한 역할·접근 범위 표시, 실제 브라우저와 계정의 기기 시험 | C1, C2 |
-| OIDC token refresh와 세션 수명 | 메모리 세션과 refresh 회전은 opt-in 합성 흐름으로 시험했다. 실패 시 세션 폐기와 미확정 요청 표시를 확인했다. 실제 공급자·브라우저, 운영 token revoke·저장·프로세스 복원은 구현·검증하지 않았다. [합성 refresh 기기 증거](../evidence/auth-consent-refresh-device.md) | 공급자 정책에 맞춘 운영 refresh/만료/로그아웃·폐기, 필요한 경우 OS 보호 저장 및 재시작 복원, 세션 상실 뒤 데이터·변경 UI 갱신 | C2, C8 |
-| device/household registration과 방문자 연결 | Guardian의 기기·가정 등록과 Visitor의 초대·접근 범위는 계약 대기 문구다. 등록 API 호출과 실제 연결된 기기 목록은 없다. [메인 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java) | 실제 등록·연결·초대·해제 흐름, 소유권 및 역할별 검증 결과, 실패·중복·회수 처리 | C3, C8 |
-| consent·목적·TTL·scope, grant approval/revoke/expiry | 비인증 고정 합성과 opt-in 인증 합성 화면이 있다. 합성 승인·회수·기기 시간 경과·서버 expired, 응답 유실 후 미확정 처리를 시험했다. 실제 사용자 grant나 ACP를 생성하거나 회수하지 않는다. 인증 합성의 프로세스 종료 후에는 boolean 미확정 표시만 남아 기존 요청 재전송이 불가능하다. [PoC 범위](AUTHENTICATED_CONSENT_POC.md), [만료 증거](../evidence/auth-consent-expiry.md) | 실제 요청의 목적·scope·TTL·revision 검토, 서버 grant에 대한 명시 승인/회수/만료 재확인, 운영 idempotency 및 미확정 요청 정산·복원, 최신 grant 반영 확인 | C2, C4, C8 |
-| incident 요청과 Group 명령 승인 | 메인 화면의 대기 문구 외 운영 요청·승인 흐름이 없다. 합성 receipt 화면은 명령을 보내거나 인가하지 않는다. [메인 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java), [receipt 범위](SYNTHETIC_RECEIPT_POC.md) | 실제 incident 생성, 승인 대상과 Group 구성원 검토, approvalHash를 포함한 승인 intent, 구성원별 수락/거부/전송/ACK/readback·미확정 결과 표시 | C4, C5, C8 |
-| 키링·Gateway live status와 위치 | debug에서 격리 CSE binarySwitch와 고정 합성 관측 CIN을 읽는다. 실제 팀 KEYRING outbox→MQTT→CORE→CSE 경로를 거친 합성 배터리/RSSI/시각을 공기계에 표시했다. 실물 Pi·BLE·키링·현재 위치 증거는 아니다. [합성 관측 기기 증거](../evidence/synthetic-cin-observation.md) | 실제 등록 기기의 인증된 상태 조회, freshness/unknown/offline·기기/수신/저장 시각 구분, 권한 있는 위치와 원천·정확도·유효기간 표시 | C1, C3, C6, C8 |
-| MEC·handover·FL 상태 | 대기 문구만 있다. 합성 RSSI를 거리로 바꾸거나 CSE 마지막 저장을 현재 상태로 해석하지 않는다. MEC 위치·handover·FL 상태 API와 화면 연결은 없다. [메인 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java) | 계약으로 제공되는 MEC·handover 상태와 epoch/전환/실패, FL 참여·round·모델 상태의 사용자별 조회·갱신 | C6, C8 |
-| push/in-app 알림 | 합성 receipt의 전경 반복 GET과 내용 차이 안내가 있다. 최초·동일·변화·실패·복구·중지를 별도 loopback fixture로 기기 시험했다. 실제 CSE 변경 알림·서버 사건·push 수신 증거는 아니다. [모니터 기기 증거](../evidence/receipt-monitor-device.md) | 실제 사건 식별자를 가진 알림 수신·재연결·중복 제거·미확인 상태, 앱 전경 안내, push 권한/등록/해지와 사용자·기기 연결, 눌렀을 때 권한 재확인 | C7, C8 |
-| command receipt 확인 | 실제 KEYRING `Store.accept`/`Gateway._finish`·SQLite 재열기·outbox MQTT·격리 CSE readback을 거친 고정 합성 `INDETERMINATE`를 공기계가 표시했다. 명령 토픽 ingress는 0이고 dispatch·인가·BLE·물리 동작을 호출하지 않았다. [기기 증거](../evidence/keyring-receipt-outbox-device.md), [호스트 증거](../../app-test-server/native/evidence/keyring-receipt-outbox.md) | 실제 앱 승인과 같은 commandId/사용자/기기에 속한 receipt 조회, 상태 전이와 구성원별 결과, 수락·적용·ACK·GPIO readback 구분, 불확실하거나 누락된 결과 표시 | C4, C5, C8 |
-| API retry/idempotency/correlation/reconnect | 테스트 GET은 네트워크 오류·503·504에서 최대 한 번 재시도한다. 합성 mutation에는 별도 idempotency·미확정 처리가 있다. 준비된 HTTPS 전송 계층은 TLS 1.3·동일 origin·redirect 거부·크기 제한을 제공하나 운영 caller·헤더·응답 매핑이 없다. [API 범위](API_TRANSPORT.md), [테스트 GET 소스](../app/src/main/java/org/privacybubble/app/TestStateClient.java) | 실제 API adapter, request/correlation/idempotency/API version, HTTP·oneM2M·구조화 오류·Retry-After 매핑, 운영 mutation 정산, 인증 만료·네트워크 전환·재연결·수명주기 처리 | C1, C8 |
-| 사용자 접근 범위에 맞춘 ACP/UI 검증 | 역할 선택은 서버 권한과 무관하다. 실제 principal→canonical AE originator, household/device scope, ACP·grantRevision과 UI의 일치 증거가 없다. 합성 bearer 검사는 운영 권한 검증을 대신하지 않는다. [앱 범위](../README.md), [합성 인증 범위](AUTHENTICATED_CONSENT_POC.md) | 서버가 판정한 접근 범위에 따른 화면·변경 동작, 권한 거절·회수·기기 소유권 변경 시 화면 갱신, Guardian/Visitor 교차 접근 부정 시험 | C2, C3, C4, C8 |
-| 모바일 통합 receipt와 발표용 녹화 | Android 공기계 screenshot·APK hash·합성/격리 CSE 연동 receipt와 [85초 합성 통합 녹화](../evidence/mobile-integration-demo.md)가 있다. 영상은 상태·합성 관측·미확정 결과와 전경 재조회를 보여준다. 실제 사용자 승인→실물 키링 ACK/readback 및 최신 grant 회수의 전체 경로는 증명하지 않았다. | 실제 운영 연동을 수행한 고정 release의 재현 가능한 receipt, 실물/합성 구분과 실패·회수를 포함한 녹화, 해당 commit/APK/로그/영상 hash 연결 | C9 |
-
-## 연결 전에 인수해야 하는 계약
-
-경로·헤더·claim·상태 이름을 APP이 임의로 정해 운영 계약처럼 사용하지 않는다. 아래 항목은 새 mock을 요구하는 목록이 아니라 실제 서비스 owner에게 받을 입력과 인수 조건이다. 계약 수령 후에도 위 표의 APP 구현과 실제 시험은 남는다.
-
-| ID | 제공 책임과 필수 내용 | APP 연결을 위한 인수 조건 |
+| 계획의 APP 요구 | 현재 구현·근거 | 상용 완료에 남은 작업 |
 |---|---|---|
-| C1 · API/resource 기준 | PC-MOBIUS-CORE + PC-MOBIUS-INTEGRATION: 버전 고정 OpenAPI, 운영 HTTPS origin·TLS 정책, oneM2M resource/status/receipt 식별 규칙, 인증 API와 내부 CSE 경계 | 실행 가능한 서비스와 해당 revision을 함께 제공한다. 앱이 관리자 originator를 보유하지 않으며 authenticated principal과 resource 접근이 연결되어야 한다. 현재 `privacy-bubble.oneM2M.test` v1.0.0은 로컬 관리자 기반 시험 계약이므로 이 입력을 충족하지 않는다. |
-| C2 · 사용자 인증·세션·역할 | PC-MOBIUS-INTEGRATION: trusted issuer, client ID, 등록 redirect·소유 검증 방식, audience/scope, Guardian/Visitor claim/서버 역할 모델, principal→canonical AE originator, refresh/만료/revoke·보관 정책 | 실제 브라우저에서 사용할 공급자·테스트 계정·API 검증 주체를 제공하고 정상/거부/만료/회수 결과를 재현한다. 사용자/기기 시스템 신뢰 변경 없이 사용할 수 있는 신뢰 경로가 필요하다. |
-| C3 · 등록·household·초대 | PC-MOBIUS-INTEGRATION + KEYRING/CORE: 실제 device/Gateway/household 식별자, 등록/연결/초대/해제 작업, 소유권·역할·동의 전제, 중복과 양도/회수 정책 | 등록 가능한 실제 기기 및 household, 권한 있는/없는 두 사용자, 중복·해제 후 접근 거절 결과를 제공한다. 단순 텍스트 역할 선택으로 권한을 부여하지 않는다. |
-| C4 · consent·grant·approval | PC-MOBIUS-INTEGRATION: request/principal/purpose/scope/TTL, consent revision·grantRevision, 서버 시각·expiry/revoke, approvalHash 대상과 정규화 규칙, 승인 결과 조회와 미확정 mutation 정산·보관 계약 | 승인된 정확한 intent와 revision을 서버가 검증하고 최신 grant 회수·만료가 이후 명령 판정에 적용됨을 조회할 수 있어야 한다. process restart 후 replay 허용 여부와 동일 키 결과의 보존 범위를 명시한다. |
-| C5 · incident·Group·실제 receipt | PC-MOBIUS-INTEGRATION + CORE + KEYRING: incident와 Group/member 식별·권한, commandId/desiredState/issuedAt/grantRevision/ownershipEpoch/deadline, intent→dispatch→ACK/readback 연결, receipt 상태·단말 정산 규칙 | 앱 승인 하나를 실제 기기 결과까지 같은 ID로 추적한다. 구성원별 거절·부분 실패·결과 미확정, 동일 commandId 재시작/재전송 시 하나의 정산, 실제 ACK와 readback을 재현한다. |
-| C6 · 상태·위치·handover·FL | PC-MOBIUS-INTEGRATION + CORE/KEYRING: 실제 관측/기기 health와 MEC Location/RNIS, handover/epoch, FL 상태 schema·권한·조회/구독 방식, 단위·null·원천·관측/수신/저장 시각·freshness | 실제 데이터 원천과 샘플, stale/offline/unknown 및 권한 거절 응답을 제공한다. RSSI를 거리로, CSE last-modified를 기기 관측 시각으로 대체하지 않는다. |
-| C7 · notification | PC-MOBIUS-INTEGRATION: push 또는 정해진 전달 방식, 수신자/기기 등록·해지, event ID·cursor/순서·재전송·중복 제거·ack/읽음, 구독 만료/회수·재연결·링크 대상 권한 | 실제 서버 사건을 해당 사용자에게 전달하고 전경/백그라운드·재접속·중복·권한 회수 시 동작을 재현한다. 내용 비교 polling만으로 사건 ID나 push 도착을 추정하지 않는다. |
-| C8 · 공통 요청·오류·복구 | CORE + PC-MOBIUS-INTEGRATION: request ID/correlation/idempotency/API version, 키의 principal·본문·작업 결합과 TTL·내구성, HTTP 200/201/202/204와 oneM2M 4000/4030/4040/4125 매핑, structured error·Retry-After·timeout·audit receipt | 각 API의 정상·거절·유실·재시도 응답 예시와 재현 경로를 제공한다. mutation timeout은 미확정으로 취급하고 서버 조회/동일 키 재시도로만 정산한다. 프레임워크 재전송 가능성까지 포함한 서버 중복 방지가 필요하다. |
-| C9 · 실제 통합·release 증거 | APP + 전원, release owner는 PC-MOBIUS-INTEGRATION: 동일 contract/DOC-REV·실행 commit·기기/host·APK, testId/expected/actual/logSha256/artifactRef 및 gate performer/approver | 첫 통합 데모의 실물 BLE→Gateway→CSE→앱, 앱 승인 Group→키링 ACK/readback, 회수 후 최신 grant 거절, 같은 commandId의 재전송 정산을 증명한다. 합성 시험·운영 시험·화면 설명 영상의 범위를 각각 명시한다. |
+| Guardian/Visitor와 OIDC 로그인 | 제품 홈의 임의 역할 전환을 제거했다. 브라우저 Authorization Code + PKCE S256, trusted discovery/JWKS·ID token 검증과 로그인·취소·실패 화면이 있다. [로그인 소스](../app/src/main/java/org/privacybubble/app/auth/MobileSignInActivity.java) | 실제 공급자·등록 redirect·테스트 계정·API 배포로 전체 로그인 검증. 서버가 인정한 Guardian/Visitor 역할과 사용자별 흐름 연결 |
+| token refresh·세션 수명 | access/refresh token·subject·검증 identity 맥락을 Keystore AES-GCM으로 보관한다. refresh credential을 요청 전에 내구성 있게 소비하고 한 번만 교환한다. 새 ID token이 있으면 기존 identity와 검증한다. epoch·origin으로 로그아웃·서비스 변경 뒤 늦은 인증 응답을 막는다. [저장소](../app/src/main/java/org/privacybubble/app/session/MobileSessionStore.java), [refresh](../app/src/main/java/org/privacybubble/app/auth/MobileTokenManager.java) | 실제 IdP의 회전·만료·revoke 정책, 응답 유실·프로세스 종료·재시작 및 로그아웃을 기기에서 검증. 서버 측 세션 폐기 정책 연결 |
+| device/household 등록·방문자 초대 | 위치 목록은 서버 관리자가 명시한 principal↔keyring binding에 한정한다. 이를 앱 등록·초대 기능으로 표시하지 않는다. | 실제 등록·연결·초대·해제 API와 UI, 소유권·역할·중복·양도·회수 처리 |
+| consent·grant 승인/회수/만료 | 팀 정책 모듈이 존재하고, 위치 binding에 grant가 지정되면 읽기 서비스가 grant와 consent의 대상·scope·revision·활성·만료를 확인한다. 제품 앱의 승인·회수 UI는 아직 없다. [서비스 권한 경계](../../pc-mobius/mobile-api/README.md) | 실제 사용자 요청의 목적·TTL·scope·revision 표시, 명시 승인/회수, idempotency·응답 유실 정산·복원 UI와 전체 시험 |
+| incident·Group 명령 승인 | 기존 debug receipt 조회는 유지한다. 제품 앱은 명령을 보내거나 승인하지 않는다. | incident 생성, 정확한 Group/member intent와 approvalHash 검토·승인, commandId별 ACK/readback·부분 실패·미확정 정산 |
+| 키링 위치·지도·상태 | MapLibre Native 13.7.1 Vulkan/OpenGL ES 지도, OpenFreeMap 배경, 키링 선택과 정확도 영역·유효기간·이전 기록 표시, 동일 정보의 접근 가능한 목록을 구현했다. 팀 저장 이벤트를 읽으며 fixture 좌표로 자동 대체하지 않는다. [지도 경계](MAP_PROVIDER.md), [제품 화면](../app/src/main/java/org/privacybubble/app/MainActivity.java) | 실제 배포의 사용자·기기 binding과 인증된 MEC ingress, 실물 Pi/BLE·키링의 위치 데이터 원천·시각·정확도·지연을 검증 |
+| MEC·handover·FL | MEC Location 이벤트 소비를 연결했다. 새 팀 handover·FL 모듈 자체는 존재한다. 앱의 handover epoch·전환·실패와 FL round/model 화면은 연결하지 않았다. | 해당 상태의 사용자 권한·조회 계약, 화면·갱신·오류·유효기간 연결과 실제 원천 검증 |
+| push/in-app 알림 | 제품의 전경 30초 조회와 오류·만료 안내가 있다. 이는 사건 push나 background 수신이 아니다. | event ID·cursor·재연결·중복 제거, push 등록/해지·권한·알림 링크의 재인가 |
+| command receipt | 과거 KEYRING SQLite/outbox→MQTT→CORE→격리 CSE→기기 조회 증거를 유지한다. 합성 결과이며 제품의 실제 승인·장치 실행 증거가 아니다. | 앱 승인과 같은 사용자·기기·commandId의 실제 dispatch/ACK/readback·구성원별 결과와 미확정 정산 |
+| API retry/idempotency/reconnect | 제품 `GET /v1/keyrings`는 HTTPS·응답 계약/크기/필드 검증·no-store·redirect 거부를 적용한다. 전경 주기·수동 갱신과 화면 세대 검사를 사용하고 401/403에서 위치를 지운다. [클라이언트](../app/src/main/java/org/privacybubble/app/location/LocationRepository.java) | 운영 공통 correlation/API version·Retry-After·구조화 오류 계약, mutation idempotency·유실 정산, 장시간 네트워크 전환·재연결 검증 |
+| 사용자 권한·UI 일치 | 읽기 API가 RS256 JWT와 명시 principal binding을 검증하고, grant가 요구되는 binding에서는 최신 grant/consent를 확인한다. `denied`·`unavailable`에 좌표가 없다. 앱은 역할 문자열로 권한을 부여하지 않는다. | 실제 IdP·principal provisioning·소유권 변경과 회수의 교차 사용자 부정 시험, upstream mutation/ingress의 운영 보안 통합 |
+| UI·AX·기기 receipt·녹화 | Material DayNight, scalable sp·48dp 주요 컨트롤·텍스트 상태·이름 있는 지도 액션·갱신 중 안정적인 View 재사용·시스템바/IME 대응을 구현했다. 기존 합성 영상은 해당 이전 버전에 한정한다. | 제품 앱의 큰 글자·가로/세로·다크/라이트·오류·접근 거절·로그아웃 기기 QA 기록, 실제 사용자→실물 위치·명령 전체 경로의 receipt와 발표 녹화 |
 
-공통 계획의 인수 순서는 CORE contract → INTEGRATION contract → KEYRING/Gateway → APP/WEB → 통합시험이다. [현재 CORE 시험 계약](../../pc-mobius/contracts/oneM2M-test-contract.v1.json)과 [테스트 중계](../../app-test-server/README.md)는 존재하지만 auth·등록·consent·approval·notification을 포괄하는 운영 OpenAPI는 이번 감사 범위의 파일 검색에서 확인하지 못했다. 계획이 연결한 `design_plan.html`, `contracts_round03.json`, `active_release.json`, Rubric 원문도 현재 workspace 파일 검색에서 확인하지 못했으므로 해당 정본의 추가 요구·최종 점수·release 일치는 검증할 수 없다. 이 부재를 운영 계약으로 추정해서 보완하지 않는다.
+## 위치 정보의 해석과 개인정보
 
-## 현재 증거가 입증하는 범위
+위치 API는 팀 `IntegrationStore`의 `Location` 이벤트와 binding의 `ueId`를 일치시킨다. 별도 `observedAt`이 없으면 upstream 이벤트의 `timestamp`를 쓰므로 물리 센서 fix 시각을 증명하지 않는다. 앱의 표기는 “정보 시각”, “N분 전 기록”, “이전 위치 정보”이며 실시간 추적이나 현재 위치 확정으로 표시하지 않는다.
 
-| 증거 | 입증하는 내용 | 입증하지 않는 내용 |
-|---|---|---|
-| [합성 관측 CIN 공기계 시험](../evidence/synthetic-cin-observation.md) | 팀 KEYRING의 실제 outbox, 임시 mTLS broker, CORE, 격리 CSE를 거친 합성 관측을 Android가 조회·표시하고 중계 중단 시 과거 값 대신 오류를 표시함 | 실물 BLE/Pi/키링 관측, 실제 현재 상태·위치, 운영 인증·권한 |
-| [receipt outbox 공기계 시험](../evidence/keyring-receipt-outbox-device.md) | 실제 SQLite journal/outbox의 합성 결과 보존·전송·CSE readback·pending 제거와 앱 표시 | 앱의 실제 승인, command dispatch, 물리 동작·ACK/readback, 실제 grant, push |
-| [receipt 전경 모니터](../evidence/receipt-monitor-device.md) | 별도 loopback fixture의 최초·동일·변화·오류·수동 복구와 중지 시 요청 수 유지 | CSE 내용 변화를 기기에서 재현한 것, 실제 사건의 시간순 진행, push, 이미 보낸 요청의 서버 취소 |
-| [합성 인증 동의](../evidence/auth-consent-device.md), [refresh](../evidence/auth-consent-refresh-device.md), [expiry](../evidence/auth-consent-expiry.md) | 별도 합성 에이전트/IdP/동의 서버의 인증·명시 승인/회수·미확정·세션 폐기·재인증·합성 서버 만료 처리 | 실제 브라우저/사용자/운영 IdP·grant·ACP, 기기 시험에서 기다려 재현한 access-token 만료, 프로세스 재시작 후 인증 mutation replay |
-| [HTTPS 전송 호스트 시험 설명](API_TRANSPORT.md), [OIDC 검증 호스트 시험 설명](OIDC_TRUST_BOUNDARY.md) | 제한된 전송·암호 검증 경계와 합성 정상/부정 입력에 대한 결과 | 실제 공급자·API의 호환성·인가, 운영 UI·토큰 정책·전체 기능 완료 |
-| [85초 모바일 합성 통합 시연](../evidence/mobile-integration-demo.md) | 실제 KEYRING outbox·CORE·격리 CSE의 합성 데이터를 Android에서 조회한 녹화, 영상/APK hash와 시험 자원·기기 복원 기록 | 운영 사용자 승인·권한·grant 회수, 실물 Pi/BLE·키링 ACK/readback, 전체 통합 시연 완료 |
+최신 이벤트가 잘못됐을 때 이전의 유효 좌표로 조용히 되돌아가지 않는다. `denied`·`unavailable`은 위치 좌표·관련 시각을 비우고, 유효기간이 지난 유효 fix는 원래 시각의 `stale`로 남긴다. 위치와 배터리·연결 정보는 실제 이벤트의 명시 필드만 사용한다. 제품 기본값에는 표본 키링·좌표가 없다.
 
-수동 기기 시험·정리 기록은 각 evidence에 기재된 APK·경로·상황에 한정한다. 저장소의 재현 도구나 호스트 상태 시험만 추가된 경우 그 버전을 공기계에서 다시 실행했다고 간주하지 않는다. 시스템·브라우저 신뢰 변경 없이 진행한다는 사용자 제약은 유지한다.
+휴대폰 위치 권한·RSSI→거리/좌표 추정·자동 역지오코딩을 사용하지 않는다. 위치 목록과 token을 일반 로그에 출력하지 않는다. 지도 제공자는 타일 요청 영역을 알 수 있으며, 기본 OpenFreeMap 공개 서비스에는 SLA가 없다. 출처 표기와 배포 제공자 선택은 [지도 문서](MAP_PROVIDER.md)를 따른다. 시스템·브라우저 인증서 신뢰 변경 없이 진행한다.
 
-## 공개 저장소·제출 상태
+## 현재 검증과 그 한계
 
-로컬 별도 브랜치 `feature/app`는 존재한다. 2026-10-29 Git 권한 변경 후 [Kx2h/bubble-lock-app](https://github.com/Kx2h/bubble-lock-app) 공개 저장소의 `main`·`feature/app`에 APP 이력을 업로드했고, 두 원격 브랜치에 `791acfc`가 포함됨을 확인했다. 이후 APP 변경은 `app-public/feature/app`을 추적한다. 원본 `tirofina/bubble_lock`의 `feature/app` 푸시는 같은 시점에도 HTTP 403으로 거절되므로 원본 팀 저장소 반영은 남아 있다. 공개 업로드는 운영 기능·공식 release gate 완료를 뜻하지 않는다. 토큰 값은 문서·코드·증거에 포함하지 않는다.
+- JDK 17 / SDK 35 / AGP 8.11.1 / Gradle 8.13의 workspace 격리 도구로 debug와 release 빌드를 통과했다. 앱 버전은 0.2.0이다.
+- Android JVM 단위시험 28개와 모바일 위치 서비스·팀 모듈 관련 호스트시험 24개가 통과했다. JWT/권한/잘못된 위치/유효기간/회수·만료 등 자동시험은 생성한 키와 명시 fixture를 사용한다.
+- 제품 공기계 QA는 현재 진행 중이다. 최종 APK·설정·지도 화면·상태·해시·파일 정리는 `app/evidence/product-map-device.md`에 고정할 예정이다. 그 파일의 실제 확인 범위가 작성되기 전에는 해당 기기 결과를 완료로 취급하지 않는다.
+- [기존 85초 합성 시연](../evidence/mobile-integration-demo.md), [합성 동의·refresh](../evidence/auth-consent-refresh-device.md), [이전 설정 시험](../evidence/settings-draft-device.md)은 당시 APK·상황의 기록이다. 새 제품 버전의 운영 IdP·실물 키링·상용 배포 검증으로 합산하지 않는다.
 
-발표용 [합성 화면 녹화와 receipt](../evidence/mobile-integration-demo.md)는 APP 소스 `3c6d71b`의 debug APK를 기준으로 고정했다. APK·영상 hash와 시험·정리 범위는 해당 receipt에 연결한다. 이 영상이 실제 사용자 승인과 실물 기기 명령의 운영 통합을 완료시키지는 않는다.
+## 실제 배포에 필요한 입력과 다음 구현
 
-## 실제 완료를 향한 다음 순서
+1. **신뢰된 배포 프로필**: `mobileApiBaseUrl`·OIDC issuer/client·등록 redirect·API audience와 scope, 실제 계정·principal binding, 유효한 공개 신뢰 HTTPS/TLS 경로를 배포자가 제공한다. 현재 실제 운영 IdP나 계정으로 전체 흐름을 검증하지 않았다.
+2. **위치 서비스 운영**: 읽기 확장의 INTEGRATION owner 검토, 인증된 MEC ingress와 실제 상태 파일, 키 회전·요청 상한·rate limit·감사·장애 복구, transactional read model을 확정한다. 현재 upstream JSON 쓰기는 원자적이지 않아 읽기 중 잘못된 상태는 503으로 거절한다.
+3. **실물 연동**: 사용자와 일치하는 실제 Pi/BLE·키링·MEC 원천으로 시각·정확도·지연·offline·revocation을 확인한다. fixture 지도 핀이나 callback 데모를 실물 증거로 대체하지 않는다.
+4. **남은 APP 업무**: 기기/household·초대, 실제 consent·approval·incident/Group/receipt, handover·FL 상태, push와 mutation 재정산을 버전 고정 계약으로 연결한다.
+5. **배포와 release 증거**: 제품 기기 QA·접근성·실제 IdP 및 실물 시험, 서명·운영 프로필·배포 정책과 최종 commit/APK/로그/영상 hash를 함께 고정하고 계획의 담당자·검토자·gate를 인수한다. 공식 gate ID나 승인자는 만들어내지 않는다.
 
-1. 서비스 owner에게 C1~C8의 버전 고정 운영 계약과 실제 테스트 가능한 배포·계정·기기를 인수한다. 기준 자료의 누락 경로와 정본 revision도 확인한다.
-2. 운영 로그인/역할/등록과 실제 consent/grant를 앱에 연결한다. 합성 Activity를 운영 경로로 표시하거나 임의 endpoint를 만들어 이 단계를 대체하지 않는다.
-3. 승인 intent와 실제 incident/Group command·receipt를 연결하고, 회수·만료·미확정 결과를 같은 서버 계약으로 처리한다.
-4. 실제 상태/위치/handover/FL와 알림을 연결한 뒤 C9의 정상·거절·회수·재전송 기기 통합시험과 증거를 고정한다.
-5. 검토된 변경을 공개 저장소에 push하고 원격 SHA를 확인한다. 원본 팀 저장소 반영과 공식 release는 별도 인수·통합 검증 뒤 진행하며 녹화·release·재현 절차와 코드 commit을 같은 제출 기록에 연결한다.
-
-운영 계약이 없는 동안 실제 기능 연결은 막혀 있으나 APP 구현 잔여분은 그대로 남는다. 추가 합성 기능이나 screenshot 수 증가를 이 요구들의 완료 조건으로 사용하지 않는다.
+현재 남은 작업은 “사용자 API가 전혀 없으므로 아무 것도 연결할 수 없음”이 아니라, 구현된 위치 읽기·지도·인증 경로를 실제 배포에 인수하고 아직 없는 사용자 mutation·서비스 화면을 완성하는 작업이다.

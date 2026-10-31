@@ -1,23 +1,45 @@
-# Privacy Bubble Android
+# Bubble Android
 
-ROLE: APP  
-DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md  
-DOC-REV: 2.0.0  
-RUBRIC: R03, R09, R10, R14, R17
+ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 
-Android 네이티브 초기 화면과 임시 Mobius4 테스트 상태 조회입니다. Guardian/Visitor 선택은 화면 분류일 뿐 로그인이나 접근권한을 부여하지 않습니다. 인증, consent, 승인, 기기 등록 등은 API 계약이 준비될 때 연결해야 합니다. HTTPS 서버 주소 설정은 아직 요청에 사용되지 않습니다. 토큰이나 개인정보를 저장하지 않습니다.
+DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.2.0 / versionCode 2
 
-요구별 현재 구현과 운영 연동에 필요한 입력은 [구현 상태·인수 조건](docs/APP_IMPLEMENTATION_STATUS.md)에 정리했습니다. [85초 모바일 합성 통합 시연](evidence/mobile-integration-demo.md)은 KEYRING outbox·CORE·격리 CSE를 거친 합성 조회의 기기 녹화이며, 실제 사용자 승인이나 실물 키링 동작을 입증하지 않습니다.
+Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 확인하는 Android 앱입니다. 제품 화면은 `위치 / 키링 / 설정`으로 구성합니다. 기존 합성 시험 화면은 debug 빌드의 `설정 → 개발 도구 → 시험 도구 열기`로 옮겼습니다.
 
-서버 주소를 저장하기 전의 입력과 피드백은 역할 전환·화면 회전 동안 유지합니다. 저장·삭제는 `주소 저장` 버튼으로 수행하며, 저장 전 초안은 앱을 강제 종료한 뒤 새로 실행하면 남지 않습니다. [기기 확인·복원 기록](evidence/settings-draft-device.md)에 재현 결과가 있습니다.
+## 제품 화면과 위치의 의미
 
-테스트 상태 조회는 debug 빌드에서만 표시되며 `127.0.0.1:8787/api/test/bubble-state`의 loopback 테스트 프록시만 사용합니다. release 빌드의 네트워크 정책은 이 HTTP 예외를 포함하지 않습니다. PC에서 프록시를 실행한 후 `adb reverse tcp:8787 tcp:8787`을 설정하고 앱의 테스트 상태 조회를 누릅니다. 이 상태는 테스트 데이터이며 실 서비스 인증이나 명령 승인을 의미하지 않습니다. bootstrap 표식의 유무만으로 실제 장치 관측 여부를 판단하지 않습니다. 성공 결과에는 조회 완료 시각(기기 시계)을 표시하며, 실패 시 과거 값을 현재 상태로 표시하지 않습니다.
+- MapLibre Native Android 13.7.1의 Vulkan/OpenGL ES 지도와 OpenFreeMap 배경을 사용합니다. 키링 핀은 인증된 위치 API의 유효 좌표로만 만듭니다. 기본 한국 광역 배경은 키링의 위치가 아닙니다.
+- 선택한 키링의 정보 시각·정확도·출처·좌표·제공된 연결/배터리 정보를 표시합니다. 지도 제스처를 사용하지 않아도 `키링` 목록에서 같은 정보를 읽고 위치를 선택할 수 있습니다.
+- 유효기간 경과와 연결 실패의 마지막 정보는 이전 위치로 구분합니다. 로그인 만료·접근 거절·로그아웃 시 지도와 목록의 위치를 지웁니다. 위치나 키링이 없을 때 표본 좌표로 대체하지 않습니다.
+- 전경에서 30초 간격으로 조회하고 수동 새로고침을 제공합니다. 화면 이탈 시 반복 조회를 중지하고 진행 요청을 취소하며, 이전 화면의 응답은 generation 검사를 통과하지 못하면 반영하지 않습니다. 네트워크 취소가 서버 처리의 즉시 중단까지 보장하지는 않습니다.
+- Material DayNight 테마, sp 글자 크기, 텍스트 상태 표시, 48dp 이상 주요 터치 영역을 사용합니다. 갱신 시 기존 카드 View를 재사용해 읽기 위치와 접근성 포커스를 유지하도록 구현했습니다. 높이가 짧은 화면에서는 헤더·탭 구성을 압축하고 각 탭의 스크롤 상태를 복원합니다. 큰 글자·가로 화면·다크 모드의 실제 확인 범위는 기기 기록에서 구분합니다.
 
-사용자가 `자동 갱신 시작`을 선택하면 화면이 전경에 있는 동안 조회 완료 10초 후에 다시 조회합니다. 중복 요청은 시작하지 않고 오류가 나면 실패를 표시한 뒤 다음 조회를 시도합니다. `자동 갱신 중지` 또는 화면 이탈 시 자동 갱신은 꺼집니다. 이미 시작된 네트워크 요청의 즉각적인 취소는 보장하지 않지만 화면 이탈 전 요청의 결과는 복귀 후에도 사용하지 않습니다. 재실행이나 화면 회전 후 자동 갱신을 원하면 다시 켜야 합니다.
+위치 데이터는 새 팀 INTEGRATION의 `IntegrationStore`에 저장된 MEC `Location` 이벤트에서 읽습니다. 상위 이벤트에 별도 `observedAt`이 없으면 이벤트의 `timestamp`를 사용하므로 이는 실물 센서의 측정 시각을 증명하지 않습니다. 앱은 이를 **정보 시각·이전 기록**으로 표시하며, 휴대폰 GPS나 RSSI를 키링 좌표로 바꾸지 않습니다. 휴대폰의 위치 권한도 요청하지 않습니다.
 
-Android SDK 35, JDK 17 및 Gradle 8.7로 `gradle :app:assembleDebug`을 실행합니다. 테스트 앱과 앱 전용 데이터는 `adb uninstall org.privacybubble.app`으로 삭제하고 포트 연결은 `adb reverse --remove tcp:8787`로 제거할 수 있습니다.
+[모바일 응답 계약](contracts/mobile-location.v1.json) · [위치 읽기 서비스](../pc-mobius/mobile-api/README.md) · [지도 제공자·출처·데이터 경계](docs/MAP_PROVIDER.md) · [요구별 구현 상태와 배포 잔여 조건](docs/APP_IMPLEMENTATION_STATUS.md)
 
-현재 작업 폴더의 격리된 도구를 사용할 때 저장소 `app/`에서 다음과 같이 빌드할 수 있습니다. `WORKSPACE`는 `mobius4` 폴더의 절대 경로입니다. 빌드 결과는 `app/build/outputs/apk/debug/app-debug.apk`입니다.
+## 로그인과 연결 설정
+
+`설정`에서 배포자가 안내한 서비스 주소를 저장한 후 로그인합니다. `서비스 연결 해제`를 확인하면 사용자가 입력한 연결 설정·로그인 정보·표시된 위치를 지웁니다. 빌드에 고정된 기본 서비스 주소가 있으면 해당 기본값을 표시합니다. 제품의 issuer와 client ID는 빌드 프로필에 고정하며, 일반 설정 화면에서 임의 공급자나 bearer를 입력하지 않습니다. 브라우저 Authorization Code + PKCE S256 흐름과 discovery/JWKS·ID token 검증을 사용합니다.
+
+access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 비추출 키를 사용하는 AES-GCM 저장소에 암호화합니다. access token이 만료되면 worker에서 refresh를 한 번 수행합니다. 회전하는 refresh credential은 요청 전에 내구성 있게 소비하며, 응답 유실·검증 실패 시 이전 credential을 재전송하지 않고 로그인을 다시 요구합니다. 서비스 변경·로그아웃 후 늦게 도착한 인증 응답은 session epoch와 origin 검사를 통과하지 못하면 저장하지 않습니다. 토큰은 앱 로그나 UI saved state에 넣지 않습니다.
+
+실제 배포에서는 아래 빌드 절의 환경변수를 설정한 뒤 다음 세 프로필을 함께 제공합니다. 사용자 설정에 비밀키나 client secret을 넣지 않습니다.
+
+```sh
+"$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon :app:assembleRelease \
+  -PmobileApiBaseUrl=https://api.example.org \
+  -PoidcIssuer=https://identity.example.org \
+  -PoidcClientId=registered-android-client
+```
+
+기본 미설정 release에서는 로그인 callback receiver를 제거합니다. 세 값을 모두 고정한 release는 `src/productionAuth/AndroidManifest.xml`의 callback을 사용합니다. 공급자에 등록한 redirect와 실제 도메인·API audience·scope·서버 principal binding을 맞춰야 합니다. 현재 실제 운영 IdP·계정의 전체 브라우저 로그인과 실물 키링 위치는 검증하지 않았습니다.
+
+debug 빌드에만 `설정 → 개발 도구 → 개발 인증 연결`과 `http://127.0.0.1:8787`의 명시적인 loopback 예외가 있습니다. 이는 통제된 기기 QA용이며 제품 release에서 임시 bearer를 직접 입력하는 기능을 제공하지 않습니다. 개발 인증도 서버의 서명·권한 검증을 통과해야 합니다.
+
+## 빌드와 검증
+
+작업 폴더 하위의 JDK 17, Android SDK 35, AGP 8.11.1, Gradle 8.13을 사용합니다. `WORKSPACE`는 `mobius4` 폴더의 절대 경로이며 아래 명령은 저장소 `app/`에서 실행합니다.
 
 ```sh
 export JAVA_HOME="$WORKSPACE/.local/jdk17"
@@ -25,10 +47,32 @@ export ANDROID_HOME="$WORKSPACE/.local/android"
 export ANDROID_USER_HOME="$WORKSPACE/.local/android-user"
 export GRADLE_USER_HOME="$WORKSPACE/.local/gradle-home"
 export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
-"$WORKSPACE/.local/gradle-8.7/bin/gradle" --no-daemon :app:assembleDebug
+"$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon \
+  :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest
 ```
 
-2026-10-28 빌드는 성공했으나 AGP 8.5.2가 SDK 35에 대해 검증 범위 경고를 출력했습니다. `evidence/android-build.log`는 빌드 로그이며 실제 휴대폰 시험을 의미하지 않습니다. 이후 실제 기기와 임시 Mobius4 조회 시험을 수행했으며 결과와 hash는 `evidence/`에 있습니다. 인증 공급자와의 실기기 로그인은 아직 시험하지 않았습니다.
+APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
+
+현재 개발 검증에서 debug/release 빌드, Android JVM 단위시험 28개, 위치 서비스와 팀 연동 관련 호스트시험 24개가 통과했습니다. 이 결과는 실제 운영 IdP·물리 키링이나 공식 release gate의 완료를 뜻하지 않습니다. 제품 앱의 공기계 지도·상태·회전·큰 글자 시험은 진행 중이며, 결과를 `evidence/product-map-device.md`에 별도로 고정합니다. 기존 `evidence/android-build.log`와 2026-10-28~29의 스크린샷은 당시 버전의 기록입니다.
+
+## 공기계 설치·업그레이드·복원
+
+먼저 연결 기기·현재 사용자·기존 APK와 앱 데이터를 확인합니다. 기존 설치본을 교체하는 작업에서는 workspace `.local`에 원본 APK와 필요한 설정 백업을 남기고 `install -r`로 업그레이드합니다. 전체 앱 데이터를 지우거나, 설치 실패를 해결하려고 알 수 없는 기존 앱을 자동으로 삭제하지 않습니다.
+
+```sh
+# 저장소 루트에서 실행; 설치 대상과 APK를 먼저 확인
+export ADB="$PWD/app/scripts/adb-windows.sh"
+"$ADB" -s "$SERIAL" shell pm path org.privacybubble.app
+"$ADB" -s "$SERIAL" install -r "$PWD/app/app/build/outputs/apk/debug/app-debug.apk"
+```
+
+WSL wrapper는 `install -r`의 최종 로컬 APK 경로도 Windows 경로로 변환합니다. Windows ADB가 읽을 수 없는 비공개 백업 폴더는 권한을 풀지 않고 APK만 읽을 수 있는 workspace 임시 폴더에 배치할 수 있습니다. 사용한 파일과 임시 폴더만 정리합니다.
+
+versionCode 2에서 이전 debug APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
+
+이번 제품 QA는 사용자가 검토할 수 있도록 최신 APK를 기기에 남기고 시험용 인증·연결 프로필을 지우는 방식으로 진행할 계획입니다. 실제 남긴 버전·백업·설정 및 파일 정리는 제품 기기 기록을 기준으로 확인합니다. 시스템·브라우저 인증서 신뢰는 변경하지 않습니다.
+
+## 소유권을 확인하는 개발 시험 설치·정리 도구
 
 실기기 PoC용 도구는 기기 serial을 명시해야 하며 기존 앱과 포트가 있으면 설치·연결을 덮어쓰지 않습니다. `cleanup`은 이 도구가 설치할 때 기록한 APK SHA-256과 설치 경로, 앱 전용 데이터 안의 임의 소유 표시가 모두 일치할 때만 앱과 앱 데이터를 제거하며, 도구가 생성한 `tcp:8787` reverse 연결만 제거합니다. 로컬 소유 기록은 Git에서 제외되는 `app/.local/device-poc/`에 저장됩니다. 해시만 있던 구 버전 기록이나 경로·표시를 읽을 수 없는 경우 자동 삭제를 거부합니다. 앱을 삭제한 뒤 같은 APK를 다시 설치하거나 앱 데이터를 지우면 표시가 사라지므로 수동 확인이 필요합니다. 소유 기록을 지우기 전에 정리하세요. `adb uninstall`은 다른 사용자에게도 영향을 줄 수 있어 설치와 정리 시 Android 사용자가 owner 0 하나뿐이고 현재 사용자도 0인지 확인하며, 다중 사용자나 조회 실패 시 거부합니다. 앱 표시도 `run-as`로 현재 사용자 0의 데이터에서 확인합니다. 이 검사는 확인과 삭제 사이의 기기 상태 변경이나 표시의 의도적 복제까지 원자적으로 막지는 못합니다.
 
@@ -57,18 +101,15 @@ node --test app/scripts/device-poc.test.mjs
 "$ADB" -s "$SERIAL" reverse --remove tcp:8787
 ```
 
-OIDC는 아직 운영 로그인 UI나 운영 토큰 교환에 연결되지 않았습니다. 신뢰된 issuer의 HTTPS discovery/JWKS와 RS256 ID 토큰 검증 경계는 [OIDC 검증 준비](docs/OIDC_TRUST_BOUNDARY.md)에 설명되어 있으며 Nimbus JOSE+JWT 9.47이 필요합니다. `:app:testDebugUnitTest`의 JVM 단위시험은 검증 경계에 대한 시험이고 실제 IdP 또는 휴대폰 로그인 시험은 아닙니다.
 
-로컬 테스트 상태 조회는 연결 오류와 HTTP 503·504에서 한 번 재시도합니다. HTTP 403·502와 잘못된 응답은 재시도하지 않습니다. 두 시도에 걸친 10초 경과 예산을 확인하며, 응답 본문이 조금씩 계속 도착하더라도 예산을 넘으면 중단하고 재시도하지 않습니다. 진행 중인 연결·헤더 수신이나 읽기는 호출이 반환된 뒤에 경과 여부를 확인하므로 엄격한 전체 시간 제한은 아닙니다. 실제 사용자 인증이나 서버 권한에 적용되는 재시도 정책은 아닙니다. 저장소 루트에서 `app/scripts/test-client.sh`로 JVM 클라이언트 시험을 실행할 수 있습니다.
+## 기존 시험 도구와 증거
 
-기기에서 읽기 재시도를 재현할 때는 실제 중계를 중지하고 `node app/tests/fixtures/retry-mock.mjs`를 실행한 뒤 기존 reverse 연결로 상태 조회를 한 번 누릅니다. 이 fixture는 첫 GET에 503, 다음 GET에 200을 반환하는 모의 서버입니다. 완료 후 실행한 fixture를 종료합니다. 실제 Mobius4나 키링 데이터가 아닙니다.
+아래 자료는 제품 지도·운영 계정의 검증을 대신하지 않는 이전 debug 시험입니다. `설정 → 개발 도구 → 시험 도구 열기`에서 접근하며 release에는 해당 Activity가 없습니다.
 
-Debug·release APK를 모두 빌드한 다음 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 패키지된 네트워크 정책과 테스트 redirect receiver의 빌드별 분리를 확인할 수 있습니다.
+- [임시 Mobius4·KEYRING outbox 연동](../app-test-server/native/README.md), [85초 합성 통합 시연](evidence/mobile-integration-demo.md): 격리 CSE와 합성 관측/receipt 조회입니다. 실제 승인·물리 동작·현재 위치 증거가 아닙니다.
+- [인증된 합성 동의·refresh](docs/AUTHENTICATED_CONSENT_POC.md), [합성 consent 서버](tests/consent-mock/README.md): 합성 IdP·승인·회수·미확정 처리의 과거 검증입니다. 시험 CA는 별도 opt-in debug 앱에만 한정합니다.
+- [합성 receipt 조회](docs/SYNTHETIC_RECEIPT_POC.md), [이전 주소 초안 시험](evidence/settings-draft-device.md): 해당 APK·화면·상황에 대한 기록입니다.
 
-Debug 빌드의 `합성 동의 시험`은 인증 없는 고정 가상 요청에 한정한 PoC입니다. 시작·기기 포트 연결과 종료 방법은 [합성 consent 서버](tests/consent-mock/README.md)를 참고하세요. 요청 전 고정된 합성 본문·중복 방지 키·서버 인스턴스를 앱 전용 저장소에 동기 저장합니다. 응답이 유실되거나 프로세스가 종료되면 동일 서버 인스턴스에서 사용자가 같은 요청을 재전송할 수 있습니다. 서버가 재시작됐거나 보류 기록이 손상되면 재전송을 차단합니다. 그때 확인 후 차단된 합성 보류 기록만 삭제할 수 있으며, 삭제해도 이전 요청의 결과는 알 수 없습니다. 이 기능은 운영 동의·grant·ACP나 실제 사용자 권한을 만들지 않습니다.
+이전 loopback 테스트 중계의 `127.0.0.1:8787/api/test/...` 경로와 새 제품 읽기 서비스의 `GET /v1/keyrings`는 서로 다른 인터페이스입니다. 같은 포트에 동시에 실행하지 않습니다. legacy 테스트 GET의 자동 갱신은 조회 완료 10초 후이고, 제품 위치 조회는 전경 30초 주기입니다.
 
-별도 opt-in debug 빌드의 인증된 합성 동의 연결은 [시험 범위와 미확정 표시](docs/AUTHENTICATED_CONSENT_POC.md), [HTTPS mock 서버 실행](tests/auth-consent-mock/README.md)을 참고하세요. 실제 운영 인증이나 권한 부여 기능은 아닙니다.
-
-Debug 빌드의 합성 결과 조회는 별도 테스트 CSE에 저장된 고정 합성 receipt만 표시합니다. 결과·시간 출처와 정리 방법은 [합성 결과 조회 시험](docs/SYNTHETIC_RECEIPT_POC.md)에 설명되어 있습니다. 실제 승인, 장치 명령 또는 물리 동작의 증거가 아닙니다.
-
-Debug의 `합성 관측 조회 화면`은 고유 시험 AE에서만 켜지는 중계를 통해 합성 CIN을 수동 조회합니다. [시험 실행](../app-test-server/native/README.md)은 `--mqtt --keyring-outbox --observation-cin --phone`을 사용하며 기존 `8787` reverse가 필요합니다. 이 화면은 CSE에 마지막 저장된 고정 합성 fixture만 표시하고 실제 기기·현재 상태·위치로 해석하지 않습니다. Gateway 수신 기반 시각과 조회 시각을 구분하고, RSSI는 거리가 아닙니다. 결과가 없거나 검증·연결이 실패하면 이전 값 대신 오류를 표시합니다. 기본 중계에는 이 조회 경로가 없으며 release에는 시험 화면이 없습니다.
+legacy GET은 연결 오류·503·504에 한 번 재시도하며 403·502·잘못된 응답은 재시도하지 않습니다. 두 시도의 경과 예산과 느린 본문 처리를 검사하지만, 이미 시작된 소켓 호출의 엄격한 전체 시간 제한을 의미하지는 않습니다. `app/scripts/test-client.sh`는 legacy 클라이언트 JVM 시험입니다. 운영 mutation의 idempotency·재정산 구현은 별도로 남아 있습니다.

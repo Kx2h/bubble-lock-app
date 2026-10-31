@@ -78,6 +78,11 @@ public final class OidcProvider {
         IdTokenVerifier.verifyRefresh(jwt, keys, initial, started, System.currentTimeMillis() / 1000, accessToken);
     }
 
+    void verifyMobileRefresh(String jwt, String clientId, String encryptedStoreContext, long requestedAt, String accessToken) throws Exception {
+        IdTokenVerifier.Identity initial=IdTokenVerifier.restoreFromEncryptedStorage(encryptedStoreContext,issuer,clientId);
+        IdTokenVerifier.verifyRefresh(jwt,fetch(jwksUri.toString()),initial,requestedAt,System.currentTimeMillis()/1000,accessToken);
+    }
+
     private static void requireCapability(Map<String, Object> doc, String key, String expected) throws Exception {
         List<String> values = JSONObjectUtils.getStringList(doc, key);
         if (values == null || !values.contains(expected)) throw new IllegalArgumentException("Unsupported OIDC provider");

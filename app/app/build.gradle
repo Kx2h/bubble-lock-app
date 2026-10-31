@@ -1,5 +1,24 @@
 plugins { id 'com.android.application' }
 
+def profileString = { name, fallback = '' ->
+    def value = providers.gradleProperty(name).orElse(fallback).get()
+    if (value.contains('\n') || value.contains('\r') || value.length() > 2048) throw new GradleException('Invalid mobile profile value: ' + name)
+    return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
+}
+def configuredIssuer = providers.gradleProperty('oidcIssuer').orElse('').get()
+def configuredClient = providers.gradleProperty('oidcClientId').orElse('').get()
+def configuredApi = providers.gradleProperty('mobileApiBaseUrl').orElse('').get()
+def configuredAuth = !configuredIssuer.isEmpty() || !configuredClient.isEmpty()
+if (configuredAuth) {
+    if (configuredIssuer.isEmpty() || configuredClient.isEmpty() || configuredApi.isEmpty())
+        throw new GradleException('A production sign-in profile requires mobileApiBaseUrl, oidcIssuer and oidcClientId together')
+    [configuredIssuer, configuredApi].each { value ->
+        def uri = new URI(value)
+        if (uri.scheme != 'https' || uri.host == null || uri.userInfo != null || uri.query != null || uri.fragment != null)
+            throw new GradleException('Mobile profile origins must be HTTPS without credentials, query or fragment')
+    }
+}
+
 // Explicitly opt in to a workspace-only synthetic IdP CA in debug builds.
 def oidcTestCa = providers.gradleProperty('oidcTestCa').orNull
 if (oidcTestCa != null) {
@@ -17,8 +36,12 @@ android {
         applicationId 'org.privacybubble.app'
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName '0.1.0'
+        versionCode 2
+        versionName '0.2.0'
+        buildConfigField 'String', 'MOBILE_API_BASE_URL', profileString('mobileApiBaseUrl')
+        buildConfigField 'String', 'OIDC_ISSUER', profileString('oidcIssuer')
+        buildConfigField 'String', 'OIDC_CLIENT_ID', profileString('oidcClientId')
+        buildConfigField 'String', 'MAP_STYLE_URL', profileString('mapStyleUrl', 'https://tiles.openfreemap.org/styles/liberty')
         manifestPlaceholders = [appAuthRedirectScheme: 'org.privacybubble.app']
     }
     buildTypes {
@@ -32,6 +55,9 @@ android {
             res.setSrcDirs(['src/oidcTest/res', "$buildDir/generated/oidc-test/res"])
         }
     }
+    if (configuredAuth) {
+        sourceSets.release.manifest.srcFile 'src/productionAuth/AndroidManifest.xml'
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -39,6 +65,9 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1'
     implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
     implementation project(':appauth-patched')
     testImplementation 'junit:junit:4.13.2'

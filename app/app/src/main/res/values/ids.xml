@@ -1,0 +1,6 @@
+<resources>
+    <item type="id" name="map_page" />
+    <item type="id" name="keyring_page" />
+    <item type="id" name="settings_page" />
+    <item type="id" name="service_address" />
+</resources>

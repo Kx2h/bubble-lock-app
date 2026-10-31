@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Bubble</string>
+    <string name="nav_location">위치</string><string name="nav_keyrings">키링</string><string name="nav_settings">설정</string>
+</resources>

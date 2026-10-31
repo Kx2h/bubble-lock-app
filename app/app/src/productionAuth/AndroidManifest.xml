@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <!-- Included only for a fully provisioned trusted HTTPS API/issuer/client build profile. -->
+        <activity android:name="net.openid.appauth.RedirectUriReceiverActivity" android:exported="true" tools:node="merge" />
+    </application>
+</manifest>

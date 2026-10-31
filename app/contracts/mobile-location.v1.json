@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "privacy-bubble.mobile.v1",
+  "title": "Authorized mobile keyring location response",
+  "contractId": "privacy-bubble.mobile.v1",
+  "contractVersion": "1.0.0",
+  "docRevision": "2.0.0",
+  "owner": "APP",
+  "integrationReview": "Consumer read extension; upstream owner review required before central release",
+  "endpoint": { "method": "GET", "path": "/v1/keyrings", "authentication": "RS256 JWT; configured issuer and audience; scope location:read", "cache": "no-store", "maxBytes": 65536, "maxKeyringsPerPrincipal": 100 },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractId", "docRevision", "generatedAt", "keyrings"],
+  "properties": {
+    "contractId": { "const": "privacy-bubble.mobile.v1" },
+    "docRevision": { "const": "2.0.0" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "keyrings": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/keyring" } }
+  },
+  "$defs": {
+    "keyring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "status", "latitude", "longitude", "accuracyMeters", "observedAt", "receivedAt", "expiresAt", "source", "connectivity", "batteryPercent"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "status": { "enum": ["available", "stale", "unavailable", "denied"] },
+        "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+        "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+        "accuracyMeters": { "type": ["number", "null"], "minimum": 0, "maximum": 10000000 },
+        "observedAt": { "type": ["string", "null"], "format": "date-time" },
+        "receivedAt": { "type": ["string", "null"], "format": "date-time" },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "source": { "enum": ["mec_location", "unknown"] },
+        "connectivity": { "enum": ["online", "offline", "unknown"] },
+        "batteryPercent": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+      },
+      "allOf": [{
+        "if": { "properties": { "status": { "enum": ["available", "stale"] } } },
+        "then": { "properties": {
+          "latitude": { "type": "number" }, "longitude": { "type": "number" },
+          "observedAt": { "type": "string" }, "receivedAt": { "type": "string" }, "expiresAt": { "type": "string" }, "source": { "const": "mec_location" }
+        } },
+        "else": { "properties": {
+          "latitude": { "type": "null" }, "longitude": { "type": "null" }, "accuracyMeters": { "type": "null" },
+          "observedAt": { "type": "null" }, "receivedAt": { "type": "null" }, "expiresAt": { "type": "null" }, "source": { "const": "unknown" }
+        } }
+      }]
+    }
+  }
+}
