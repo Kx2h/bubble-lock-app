@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "installed_version": "0.3.0",
+  "installed_variant": "optimized release, workspace QA signature",
+  "original_version": "0.2.0",
+  "original_backup_retained": true,
+  "original_credentials_present": false,
+  "test_session_removed": true,
+  "instrumentation_package_removed_for_test_user": true,
+  "test_user": 0,
+  "owned_ui_dump_removed": true,
+  "display_settings_restored": true,
+  "settings": {
+    "font_scale": "1.0",
+    "user_rotation": "0",
+    "accelerometer_rotation": "0",
+    "screen_off_timeout": "600000"
+  },
+  "night_mode": "Night mode: yes",
+  "usb_reverse_unchanged": true,
+  "system_browser_ca_changed": false,
+  "whole_app_data_cleared": false,
+  "existing_cse_modified": false,
+  "existing_cse_listener_verified": true
+}

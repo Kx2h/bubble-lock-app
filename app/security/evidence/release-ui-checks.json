@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "Optimized release navigation",
+      "passed": true
+    },
+    {
+      "name": "Empty account does not fabricate a keyring",
+      "passed": true
+    },
+    {
+      "name": "Native MapLibre rendered basemap",
+      "passed": true
+    },
+    {
+      "name": "Release hides development tools",
+      "passed": true
+    },
+    {
+      "name": "Release service address is read-only",
+      "passed": true
+    },
+    {
+      "name": "Offline legal notice visible",
+      "passed": true
+    },
+    {
+      "name": "200% font navigation",
+      "passed": true
+    },
+    {
+      "name": "200% landscape navigation",
+      "passed": true
+    },
+    {
+      "name": "Light native map after recreation",
+      "passed": true
+    },
+    {
+      "name": "Native zoom button changes rendered map",
+      "passed": true
+    },
+    {
+      "name": "Native pan moves map while scroll viewport stays fixed",
+      "passed": true
+    }
+  ]
+}

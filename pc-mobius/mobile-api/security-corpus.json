@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "jwtHeaders": [
+    { "id": "alg-none", "value": { "alg": "none" } },
+    { "id": "alg-hmac-confusion", "value": { "alg": "HS256" } },
+    { "id": "alg-pss-confusion", "value": { "alg": "PS256" } },
+    { "id": "alg-object", "value": { "alg": { "toString": "RS256" } } },
+    { "id": "critical-extension", "value": { "crit": ["test-extension"] } },
+    { "id": "critical-empty", "value": { "crit": [] } },
+    { "id": "unencoded-payload", "value": { "b64": false } },
+    { "id": "remote-jwks", "value": { "jku": "https://attacker.invalid/jwks" } },
+    { "id": "remote-x509", "value": { "x5u": "file:///etc/passwd" } },
+    { "id": "embedded-key", "value": { "jwk": {} } },
+    { "id": "null-key-directive", "value": { "jku": null } },
+    { "id": "kid-object", "value": { "kid": { "path": "../../signing.pem" } } },
+    { "id": "kid-control", "value": { "kid": "test\u0000key" } },
+    { "id": "kid-overlong", "value": { "kid": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" } },
+    { "id": "typ-array", "value": { "typ": ["JWT"] } },
+    { "id": "typ-null", "value": { "typ": null } }
+  ],
+  "duplicateJson": [
+    "{\"alg\":\"none\",\"alg\":\"RS256\"}",
+    "{\"alg\":\"RS256\",\"\\u0061lg\":\"RS256\"}",
+    "{\"outer\":{\"sub\":\"bob\",\"sub\":\"alice\"}}",
+    "{\"__proto__\":{},\"\\u005f_proto__\":{}}"
+  ],
+  "paths": [
+    "/v1/keyrings?subject=bob",
+    "/v1/keyrings#fragment",
+    "/v1/%6beyrings",
+    "/v1//keyrings",
+    "/v1/keyrings/../keyrings",
+    "/v1/keyrings/",
+    "/v1/keyrings%00",
+    "http://attacker.invalid/v1/keyrings",
+    "/../../integration/state/runtime.json"
+  ],
+  "unknownKids": ["../../signing.pem", "__proto__", "constructor", "toString", "https://attacker.invalid/jwks", "' OR 1=1 --"]
+}

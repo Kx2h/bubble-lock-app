@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +15,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.privacybubble.app.api.HttpsApiTransport;
+import org.privacybubble.app.net.StrictJson;
+import org.privacybubble.app.net.BearerToken;
 
-/** Read-only mobile API caller. It never sends a credential to a redirect or caches location. */
 public final class LocationRepository {
     private static final int MAX_BODY = 65_536;
     private static final String CONTRACT = "privacy-bubble.mobile.v1";
@@ -31,7 +27,7 @@ public final class LocationRepository {
     public LocationRepository(boolean allowDebugLoopback) { this.allowDebugLoopback = allowDebugLoopback; }
 
     public LocationSnapshot load(String apiBaseUrl, String accessToken) throws ApiException {
-        if (accessToken == null || !accessToken.matches("[A-Za-z0-9_.-]{1,8192}")) throw new ApiException(401, "로그인이 필요합니다.");
+        if (!BearerToken.isValid(accessToken)) throw new ApiException(401, "로그인이 필요합니다.");
         try {
             URI base = new URI(apiBaseUrl == null ? "" : apiBaseUrl.trim());
             String path = base.getRawPath();
@@ -96,31 +92,25 @@ public final class LocationRepository {
         } finally { connection.disconnect(); }
     }
 
-    /** Public to permit deterministic schema tests without network or an Android Activity. */
     public static LocationSnapshot parse(byte[] payload, long nowMillis) throws ApiException {
         try {
-            if (payload == null || payload.length > MAX_BODY) throw new IllegalArgumentException();
-            String document = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(payload)).toString();
-            checkDepth(document);
-            JSONTokener tokener = new JSONTokener(document);
-            Object decoded = tokener.nextValue();
-            if (!(decoded instanceof JSONObject) || tokener.nextClean() != 0) throw new IllegalArgumentException();
-            JSONObject root = (JSONObject)decoded;
+            if (nowMillis < 86_400_000 || nowMillis > Long.MAX_VALUE - 86_400_000) throw new IllegalArgumentException();
+            String document = StrictJson.utf8(payload, MAX_BODY);
+            Map<String,Object> root = StrictJson.object(document, MAX_BODY);
             checkKeys(root, "contractId", "docRevision", "generatedAt", "keyrings");
             if (!CONTRACT.equals(string(root, "contractId", 64)) || !"2.0.0".equals(string(root, "docRevision", 16))) throw new IllegalArgumentException();
             String generatedAt = string(root, "generatedAt", 48);
             long generated = timestamp(generatedAt);
             if (generated > nowMillis + 30_000 || generated < nowMillis - 86_400_000) throw new IllegalArgumentException();
-            Object rawList = root.opt("keyrings");
-            if (!(rawList instanceof JSONArray)) throw new IllegalArgumentException();
-            JSONArray array = (JSONArray)rawList;
-            if (array.length() > 100) throw new IllegalArgumentException();
+            Object rawList = root.get("keyrings");
+            if (!(rawList instanceof List)) throw new IllegalArgumentException();
+            List<?> array = (List<?>)rawList;
+            if (array.size() > 100) throw new IllegalArgumentException();
             List<KeyringLocation> items = new ArrayList<>(); Set<String> ids = new HashSet<>();
-            for (int index = 0; index < array.length(); index++) {
+            for (int index = 0; index < array.size(); index++) {
                 Object raw = array.get(index);
-                if (!(raw instanceof JSONObject)) throw new IllegalArgumentException();
-                JSONObject item = (JSONObject)raw;
+                if (!(raw instanceof Map)) throw new IllegalArgumentException();
+                @SuppressWarnings("unchecked") Map<String,Object> item = (Map<String,Object>)raw;
                 checkKeys(item, "id", "name", "status", "latitude", "longitude", "accuracyMeters", "observedAt", "receivedAt", "expiresAt", "source", "connectivity", "batteryPercent");
                 String id = string(item, "id", 96), name = string(item, "name", 96), status = string(item, "status", 16);
                 String source = string(item, "source", 32), connectivity = string(item, "connectivity", 16);
@@ -147,52 +137,41 @@ public final class LocationRepository {
         } catch (Exception error) { throw new ApiException(0, "위치 응답을 확인할 수 없습니다."); }
     }
 
-    private static void checkDepth(String text) {
-        int depth = 0; boolean quoted = false, escaped = false;
-        for (int index = 0; index < text.length(); index++) {
-            char c = text.charAt(index);
-            if (quoted) {
-                if (c < 32) throw new IllegalArgumentException();
-                if (escaped) escaped = false;
-                else if (c == '\\') escaped = true;
-                else if (c == '"') quoted = false;
-            } else if (c < 32 && c != '\t' && c != '\n' && c != '\r') throw new IllegalArgumentException();
-            else if (c == '"') quoted = true;
-            else if (c == '{' || c == '[') { if (++depth > 8) throw new IllegalArgumentException(); }
-            else if (c == '}' || c == ']') { if (--depth < 0) throw new IllegalArgumentException(); }
-        }
-        if (quoted || depth != 0) throw new IllegalArgumentException();
-    }
-
-    private static void checkKeys(JSONObject object, String... expected) {
+    private static void checkKeys(Map<String,Object> object, String... expected) {
         Set<String> keys = new HashSet<>(Arrays.asList(expected));
-        if (object.length() != keys.size()) throw new IllegalArgumentException();
-        java.util.Iterator<String> iterator = object.keys();
-        while (iterator.hasNext()) if (!keys.contains(iterator.next())) throw new IllegalArgumentException();
+        if (!object.keySet().equals(keys)) throw new IllegalArgumentException();
     }
 
-    private static String string(JSONObject object, String key, int max) {
-        Object value = object.opt(key);
+    private static String string(Map<String,Object> object, String key, int max) {
+        Object value = object.get(key);
         if (!(value instanceof String)) throw new IllegalArgumentException();
         String text = (String)value;
         if (text.isEmpty() || text.length() > max || !text.equals(text.trim())) throw new IllegalArgumentException();
         for (int index = 0; index < text.length(); index++) if (text.charAt(index) < 32 || text.charAt(index) == 127) throw new IllegalArgumentException();
         return text;
     }
-    private static String nullableString(JSONObject object, String key) {
-        if (!object.has(key)) throw new IllegalArgumentException();
-        return object.isNull(key) ? null : string(object, key, 48);
+    private static String nullableString(Map<String,Object> object, String key) {
+        if (!object.containsKey(key)) throw new IllegalArgumentException();
+        return object.get(key) == null ? null : string(object, key, 48);
     }
-    private static Double number(JSONObject object, String key) {
-        if (!object.has(key)) throw new IllegalArgumentException();
-        if (object.isNull(key)) return null;
-        Object value = object.opt(key);
-        if (!(value instanceof Number)) throw new IllegalArgumentException();
-        double number = ((Number)value).doubleValue();
+    private static Double number(Map<String,Object> object, String key) {
+        if (!object.containsKey(key)) throw new IllegalArgumentException();
+        Object value = object.get(key);
+        if (value == null) return null;
+        if (!(value instanceof BigDecimal)) throw new IllegalArgumentException();
+        BigDecimal decimal = (BigDecimal)value;
+        long minimum = key.equals("latitude") ? -90 : key.equals("longitude") ? -180 : 0;
+        long maximum = key.equals("latitude") ? 90 : key.equals("longitude") ? 180 : key.equals("batteryPercent") ? 100 : 10_000_000;
+        if (decimal.compareTo(BigDecimal.valueOf(minimum)) < 0 || decimal.compareTo(BigDecimal.valueOf(maximum)) > 0) throw new IllegalArgumentException();
+        if (key.equals("batteryPercent")) decimal.intValueExact();
+        double number = decimal.doubleValue();
         if (!Double.isFinite(number)) throw new IllegalArgumentException();
         return number;
     }
-    private static long timestamp(String value) { return Instant.parse(value).toEpochMilli(); }
+    private static long timestamp(String value) {
+        if (value == null || !value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z")) throw new IllegalArgumentException();
+        return Instant.parse(value).toEpochMilli();
+    }
 
     public static final class ApiException extends IOException {
         public final int statusCode;

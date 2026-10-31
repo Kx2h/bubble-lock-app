@@ -1,0 +1,67 @@
+{
+  "schema": "privacy-bubble.mobile-api.security-run-summary.v1",
+  "baseline": "0159653",
+  "node": "v22.23.4",
+  "iterationsPerStage": 4000,
+  "runs": [
+    {
+      "seed": "5ec0a11",
+      "cases": 12986,
+      "tests": 30,
+      "fuzzTests": 13,
+      "failed": 0,
+      "queryMilliseconds": [
+        8.896,
+        4.952,
+        4.822,
+        4.492,
+        4.352
+      ]
+    },
+    {
+      "seed": "c0ffee",
+      "cases": 12986,
+      "tests": 30,
+      "fuzzTests": 13,
+      "failed": 0,
+      "queryMilliseconds": [
+        8.677,
+        5.683,
+        5.028,
+        4.429,
+        4.228
+      ]
+    },
+    {
+      "seed": "deadbeef",
+      "cases": 12986,
+      "tests": 30,
+      "fuzzTests": 13,
+      "failed": 0,
+      "queryMilliseconds": [
+        12.621,
+        8.597,
+        4.838,
+        4.72,
+        4.818
+      ]
+    }
+  ],
+  "totalCases": 38958,
+  "core": {
+    "command": "node --test pc-mobius/test/*.test.mjs",
+    "tests": 21,
+    "passed": 21,
+    "failed": 0
+  },
+  "aggregate": {
+    "distinctTests": 51,
+    "testExecutions": 111,
+    "failed": 0
+  },
+  "temporaryPathVerification": {
+    "configuredTmpdirHonored": true,
+    "relocatedTmpdirSeed": "5ec0a11",
+    "fallback": "existing workspace .local/tmp/security when TMPDIR is unset"
+  }
+}

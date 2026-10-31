@@ -1,0 +1,14 @@
+.local/
+**/build/
+**/.gradle/
+**/local.properties
+**/__pycache__/
+**/*.py[cod]
+**/node_modules/
+**/.env
+**/.env.*
+!**/.env.example
+*.keystore
+*.jks
+*.p12
+*.pfx

@@ -1,0 +1,66 @@
+{
+  "schema": "privacy-bubble.mobile-api.security-fuzz.v1",
+  "seed": 12648430,
+  "iterations": 4000,
+  "startedAt": "2026-10-31T20:40:04.934Z",
+  "node": "v22.23.4",
+  "network": "ephemeral loopback listeners only",
+  "signingMaterial": "fresh local RSA-2048 test keys",
+  "cases": {
+    "jwt-corpus": 16,
+    "jwt-duplicate-json": 9,
+    "jwt-invalid-utf8": 1,
+    "jwt-kid": 6,
+    "jwks-config": 22,
+    "jwt-claim-types": 48,
+    "json-grammar-mutations": 4000,
+    "jwt-wire-mutations": 4000,
+    "jwt-noncanonical": 1,
+    "base64-corpus": 7,
+    "authorization-corpus": 8,
+    "grant-corruption": 19,
+    "consent-corruption": 10,
+    "prototype-isolation": 6,
+    "location-mutations": 4000,
+    "http-corpus": 30,
+    "http-mutations": 256,
+    "http-byte-mutations": 512,
+    "file-corpus": 24,
+    "file-valid-json": 3,
+    "mutation-safety": 1,
+    "resource-bounds": 7
+  },
+  "tests": {
+    "passed": 13,
+    "failed": 0
+  },
+  "failures": [],
+  "resourceMeasurements": {
+    "maxEvents": 20000,
+    "visibleKeyrings": 100,
+    "maxConcurrentReads": 2,
+    "queryMilliseconds": [
+      8.677,
+      5.683,
+      5.028,
+      4.429,
+      4.228
+    ],
+    "heapDeltaBytes": 5127592
+  },
+  "limits": [
+    "No production credentials or identity-provider requests",
+    "No public-host scanning",
+    "Local deterministic corpus and mutation testing is not a complete penetration test"
+  ],
+  "sourceSha256": {
+    "auth.mjs": "815505d47fdf5f7658caaf92fd96351970e4e012eb460992768ed97ee564dd09",
+    "location-reader.mjs": "561c52f090678dbe47b25684778d6a00bdecdd17de25dc5d290c101a22ebf406",
+    "server.mjs": "1f88451c19f2daf979673caae5788b5e5d4c93dce7ab052e872b17a5dc63bae3",
+    "strict-json.mjs": "053a76fbef7e9dfb9379c5ba01bc1baf88864ead60483aac1bac2b83719a9132",
+    "security-corpus.json": "5851a4743d8be86a07428b122a358b575f78285db6313ab565528a3defe84db4",
+    "security-fuzz.test.mjs": "483670bde9f001fc8a31e344273daa341191ccee768562d5bc992683d2e6202d"
+  },
+  "completedAt": "2026-10-31T20:40:10.568Z",
+  "totalCases": 12986
+}

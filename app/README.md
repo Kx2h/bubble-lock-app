@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 
-DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.2.0 / versionCode 2
+DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.3.0 / versionCode 3
 
 Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 확인하는 Android 앱입니다. 제품 화면은 `위치 / 키링 / 설정`으로 구성합니다. 기존 합성 시험 화면은 debug 빌드의 `설정 → 개발 도구 → 시험 도구 열기`로 옮겼습니다.
 
@@ -20,7 +20,7 @@ Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 
 
 ## 로그인과 연결 설정
 
-`설정`에서 배포자가 안내한 서비스 주소를 저장한 후 로그인합니다. `서비스 연결 해제`를 확인하면 사용자가 입력한 연결 설정·로그인 정보·표시된 위치를 지웁니다. 빌드에 고정된 기본 서비스 주소가 있으면 해당 기본값을 표시합니다. 제품의 issuer와 client ID는 빌드 프로필에 고정하며, 일반 설정 화면에서 임의 공급자나 bearer를 입력하지 않습니다. 브라우저 Authorization Code + PKCE S256 흐름과 discovery/JWKS·ID token 검증을 사용합니다.
+release는 현재 빌드에 고정된 서비스 주소를 읽기 전용으로 표시합니다. 업데이트 후 이전 저장 주소로 토큰을 보내지 않으며, 주소가 바뀌면 이전 주소에 묶인 세션을 무효화합니다. `이 기기의 데이터 삭제`는 로그인 정보와 표시된 위치를 지웁니다. debug에서만 서비스 주소를 직접 저장·해제할 수 있습니다. 제품의 issuer와 client ID는 빌드 프로필에 고정하며, 일반 설정 화면에서 임의 공급자나 bearer를 입력하지 않습니다. 브라우저 Authorization Code + PKCE S256 흐름과 discovery/JWKS·ID token 검증을 사용합니다.
 
 access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 비추출 키를 사용하는 AES-GCM 저장소에 암호화합니다. access token이 만료되면 worker에서 refresh를 한 번 수행합니다. 회전하는 refresh credential은 요청 전에 내구성 있게 소비하며, 응답 유실·검증 실패 시 이전 credential을 재전송하지 않고 로그인을 다시 요구합니다. 서비스 변경·로그아웃 후 늦게 도착한 인증 응답은 session epoch와 origin 검사를 통과하지 못하면 저장하지 않습니다. 토큰은 앱 로그나 UI saved state에 넣지 않습니다.
 
@@ -39,7 +39,7 @@ debug 빌드에만 `설정 → 개발 도구 → 개발 인증 연결`과 `http:
 
 ## 빌드와 검증
 
-작업 폴더 하위의 JDK 17, Android SDK 35, AGP 8.11.1, Gradle 8.13을 사용합니다. `WORKSPACE`는 `mobius4` 폴더의 절대 경로이며 아래 명령은 저장소 `app/`에서 실행합니다.
+작업 폴더 하위의 JDK 17, Android SDK 36, AGP 8.11.1, Gradle 8.13을 사용합니다. TLS 1.3 플랫폼 지원에 맞춰 최소 Android 10(API 29), target/compile API 36입니다. release는 R8 코드 최적화·난독화와 리소스 축소를 적용하고 버전/의존성 해시를 고정합니다. `WORKSPACE`는 `mobius4` 폴더의 절대 경로이며 아래 명령은 저장소 `app/`에서 실행합니다.
 
 ```sh
 export JAVA_HOME="$WORKSPACE/.local/jdk17"
@@ -48,12 +48,15 @@ export ANDROID_USER_HOME="$WORKSPACE/.local/android-user"
 export GRADLE_USER_HOME="$WORKSPACE/.local/gradle-home"
 export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 "$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon \
-  :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest
+  --dependency-verification strict :app:assembleDebug :app:assembleRelease :app:bundleRelease \
+  :app:testDebugUnitTest :app:testReleaseUnitTest :app:lintRelease
 ```
 
 APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
 
-현재 개발 검증에서 debug/release APK와 release AAB 빌드, Android JVM 단위시험 28개, CORE/INTEGRATION·위치 서비스 호스트시험 38개가 통과했습니다. [제품 기기 기록](evidence/product-map-device.md)에 실제 지도·상태·회전·200% 글자 등 14개 시나리오와 해시를 고정했습니다. 실제 운영 IdP·물리 키링·공식 release 검증은 남아 있습니다. 기존 `evidence/android-build.log`와 2026-10-28~29의 스크린샷은 당시 버전의 기록입니다.
+0.3.0 최종 검증은 Debug 56 / Release 47 단위시험, CORE 21 / API 30 고유 호스트시험, API 3개 seed의 38,958개 공격 입력, 기기 27개 보안 assertion을 통과했습니다. Android lint는 0 issues입니다. 최종 QA 서명 release를 삼성 Android 14 기기에 설치해 지도·확대/이동·라이트/다크·200% 글씨와 회전을 확인했습니다. [0.3.0 보안 릴리스 기록](security/RELEASE-0.3.0.md), [SBOM·SCA와 해시](security/README.md), [공격면](security/THREAT_MODEL.md), [릴리스 검증 절차](security/BUILD_GATES.md)를 참고하세요. 최종 미서명 APK/AAB는 운영 IdP/API 프로필과 운영 서명을 아직 포함하지 않습니다.
+
+기존 [제품 기기 기록](evidence/product-map-device.md)의 14개 시나리오는 0.2.0 기록입니다. 2026-10-28~31 이전 로그와 스크린샷은 해당 시점 버전의 증거로 유지합니다.
 
 ## 공기계 설치·업그레이드·복원
 
@@ -68,9 +71,9 @@ export ADB="$PWD/app/scripts/adb-windows.sh"
 
 WSL wrapper는 `install -r`의 최종 로컬 APK 경로도 Windows 경로로 변환합니다. Windows ADB가 읽을 수 없는 비공개 백업 폴더는 권한을 풀지 않고 APK만 읽을 수 있는 workspace 임시 폴더에 배치할 수 있습니다. 사용한 파일과 임시 폴더만 정리합니다.
 
-versionCode 2에서 이전 debug APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
+versionCode 3에서 이전 APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
 
-이번 제품 QA에서 새 0.2.0 APK를 기기에 남기고 시험용 인증·연결 프로필·서버·USB 중계·키를 정리했습니다. 전역 설정을 복원했고 기존 앱 전체 데이터는 지우지 않았습니다. 원본 APK 백업·최종 APK 해시·정리 결과는 [제품 기기 기록](evidence/product-map-device.md)에 있습니다. 시스템·브라우저 인증서 신뢰는 변경하지 않았습니다.
+이번 보안 QA에서는 최적화된 0.3.0 release의 workspace QA 서명 사본을 기기에 남겼습니다. 운영 서명본은 아닙니다. 시험용 인증과 instrumentation 패키지를 정리하고 표시 설정을 복원했습니다. 원본 0.2.0 APK와 세션 설정 백업은 workspace `.local/security-release/`에 보관합니다. 기존 앱 전체 데이터나 시스템·브라우저 인증서 신뢰는 변경하지 않았습니다. [최종 기기·정리 기록](security/RELEASE-0.3.0.md)을 참고하세요.
 
 ## 소유권을 확인하는 개발 시험 설치·정리 도구
 

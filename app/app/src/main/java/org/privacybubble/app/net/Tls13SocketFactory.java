@@ -8,12 +8,10 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-/** Restricts the process-default HTTPS socket factory to TLS 1.3. */
 public final class Tls13SocketFactory extends SSLSocketFactory {
     private final SSLSocketFactory delegate;
     private Tls13SocketFactory(SSLSocketFactory delegate) { this.delegate = delegate; }
 
-    /** Keeps the connection's default hostname verifier and process-default trust configuration. */
     public static void configure(HttpsURLConnection connection) {
         connection.setSSLSocketFactory(new Tls13SocketFactory(HttpsURLConnection.getDefaultSSLSocketFactory()));
     }

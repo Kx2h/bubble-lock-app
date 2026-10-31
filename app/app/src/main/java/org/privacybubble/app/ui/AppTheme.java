@@ -17,7 +17,6 @@ import androidx.core.view.ViewCompat;
 import com.google.android.material.button.MaterialButton;
 import org.privacybubble.app.R;
 
-/** Semantic native UI primitives shared across the app's product screens. */
 public final class AppTheme {
     public final Context context;
     public final int background, surface, subtle, text, muted, accent, onAccent, border, warning, danger, success;
@@ -80,7 +79,6 @@ public final class AppTheme {
 
     public Drawable icon(String kind, int color) { return new Icon(kind, color, dp(24)); }
 
-    /** Small vector icons, with labels supplied by the hosting native controls. */
     private static final class Icon extends Drawable {
         private final String kind; private final int color, size; private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         Icon(String kind, int color, int size) { this.kind = kind; this.color = color; this.size = size; }

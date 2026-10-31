@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "0159653",
+  "baselineNimbus": "9.47",
+  "reproduction": "Original source compiled in an isolated JDK17 harness with generated local RSA keys and fixed synthetic inputs; no production credential, endpoint or trust change used.",
+  "cases": [
+    {
+      "id": "JWT-01",
+      "boundary": "ID-token compact JWS encoding and refresh replay binding",
+      "inputClass": "Change only unused final base64url signature bits, preserving decoded signature bytes",
+      "baseline": "accepted on initial validation and on refresh when the same initial token should be rejected",
+      "fixed": "reject noncanonical base64url before signature/claim parsing",
+      "prerequisites": [
+        "A captured valid ID token signed by the trusted issuer",
+        "Ability to substitute it at the already trusted token-response boundary"
+      ],
+      "notDemonstrated": [
+        "Signature forgery",
+        "Certificate forgery",
+        "A general unauthenticated login bypass"
+      ]
+    },
+    {
+      "id": "JWK-01",
+      "boundary": "JWKS JSON member uniqueness",
+      "inputClass": "A single JWK with repeated decoded kid members",
+      "baseline": "accepted",
+      "fixed": "reject duplicate decoded JSON names",
+      "prerequisites": [
+        "Control of the JWKS response received through the provisioned trusted HTTPS issuer path"
+      ]
+    },
+    {
+      "id": "JWT-02",
+      "boundary": "NumericDate exactness and overflow",
+      "inputClass": "Issuer-signed iat, nbf or auth_time set to 1e100 or Long.MAX_VALUE",
+      "baseline": "accepted due to numeric/date conversion overflow",
+      "fixed": "reject nonintegral, negative or out-of-range NumericDate before Nimbus conversion",
+      "prerequisites": [
+        "A valid trusted-issuer signature over the malformed claims"
+      ],
+      "policy": "This application intentionally accepts nonnegative integral NumericDate values within the safe millisecond conversion range."
+    },
+    {
+      "id": "CALLBACK-01",
+      "boundary": "Authorization callback decoding and exact URI",
+      "inputClass": "Malformed percent-encoded UTF-8 in an unknown parameter; alternate empty-authority spelling",
+      "baseline": "accepted when valid expected state, issuer and code are also present",
+      "fixed": "reject malformed UTF-8 and require the exact configured redirect prefix",
+      "prerequisites": [
+        "The state, issuer and all normal authentication checks still apply"
+      ],
+      "notDemonstrated": [
+        "An external caller without transaction state authenticating successfully"
+      ]
+    },
+    {
+      "id": "LOCATION-01",
+      "boundary": "Exact JSON coordinate, accuracy and battery ranges",
+      "inputClass": "90.000000000000000000001 latitude; 80.000000000000000000001 battery; -1e-400 accuracy",
+      "baseline": "accepted after double conversion rounded/underflowed to an allowed value",
+      "fixed": "compare original BigDecimal against exact ranges and use exact integer conversion for battery",
+      "prerequisites": [
+        "A malformed authorized location API response"
+      ],
+      "notDemonstrated": [
+        "A device authorization or consent bypass"
+      ]
+    },
+    {
+      "id": "TOKEN-01",
+      "boundary": "Exact token lifetime",
+      "inputClass": "expires_in 300.000000000000000000001, 29.999999999999999999999 or 604800.000000000000000000001",
+      "baseline": "accepted after double conversion",
+      "fixed": "read original strict JSON map and require longValueExact before range validation",
+      "prerequisites": [
+        "A malformed response from the trusted token endpoint"
+      ]
+    }
+  ]
+}

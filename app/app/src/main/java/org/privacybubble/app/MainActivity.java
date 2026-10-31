@@ -50,7 +50,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-/** Product launcher: authorized location map, accessible keyring list, and service settings. */
 public final class MainActivity extends AppCompatActivity {
     private static final int SIGN_IN = 7701;
     private static final long REFRESH_MILLIS = 30_000;
@@ -200,27 +199,22 @@ public final class MainActivity extends AppCompatActivity {
         settingsStatus = theme.text("", 16, theme.muted); add(account, settingsStatus, 10, 16);
         accountButton = theme.button("로그인", true, v -> { if (hasSession()) confirmSignOut(); else signIn(); }); account.addView(accountButton); body.addView(account);
         LinearLayout service = theme.panel(); add(service, theme.heading("서비스 연결", 19), 0, 8);
-        add(service, theme.text("안내받은 서비스 주소를 저장한 후 계정으로 로그인하세요.", 15, theme.muted), 0, 16);
+        add(service, theme.text(VariantFeatures.allowsCustomService() ? "안내받은 서비스 주소를 저장한 후 계정으로 로그인하세요." : "서비스 연결 정보는 서비스 제공자가 관리해요.", 15, theme.muted), 0, 16);
         addressField = new TextInputLayout(this); addressField.setHint("서비스 주소"); addressField.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
         addressField.setBoxCornerRadii(theme.dp(12), theme.dp(12), theme.dp(12), theme.dp(12));
         addressInput = new TextInputEditText(addressField.getContext()); addressInput.setSingleLine(true);
         addressInput.setId(R.id.service_address);
         addressInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        addressInput.setEnabled(VariantFeatures.allowsCustomService());
         addressInput.setTextSize(16); addressInput.setText(addressDraft); addressInput.setHint("https://service.example.org");
         addressInput.setSelection(clamp(addressSelectionStart, addressDraft.length()), clamp(addressSelectionEnd, addressDraft.length()));
-        addressField.addView(addressInput); service.addView(addressField); add(service, theme.button("연결 정보 저장", false, v -> saveConnection()), 16, 0);
-        add(service, theme.button("서비스 연결 해제", false, v -> confirmDisconnect()), 10, 0); add(body, service, 18, 0);
+        addressField.addView(addressInput); service.addView(addressField); if (VariantFeatures.allowsCustomService()) add(service, theme.button("연결 정보 저장", false, v -> saveConnection()), 16, 0);
+        add(service, theme.button(VariantFeatures.allowsCustomService() ? "서비스 연결 해제" : "이 기기의 데이터 삭제", false, v -> confirmDisconnect()), 10, 0); add(body, service, 18, 0);
         addressField.setHelperText(addressHelper); addressField.setError(addressError);
         LinearLayout privacy = theme.panel(); privacy.addView(theme.heading("위치와 개인정보", 19));
         add(privacy, theme.text("키링이 공유한 위치만 표시하며 휴대폰의 위치 권한은 사용하지 않아요. 위치가 늦게 도착하거나 정확하지 않을 수 있어요.", 15, theme.muted), 10, 0); add(body, privacy, 18, 0);
-        if (BuildConfig.DEBUG) {
-            LinearLayout developer = theme.panel(); developer.addView(theme.heading("개발 도구", 19));
-            add(developer, theme.text("개발 빌드에서만 보이는 메뉴예요.", 14, theme.muted), 8, 14);
-            developer.addView(theme.button("개발 인증 연결", false, v -> debugConnection()));
-            add(developer, theme.button("시험 도구 열기", false, v -> {
-                Intent intent = new Intent(); intent.setClassName(this, "org.privacybubble.app.DeveloperToolsActivity"); startActivity(intent);
-            }), 10, 0); add(body, developer, 18, 0);
-        }
+        add(privacy, theme.button("오픈소스 라이선스", false, v -> showLicenses()), 16, 0);
+        VariantFeatures.addSettings(this, body, theme, session, () -> { state.clear(); renderState(); fetchLocations(); });
         TextView version = theme.text("Bubble · " + BuildConfig.VERSION_NAME, 13, theme.muted); version.setGravity(Gravity.CENTER); add(body, version, 26, 0); settingsScroll = page(body); settingsScroll.setId(R.id.settings_page);
     }
 
@@ -266,7 +260,7 @@ public final class MainActivity extends AppCompatActivity {
         mapCaption.setText(state.loading ? "공유된 위치를 확인하고 있어요." : state.lastSuccess > 0 && signedIn
                 ? "최근 확인 " + relative(Instant.ofEpochMilli(state.lastSuccess).toString()) + " · 위치 도착이 지연될 수 있어요." : "공유된 위치를 한눈에 확인하세요.");
         settingsStatus.setText(signedIn ? "계정이 연결되어 있어요. 공유가 허용된 키링만 표시해요." : "로그인하면 내게 공유된 키링 위치를 확인할 수 있어요.");
-        accountButton.setText(signedIn ? "로그아웃" : "로그인"); accountButton.setEnabled(!vaultProblem);
+        accountButton.setText(signedIn ? "로그아웃" : "로그인"); accountButton.setEnabled(!vaultProblem && (signedIn || session.isSignInConfigured()));
         List<KeyringLocation> visible = visibleLocations(); map.updateLocations(visible, state.selectedId);
         View center = mapScroll.findViewWithTag("centerKeyring"); KeyringLocation selected = selected(visible);
         if (center != null) {
@@ -337,7 +331,7 @@ public final class MainActivity extends AppCompatActivity {
     private static void setText(TextView view, String value) {
         if (!value.contentEquals(view.getText())) view.setText(value);
     }
-    /** Stable native views preserve reading position and TalkBack focus during polling. */
+
     private final class LocationCard {
         final LinearLayout view = theme.panel();
         final TextView name = theme.heading("", 22), status = badge("", theme.muted);
@@ -413,8 +407,7 @@ public final class MainActivity extends AppCompatActivity {
         if (!state.loading) state.load(safeBase(), session); main.postDelayed(refresh, REFRESH_MILLIS);
     }
     private boolean hasSession() {
-        // The refresh credential is deliberately consumed before network I/O. Keep the
-        // current authenticated loading state while that one attempt is in progress.
+
         try { return !session.getAccessToken().isEmpty() || !session.getRefreshToken().isEmpty() || (state != null && state.loading); }
         catch (Exception error) { vaultProblem = true; return false; }
     }
@@ -435,13 +428,13 @@ public final class MainActivity extends AppCompatActivity {
                 }).show();
     }
     private void confirmDisconnect() {
-        new MaterialAlertDialogBuilder(this).setTitle("서비스 연결을 해제할까요?")
-                .setMessage("이 기기에 입력한 서비스 주소, 로그인 정보와 표시된 키링 위치가 지워져요.")
+        new MaterialAlertDialogBuilder(this).setTitle(VariantFeatures.allowsCustomService() ? "서비스 연결을 해제할까요?" : "이 기기의 데이터를 지울까요?")
+                .setMessage(VariantFeatures.allowsCustomService() ? "이 기기에 입력한 서비스 주소, 로그인 정보와 표시된 키링 위치가 지워져요." : "이 기기의 로그인 정보와 표시된 키링 위치가 지워져요.")
                 .setNegativeButton("취소", null).setPositiveButton("연결 해제", (dialog, which) -> {
                     state.clear(); main.removeCallbacks(refresh);
                     try {
                         session.clearAll(); addressDraft=session.getApiBaseUrl(); addressSelectionStart=addressSelectionEnd=addressDraft.length();
-                        addressInput.setText(addressDraft); addressField.setError(null); addressField.setHelperText("연결을 해제했어요.");
+                        addressInput.setText(addressDraft); addressField.setError(null); addressField.setHelperText(VariantFeatures.allowsCustomService() ? "연결을 해제했어요." : "이 기기의 데이터를 지웠어요.");
                     } catch (Exception error) { vaultProblem=true; }
                     renderState();
                 }).show();
@@ -462,22 +455,18 @@ public final class MainActivity extends AppCompatActivity {
         addressError = addressField.getError() == null ? null : addressField.getError().toString();
         addressHelper = addressField.getHelperText() == null ? null : addressField.getHelperText().toString();
     }
-    private void debugConnection() {
-        if (!BuildConfig.DEBUG) return;
-        LinearLayout content = theme.column(); content.setPadding(theme.dp(24), theme.dp(12), theme.dp(24), 0);
-        add(content, theme.text("개발 서버에서 발급한 임시 인증으로 연결합니다. 먼저 서비스 주소를 저장해 주세요.", 15, theme.muted), 0, 16);
-        TextInputLayout field = new TextInputLayout(this); field.setHint("개발 인증 값"); field.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        TextInputEditText input = new TextInputEditText(field.getContext()); input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); input.setSaveEnabled(false);
-        input.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS); field.addView(input); content.addView(field);
-        new MaterialAlertDialogBuilder(this).setTitle("개발 연결").setView(content).setNegativeButton("취소", (d,w) -> { if (input.getText()!=null) input.getText().clear(); })
-                .setPositiveButton("연결", (d,w) -> {
-                    try {
-                        if (safeBase().isEmpty()) throw new IllegalStateException();
-                        session.setDebugAccessToken(input.getText() == null ? "" : input.getText().toString().trim()); state.clear(); renderState(); fetchLocations();
-                    } catch (Exception error) { showMessage("개발 연결 실패", "서비스 주소와 개발 인증 값을 확인해 주세요."); }
-                    finally { if (input.getText()!=null) input.getText().clear(); }
-                }).show();
+    private void showLicenses() {
+        try (java.io.InputStream input=getAssets().open("licenses/open_source_licenses.txt"); java.io.ByteArrayOutputStream output=new java.io.ByteArrayOutputStream()) {
+            byte[] buffer=new byte[4096]; int count;
+            while ((count=input.read(buffer))!=-1) {
+                if (output.size()+count>524288) throw new java.io.IOException();
+                output.write(buffer,0,count);
+            }
+            TextView text=theme.text(new String(output.toByteArray(),java.nio.charset.StandardCharsets.UTF_8),14,theme.text);
+            text.setTextIsSelectable(true); text.setPadding(theme.dp(24),theme.dp(8),theme.dp(24),theme.dp(16));
+            ScrollView scroll=new ScrollView(this); scroll.addView(text);
+            new MaterialAlertDialogBuilder(this).setTitle("오픈소스 라이선스").setView(scroll).setPositiveButton("닫기",null).show();
+        } catch (Exception unavailable) { showMessage("안내를 열 수 없어요", "앱을 다시 연 뒤 시도해 주세요."); }
     }
     private void showMessage(String title, String message) { new MaterialAlertDialogBuilder(this).setTitle(title).setMessage(message).setPositiveButton("확인", null).show(); }
     private void add(LinearLayout parent, View child, int top, int bottom) {
@@ -520,7 +509,6 @@ public final class MainActivity extends AppCompatActivity {
         catch (RuntimeException error) { return "제공 정보 없음"; }
     }
 
-    /** Retains in-memory state without an Activity or a repeating background request. */
     private static final class ScreenState {
         private final ExecutorService worker = Executors.newSingleThreadExecutor();
         private final Handler main = new Handler(Looper.getMainLooper());

@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-10-31T20:31:10Z",
+  "checks": [
+    "official schema including external references and formats",
+    "unique graph references",
+    "all component graph nodes present",
+    "no dangling references",
+    "no local absolute/cache paths"
+  ],
+  "official_schemas": [
+    {
+      "sha256": "9fe10d461c8ca16a8f32b777b01a46418b0bcca380812da6d15a3c81ec3cb512",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/bom-1.6.schema.json"
+    },
+    {
+      "sha256": "8bcce78231e337edef159eef41b2d6fdcc2fb2a684a9722fec6e9e8e9f926d98",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/spdx.schema.json"
+    },
+    {
+      "sha256": "6c5b63ea535f47f1f6fe86e4e7084cd1d5b973b8574a3a7d542901103af857a6",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/jsf-0.82.schema.json"
+    }
+  ],
+  "result": "PASS",
+  "sbom_sha256": "830f2f3135bcdeae3eb8880778166bd8d5d0438b09e6c960ba9cf6af54ceadec",
+  "specification": "CycloneDX 1.6 JSON Draft-07",
+  "validator": "jsonschema 4.26.0"
+}

@@ -17,7 +17,8 @@
     "integration:evidence": "node scripts/build-integration-evidence.mjs",
     "integration:replay": "node scripts/replay-integration.mjs",
     "mobile:api": "node mobile-api/server.mjs",
-    "test:mobile": "node --test mobile-api/mobile-api.test.mjs"
+    "test:mobile": "node --test mobile-api/*.test.mjs",
+    "test:mobile:security": "node --test mobile-api/security-fuzz.test.mjs"
   },
   "dependencies": {
     "mqtt": "^5.14.0"

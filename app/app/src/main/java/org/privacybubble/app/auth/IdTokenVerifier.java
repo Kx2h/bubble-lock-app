@@ -20,8 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Map;
+import java.math.BigDecimal;
+import org.privacybubble.app.net.StrictJson;
 
-/** Validates an ID token against an already authenticated issuer and JWKS document. */
 public final class IdTokenVerifier {
     private static final int MAX_TOKEN_LENGTH = 16384;
     private static final int MAX_JWKS_LENGTH = 65536;
@@ -29,18 +31,11 @@ public final class IdTokenVerifier {
 
     private IdTokenVerifier() { }
 
-    /**
-     * Returns only the verified subject. The caller must obtain jwksJson over verified TLS from
-     * the configured issuer's validated discovery document and bind nonce to this transaction.
-     * A multiple-audience token is rejected because no other audiences are configured as trusted.
-     * Never log the token, nonce, or returned subject.
-     */
     public static String verify(String jwt, String jwksJson, String expectedIssuer,
                                 String clientId, String nonce, long nowEpochSeconds) {
         return verifyInitial(jwt, jwksJson, expectedIssuer, clientId, nonce, nowEpochSeconds).subject();
     }
 
-    /** Created only after validation, or restored from the app's authenticated encrypted session store. Never log. */
     static final class Identity {
         private final String issuer, clientId, subject, nonce, azp;
         private final Long authTimeMillis;
@@ -87,7 +82,6 @@ public final class IdTokenVerifier {
         } catch (Exception e) { throw new IllegalArgumentException("ID token validation failed"); }
     }
 
-    /** Refresh tokens may omit nonce and auth_time; if supplied they must bind to the initial token. */
     static void verifyRefresh(String jwt, String jwksJson, Identity initial,
                               long requestStartedEpochSeconds, long nowEpochSeconds) {
         verifyRefresh(jwt, jwksJson, initial, requestStartedEpochSeconds, nowEpochSeconds, null);
@@ -117,7 +111,6 @@ public final class IdTokenVerifier {
         return MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
     }
 
-    /** RS256 uses the left half of SHA-256, encoded as unpadded base64url. */
     private static void verifyAccessTokenHash(JWTClaimsSet claims, String accessToken) throws Exception {
         if (!claims.getClaims().containsKey("at_hash")) return;
         Object supplied = claims.getClaim("at_hash");
@@ -132,17 +125,16 @@ public final class IdTokenVerifier {
         return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), actual.getBytes(StandardCharsets.UTF_8));
     }
 
-    /** Only call with a value decrypted and authenticated by MobileSessionStore, never an Intent or response field. */
     static Identity restoreFromEncryptedStorage(String value, String issuer, String clientId) {
         try {
             requireText(value,4096);
-            java.util.Map<String,Object> context=com.nimbusds.jose.util.JSONObjectUtils.parse(value);
+            java.util.Map<String,Object> context=StrictJson.object(value,4096);
             if (!issuer.equals(context.get("issuer")) || !clientId.equals(context.get("client"))) fail();
             String subject=com.nimbusds.jose.util.JSONObjectUtils.getString(context,"subject"), nonce=com.nimbusds.jose.util.JSONObjectUtils.getString(context,"nonce");
             requireSubject(subject); requireText(nonce,512);
             Object azp=context.get("azp"); if (azp!=null && (!(azp instanceof String) || !clientId.equals(azp))) fail();
-            long issued=com.nimbusds.jose.util.JSONObjectUtils.getLong(context,"issued"); if (issued<=0) fail();
-            Long auth=context.get("authTime")==null ? null : com.nimbusds.jose.util.JSONObjectUtils.getLong(context,"authTime");
+            long issued=integer(context.get("issued"), Long.MAX_VALUE - 60_000); if (issued<=0) fail();
+            Long auth=context.get("authTime")==null ? null : integer(context.get("authTime"), Long.MAX_VALUE - 60_000);
             if (auth!=null && (auth<0 || auth>issued+60_000)) fail();
             byte[] fingerprint=Base64.getDecoder().decode(com.nimbusds.jose.util.JSONObjectUtils.getString(context,"digest"));
             if (fingerprint.length!=32) fail();
@@ -167,6 +159,27 @@ public final class IdTokenVerifier {
         URI issuer = new URI(expectedIssuer);
         if (!"https".equalsIgnoreCase(issuer.getScheme()) || issuer.getHost() == null
                 || issuer.getUserInfo() != null || issuer.getQuery() != null || issuer.getFragment() != null) fail();
+        String[] segments = jwt.split("\\.", -1);
+        if (segments.length != 3) fail();
+        byte[] protectedHeader = canonicalBase64(segments[0]);
+        byte[] payload = canonicalBase64(segments[1]);
+        canonicalBase64(segments[2]);
+        StrictJson.object(StrictJson.utf8(protectedHeader, MAX_TOKEN_LENGTH), MAX_TOKEN_LENGTH);
+        Map<String,Object> rawClaims = StrictJson.object(StrictJson.utf8(payload, MAX_TOKEN_LENGTH), MAX_TOKEN_LENGTH);
+        for (String name : new String[]{"iat", "exp", "nbf", "auth_time"}) {
+            if (rawClaims.containsKey(name)) integer(rawClaims.get(name), Long.MAX_VALUE / 1000 - 60);
+        }
+        Map<String,Object> keyDocument = StrictJson.object(jwksJson, MAX_JWKS_LENGTH);
+        Object rawKeys = keyDocument.get("keys");
+        if (!(rawKeys instanceof List) || ((List<?>)rawKeys).size() > 64) fail();
+        for (Object rawKey : (List<?>)rawKeys) {
+            if (!(rawKey instanceof Map)) fail();
+            Map<?,?> parameters = (Map<?,?>)rawKey;
+            if ("RSA".equals(parameters.get("kty"))) {
+                if (!(parameters.get("n") instanceof String) || ((String)parameters.get("n")).length() > 1366
+                        || !(parameters.get("e") instanceof String) || ((String)parameters.get("e")).length() > 16) fail();
+            }
+        }
         SignedJWT token = SignedJWT.parse(jwt);
         JWSHeader header = token.getHeader();
         if (!JWSAlgorithm.RS256.equals(header.getAlgorithm())) fail();
@@ -174,7 +187,7 @@ public final class IdTokenVerifier {
         requireText(kid, 512);
         if (header.getJWK() != null || header.getJWKURL() != null || header.getX509CertURL() != null
                 || (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty())) fail();
-        List<JWK> keys = JWKSet.parse(jwksJson).getKeys();
+        List<JWK> keys = JWKSet.parse(keyDocument).getKeys();
         JWK selected = null;
         for (JWK key : keys) {
             if (kid.equals(key.getKeyID())) {
@@ -184,7 +197,7 @@ public final class IdTokenVerifier {
         }
         if (!(selected instanceof RSAKey) || selected.isPrivate()) fail();
         RSAKey rsa = (RSAKey) selected;
-        if (rsa.size() < 2048 || (rsa.getAlgorithm() != null && !JWSAlgorithm.RS256.equals(rsa.getAlgorithm()))
+        if (rsa.size() < 2048 || rsa.size() > 8192 || (rsa.getAlgorithm() != null && !JWSAlgorithm.RS256.equals(rsa.getAlgorithm()))
                 || (rsa.getKeyUse() != null && !KeyUse.SIGNATURE.equals(rsa.getKeyUse()))) fail();
         Set<KeyOperation> operations = rsa.getKeyOperations();
         if (operations != null && !operations.contains(KeyOperation.VERIFY)) fail();
@@ -210,10 +223,25 @@ public final class IdTokenVerifier {
         if (value == null || value.isEmpty() || value.length() > maxLength || !value.equals(value.trim())) fail();
     }
 
-    /** OpenID Connect limits the case-sensitive subject to 255 ASCII characters. */
+    private static long integer(Object value, long maximum) {
+        if (!(value instanceof BigDecimal)) fail();
+        try {
+            long number = ((BigDecimal)value).longValueExact();
+            if (number < 0 || number > maximum) fail();
+            return number;
+        } catch (ArithmeticException failure) { throw new IllegalArgumentException("ID token validation failed"); }
+    }
+
+    private static byte[] canonicalBase64(String encoded) {
+        if (encoded.isEmpty() || !encoded.matches("[A-Za-z0-9_-]+")) { fail(); }
+        byte[] bytes = Base64.getUrlDecoder().decode(encoded);
+        if (!Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).equals(encoded)) fail();
+        return bytes;
+    }
+
     private static void requireSubject(String value) {
         requireText(value, 255);
-        for (int i = 0; i < value.length(); i++) if (value.charAt(i) > 0x7f) fail();
+        for (int i = 0; i < value.length(); i++) if (value.charAt(i) < 32 || value.charAt(i) > 0x7e) fail();
     }
 
     private static void fail() { throw new IllegalArgumentException("ID token validation failed"); }

@@ -1,0 +1,2144 @@
+{
+  "advisories": {},
+  "affected_package_versions": 0,
+  "checked_at": "2026-10-31T20:31:11Z",
+  "exact_package_versions": 117,
+  "excluded_components": [
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "application:pc-mobius"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "artifact:android-release-aab"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "artifact:android-release-apk"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/arm64-v8a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/arm64-v8a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/armeabi-v7a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/armeabi-v7a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/x86/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/x86/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/x86_64/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aab:base/lib/x86_64/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/arm64-v8a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/arm64-v8a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/armeabi-v7a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/armeabi-v7a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/x86/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/x86/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/x86_64/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-aar:maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1:jni/x86_64/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/arm64-v8a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/arm64-v8a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/armeabi-v7a/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/armeabi-v7a/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/x86/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/x86/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/x86_64/libmaplibre-opengl.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "native-apk:lib/x86_64/libmaplibre.so"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "project::app"
+    }
+  ],
+  "format": "privacy-bubble.osv-sca.v1",
+  "limitations": [
+    "OSV database matches are not proof of runtime exploitability or absence of vulnerabilities.",
+    "Patched AppAuth is queried using upstream 0.11.1; local patches require separate review.",
+    "Native file hashes do not identify statically bundled third-party versions; those internals are not scanned.",
+    "Node coverage is the complete checked-in pc-mobius package-lock tree, not an assertion that dependencies are embedded in the Android APK."
+  ],
+  "packages": [
+    {
+      "component_refs": [
+        "maven:androidx.activity:activity:1.8.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.activity:activity",
+      "version": "1.8.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.annotation:annotation:1.8.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.annotation:annotation",
+      "version": "1.8.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.annotation:annotation-experimental:1.4.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.annotation:annotation-experimental",
+      "version": "1.4.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.annotation:annotation-jvm:1.8.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.annotation:annotation-jvm",
+      "version": "1.8.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.appcompat:appcompat:1.7.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.appcompat:appcompat",
+      "version": "1.7.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.appcompat:appcompat-resources:1.7.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.appcompat:appcompat-resources",
+      "version": "1.7.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.arch.core:core-common:2.2.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.arch.core:core-common",
+      "version": "2.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.arch.core:core-runtime:2.2.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.arch.core:core-runtime",
+      "version": "2.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.browser:browser:1.3.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.browser:browser",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.cardview:cardview:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.cardview:cardview",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.collection:collection:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.collection:collection",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.concurrent:concurrent-futures:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.concurrent:concurrent-futures",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.constraintlayout:constraintlayout:2.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.constraintlayout:constraintlayout",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.constraintlayout:constraintlayout-solver:2.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.constraintlayout:constraintlayout-solver",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.coordinatorlayout:coordinatorlayout",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.core:core:1.13.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.core:core",
+      "version": "1.13.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.core:core-ktx:1.13.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.core:core-ktx",
+      "version": "1.13.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.cursoradapter:cursoradapter:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.cursoradapter:cursoradapter",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.customview:customview:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.customview:customview",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.documentfile:documentfile:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.documentfile:documentfile",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.drawerlayout:drawerlayout:1.1.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.drawerlayout:drawerlayout",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.dynamicanimation:dynamicanimation:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.dynamicanimation:dynamicanimation",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.emoji2:emoji2:1.3.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.emoji2:emoji2",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.emoji2:emoji2-views-helper:1.3.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.emoji2:emoji2-views-helper",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.fragment:fragment:1.8.9"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.fragment:fragment",
+      "version": "1.8.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.interpolator:interpolator:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.interpolator:interpolator",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.legacy:legacy-support-core-utils:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.legacy:legacy-support-core-utils",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-common:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-common",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-livedata:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-livedata",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-livedata-core:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-livedata-core",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-process:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-process",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-runtime:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-runtime",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-viewmodel:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-viewmodel",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate",
+      "version": "2.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.loader:loader:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.loader:loader",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.localbroadcastmanager:localbroadcastmanager:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.localbroadcastmanager:localbroadcastmanager",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.print:print:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.print:print",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.profileinstaller:profileinstaller:1.3.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.profileinstaller:profileinstaller",
+      "version": "1.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.recyclerview:recyclerview:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.recyclerview:recyclerview",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.resourceinspection:resourceinspection-annotation:1.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.resourceinspection:resourceinspection-annotation",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.savedstate:savedstate:1.2.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.savedstate:savedstate",
+      "version": "1.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.startup:startup-runtime:1.1.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.startup:startup-runtime",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.tracing:tracing:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.tracing:tracing",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.transition:transition:1.5.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.transition:transition",
+      "version": "1.5.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.vectordrawable:vectordrawable:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.vectordrawable:vectordrawable",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.vectordrawable:vectordrawable-animated:1.1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.vectordrawable:vectordrawable-animated",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.versionedparcelable:versionedparcelable:1.1.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.versionedparcelable:versionedparcelable",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.viewpager2:viewpager2:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.viewpager2:viewpager2",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:androidx.viewpager:viewpager:1.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "androidx.viewpager:viewpager",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.google.android.material:material:1.12.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.google.android.material:material",
+      "version": "1.12.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.google.code.gson:gson:2.10.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.google.code.gson:gson",
+      "version": "2.10.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.google.errorprone:error_prone_annotations:2.15.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.google.errorprone:error_prone_annotations",
+      "version": "2.15.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.google.guava:listenablefuture:1.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.google.guava:listenablefuture",
+      "version": "1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.jakewharton.timber:timber:5.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.jakewharton.timber:timber",
+      "version": "5.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.nimbusds:nimbus-jose-jwt:10.10"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.nimbusds:nimbus-jose-jwt",
+      "version": "10.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.squareup.okhttp3:okhttp:4.12.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.12.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.squareup.okio:okio:3.6.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.squareup.okio:okio",
+      "version": "3.6.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:com.squareup.okio:okio-jvm:3.6.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "com.squareup.okio:okio-jvm",
+      "version": "3.6.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "project::appauth-patched"
+      ],
+      "ecosystem": "Maven",
+      "name": "net.openid:appauth",
+      "version": "0.11.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlin:kotlin-bom:1.8.22"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-bom",
+      "version": "1.8.22",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlin:kotlin-stdlib:2.2.10"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.2.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlin:kotlin-stdlib-common:2.2.10"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "2.2.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "1.9.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "1.9.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+      "version": "1.10.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
+      "version": "1.10.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.10.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.10.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.jetbrains:annotations:23.0.0"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.jetbrains:annotations",
+      "version": "23.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.maplibre.gl:android-sdk-geojson:6.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.maplibre.gl:android-sdk-geojson",
+      "version": "6.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.maplibre.gl:android-sdk-turf:6.0.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.maplibre.gl:android-sdk-turf",
+      "version": "6.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.maplibre.gl:android-sdk-vulkan-opengl",
+      "version": "13.7.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "maven:org.maplibre.gl:maplibre-android-gestures:0.0.4"
+      ],
+      "ecosystem": "Maven",
+      "name": "org.maplibre.gl:maplibre-android-gestures",
+      "version": "0.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/@babel/runtime"
+      ],
+      "ecosystem": "npm",
+      "name": "@babel/runtime",
+      "version": "7.29.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/@types/node"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/node",
+      "version": "26.6.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/@types/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/readable-stream",
+      "version": "4.0.25",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/@types/ws"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/ws",
+      "version": "8.18.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/abort-controller"
+      ],
+      "ecosystem": "npm",
+      "name": "abort-controller",
+      "version": "3.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/base64-js"
+      ],
+      "ecosystem": "npm",
+      "name": "base64-js",
+      "version": "1.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/bl"
+      ],
+      "ecosystem": "npm",
+      "name": "bl",
+      "version": "6.1.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/broker-factory"
+      ],
+      "ecosystem": "npm",
+      "name": "broker-factory",
+      "version": "3.1.15",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "buffer",
+      "version": "6.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/buffer-from"
+      ],
+      "ecosystem": "npm",
+      "name": "buffer-from",
+      "version": "1.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/commist"
+      ],
+      "ecosystem": "npm",
+      "name": "commist",
+      "version": "3.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/concat-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "concat-stream",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/debug"
+      ],
+      "ecosystem": "npm",
+      "name": "debug",
+      "version": "4.4.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/event-target-shim"
+      ],
+      "ecosystem": "npm",
+      "name": "event-target-shim",
+      "version": "5.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/events"
+      ],
+      "ecosystem": "npm",
+      "name": "events",
+      "version": "3.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/fast-unique-numbers"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-unique-numbers",
+      "version": "9.0.27",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/help-me"
+      ],
+      "ecosystem": "npm",
+      "name": "help-me",
+      "version": "5.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/ieee754"
+      ],
+      "ecosystem": "npm",
+      "name": "ieee754",
+      "version": "1.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/inherits"
+      ],
+      "ecosystem": "npm",
+      "name": "inherits",
+      "version": "2.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/ip-address"
+      ],
+      "ecosystem": "npm",
+      "name": "ip-address",
+      "version": "10.7.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/lru-cache"
+      ],
+      "ecosystem": "npm",
+      "name": "lru-cache",
+      "version": "10.4.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/minimist"
+      ],
+      "ecosystem": "npm",
+      "name": "minimist",
+      "version": "1.2.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/mqtt"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt",
+      "version": "5.16.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/mqtt-packet"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt-packet",
+      "version": "9.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/ms"
+      ],
+      "ecosystem": "npm",
+      "name": "ms",
+      "version": "2.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/process"
+      ],
+      "ecosystem": "npm",
+      "name": "process",
+      "version": "0.11.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/process-nextick-args"
+      ],
+      "ecosystem": "npm",
+      "name": "process-nextick-args",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/concat-stream/node_modules/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "readable-stream",
+      "version": "3.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "readable-stream",
+      "version": "4.8.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/rfdc"
+      ],
+      "ecosystem": "npm",
+      "name": "rfdc",
+      "version": "1.4.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/safe-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "safe-buffer",
+      "version": "5.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/smart-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "smart-buffer",
+      "version": "4.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/socks"
+      ],
+      "ecosystem": "npm",
+      "name": "socks",
+      "version": "2.8.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/split2"
+      ],
+      "ecosystem": "npm",
+      "name": "split2",
+      "version": "4.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/string_decoder"
+      ],
+      "ecosystem": "npm",
+      "name": "string_decoder",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/tslib"
+      ],
+      "ecosystem": "npm",
+      "name": "tslib",
+      "version": "2.8.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/typedarray"
+      ],
+      "ecosystem": "npm",
+      "name": "typedarray",
+      "version": "0.0.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/undici-types"
+      ],
+      "ecosystem": "npm",
+      "name": "undici-types",
+      "version": "8.9.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/util-deprecate"
+      ],
+      "ecosystem": "npm",
+      "name": "util-deprecate",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/worker-factory"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-factory",
+      "version": "7.0.50",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/worker-timers"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers",
+      "version": "8.0.34",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/worker-timers-broker"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers-broker",
+      "version": "8.0.18",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/worker-timers-worker"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers-worker",
+      "version": "9.0.15",
+      "vulnerability_ids": []
+    },
+    {
+      "component_refs": [
+        "npm-location:node_modules/ws"
+      ],
+      "ecosystem": "npm",
+      "name": "ws",
+      "version": "8.22.0",
+      "vulnerability_ids": []
+    }
+  ],
+  "querybatch_requests": 2,
+  "request_response_evidence": [
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.activity:activity"
+            },
+            "version": "1.8.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.annotation:annotation"
+            },
+            "version": "1.8.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.annotation:annotation-experimental"
+            },
+            "version": "1.4.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.annotation:annotation-jvm"
+            },
+            "version": "1.8.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.appcompat:appcompat"
+            },
+            "version": "1.7.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.appcompat:appcompat-resources"
+            },
+            "version": "1.7.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.arch.core:core-common"
+            },
+            "version": "2.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.arch.core:core-runtime"
+            },
+            "version": "2.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.browser:browser"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.cardview:cardview"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.collection:collection"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.concurrent:concurrent-futures"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.constraintlayout:constraintlayout"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.constraintlayout:constraintlayout-solver"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.coordinatorlayout:coordinatorlayout"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.core:core"
+            },
+            "version": "1.13.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.core:core-ktx"
+            },
+            "version": "1.13.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.cursoradapter:cursoradapter"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.customview:customview"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.documentfile:documentfile"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.drawerlayout:drawerlayout"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.dynamicanimation:dynamicanimation"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.emoji2:emoji2"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.emoji2:emoji2-views-helper"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.fragment:fragment"
+            },
+            "version": "1.8.9"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.interpolator:interpolator"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.legacy:legacy-support-core-utils"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-common"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-livedata"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-livedata-core"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-process"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-runtime"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-viewmodel"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate"
+            },
+            "version": "2.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.loader:loader"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.localbroadcastmanager:localbroadcastmanager"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.print:print"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.profileinstaller:profileinstaller"
+            },
+            "version": "1.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.recyclerview:recyclerview"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.resourceinspection:resourceinspection-annotation"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.savedstate:savedstate"
+            },
+            "version": "1.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.startup:startup-runtime"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.tracing:tracing"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.transition:transition"
+            },
+            "version": "1.5.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.vectordrawable:vectordrawable"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.vectordrawable:vectordrawable-animated"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.versionedparcelable:versionedparcelable"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.viewpager2:viewpager2"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "androidx.viewpager:viewpager"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.google.android.material:material"
+            },
+            "version": "1.12.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.google.code.gson:gson"
+            },
+            "version": "2.10.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.google.errorprone:error_prone_annotations"
+            },
+            "version": "2.15.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.google.guava:listenablefuture"
+            },
+            "version": "1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.jakewharton.timber:timber"
+            },
+            "version": "5.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.nimbusds:nimbus-jose-jwt"
+            },
+            "version": "10.10"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.squareup.okhttp3:okhttp"
+            },
+            "version": "4.12.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.squareup.okio:okio"
+            },
+            "version": "3.6.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "com.squareup.okio:okio-jvm"
+            },
+            "version": "3.6.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "net.openid:appauth"
+            },
+            "version": "0.11.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlin:kotlin-bom"
+            },
+            "version": "1.8.22"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlin:kotlin-stdlib"
+            },
+            "version": "2.2.10"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlin:kotlin-stdlib-common"
+            },
+            "version": "2.2.10"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
+            },
+            "version": "1.9.10"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+            },
+            "version": "1.9.10"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android"
+            },
+            "version": "1.10.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom"
+            },
+            "version": "1.10.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core"
+            },
+            "version": "1.10.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm"
+            },
+            "version": "1.10.2"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.jetbrains:annotations"
+            },
+            "version": "23.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.maplibre.gl:android-sdk-geojson"
+            },
+            "version": "6.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.maplibre.gl:android-sdk-turf"
+            },
+            "version": "6.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.maplibre.gl:android-sdk-vulkan-opengl"
+            },
+            "version": "13.7.1"
+          },
+          {
+            "package": {
+              "ecosystem": "Maven",
+              "name": "org.maplibre.gl:maplibre-android-gestures"
+            },
+            "version": "0.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@babel/runtime"
+            },
+            "version": "7.29.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/node"
+            },
+            "version": "26.6.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/readable-stream"
+            },
+            "version": "4.0.25"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/ws"
+            },
+            "version": "8.18.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "abort-controller"
+            },
+            "version": "3.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "base64-js"
+            },
+            "version": "1.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "bl"
+            },
+            "version": "6.1.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "broker-factory"
+            },
+            "version": "3.1.15"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "buffer"
+            },
+            "version": "6.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "buffer-from"
+            },
+            "version": "1.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "commist"
+            },
+            "version": "3.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "concat-stream"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "debug"
+            },
+            "version": "4.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "event-target-shim"
+            },
+            "version": "5.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "events"
+            },
+            "version": "3.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-unique-numbers"
+            },
+            "version": "9.0.27"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "help-me"
+            },
+            "version": "5.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ieee754"
+            },
+            "version": "1.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "inherits"
+            },
+            "version": "2.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ip-address"
+            },
+            "version": "10.7.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "lru-cache"
+            },
+            "version": "10.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "minimist"
+            },
+            "version": "1.2.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt"
+            },
+            "version": "5.16.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt-packet"
+            },
+            "version": "9.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ms"
+            },
+            "version": "2.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process"
+            },
+            "version": "0.11.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process-nextick-args"
+            },
+            "version": "2.0.1"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    },
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "3.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "4.8.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "rfdc"
+            },
+            "version": "1.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "safe-buffer"
+            },
+            "version": "5.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "smart-buffer"
+            },
+            "version": "4.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "socks"
+            },
+            "version": "2.8.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "split2"
+            },
+            "version": "4.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "string_decoder"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "tslib"
+            },
+            "version": "2.8.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "typedarray"
+            },
+            "version": "0.0.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "undici-types"
+            },
+            "version": "8.9.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "util-deprecate"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-factory"
+            },
+            "version": "7.0.50"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers"
+            },
+            "version": "8.0.34"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers-broker"
+            },
+            "version": "8.0.18"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers-worker"
+            },
+            "version": "9.0.15"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ws"
+            },
+            "version": "8.22.0"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    }
+  ],
+  "sbom_sha256": "830f2f3135bcdeae3eb8880778166bd8d5d0438b09e6c960ba9cf6af54ceadec",
+  "status": "no-known-findings",
+  "unique_advisories": 0
+}

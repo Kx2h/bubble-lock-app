@@ -119,8 +119,8 @@ test('permission denial and disabled binding clear coordinates and location meta
 });
 
 test('grant revocation, consent revocation, expiry, wrong principal and revision revoke visible coordinates', () => {
-  const grant = { status: 'ACTIVE', principalId: 'alice', subjectId: 'ue-1', expiresAt: '2026-10-31T13:00:00Z', scopes: ['location:read'], consentId: 'consent-1', revision: 2 };
-  const consent = { status: 'ACTIVE', subjectId: 'ue-1', expiresAt: '2026-10-31T13:00:00Z', revision: 2 };
+  const grant = { grantId: 'grant-1', status: 'ACTIVE', principalId: 'alice', subjectId: 'ue-1', expiresAt: '2026-10-31T13:00:00Z', scopes: ['location:read'], consentId: 'consent-1', revision: 2 };
+  const consent = { consentId: 'consent-1', status: 'ACTIVE', subjectId: 'ue-1', scopes: ['location:read'], expiresAt: '2026-10-31T13:00:00Z', revision: 2 };
   const bs = [{ ...bindings[0], grantId: 'grant-1' }];
   const project = (g, c) => snapshot({ a: event() }, { grants: { 'grant-1': g }, consents: { 'consent-1': c } }, bs).keyrings[0];
   assert.equal(project(grant, consent).status, 'available');
@@ -155,7 +155,7 @@ test('HTTP requires signed auth, rejects mutation/body/query, returns no-store w
 });
 
 test('actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules', async t => {
-  const scratch = fileURLToPath(new URL('../../../../.local/mobile-api-tests/', import.meta.url));
+  const scratch = process.env.TMPDIR ?? fileURLToPath(new URL('../../../../.local/tmp/security/', import.meta.url));
   await mkdir(scratch, { recursive: true });
   const directory = await mkdtemp(join(scratch, 'mobile-location-read-')); t.after(() => rm(directory, { recursive: true, force: true }));
   const statePath = join(directory, 'runtime.json');

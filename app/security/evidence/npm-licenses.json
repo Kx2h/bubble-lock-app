@@ -1,0 +1,578 @@
+{
+  "checked_at": "2026-10-31T20:20:26Z",
+  "packages": [
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "07cee4a3a13b16e0afc384cdb0f9de426dcf0d1ef1085dc38ce54a1fe5f02b96",
+      "name": "@babel/runtime",
+      "source": "https://registry.npmjs.org/%40babel%2Fruntime/7.29.10",
+      "version": "7.29.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "7db5f21c56ef0d03dcab4237d1760d28f00ab19b9edd25dc7ba7d78ce9ac1207",
+      "name": "@types/node",
+      "source": "https://registry.npmjs.org/%40types%2Fnode/26.6.5",
+      "version": "26.6.5"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "174a87643c8ba73ba4ed7576fab5bd6ce8af839894c7e8109bf25727b76277b1",
+      "name": "@types/readable-stream",
+      "source": "https://registry.npmjs.org/%40types%2Freadable-stream/4.0.25",
+      "version": "4.0.25"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ce84a24d90981a84c9ed14e7c331ee3276fa999f1fbd19a93bf13585e6f20c67",
+      "name": "@types/ws",
+      "source": "https://registry.npmjs.org/%40types%2Fws/8.18.2",
+      "version": "8.18.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "30707f3764743a8bd0e82f7fbeb60343d98ff3313cb9369e0ffc0ead17ebdbe1",
+      "name": "abort-controller",
+      "source": "https://registry.npmjs.org/abort-controller/3.0.0",
+      "version": "3.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "9e1b9210ad2284f9c219860beaae1ed476e6591c77a5c9254a5d67c7b49160b1",
+      "name": "base64-js",
+      "source": "https://registry.npmjs.org/base64-js/1.5.1",
+      "version": "1.5.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b656daa252da5e053305440189a79134cf5a59095e29da053b464fdab83fd484",
+      "name": "bl",
+      "source": "https://registry.npmjs.org/bl/6.1.6",
+      "version": "6.1.6"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8d100a9eb476debb770819659ac0d73ff9197f28e97f9d60365e939bb64a6f3c",
+      "name": "broker-factory",
+      "source": "https://registry.npmjs.org/broker-factory/3.1.15",
+      "version": "3.1.15"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1e4c5d759986699c80290b6307aeb2678d5a7032ac72e7dd8250c0e9d97487ad",
+      "name": "buffer",
+      "source": "https://registry.npmjs.org/buffer/6.0.3",
+      "version": "6.0.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "88a0705c8a4f1ae5bd13a488cbe8210f3d7f6a6e92ec255d3aa880295a1b8a84",
+      "name": "buffer-from",
+      "source": "https://registry.npmjs.org/buffer-from/1.1.2",
+      "version": "1.1.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6d3c649b563ab948ff162b00e0558d546c8d0c42821d5f753201cbb1bd66b0b6",
+      "name": "commist",
+      "source": "https://registry.npmjs.org/commist/3.2.0",
+      "version": "3.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6f3b8ca3007546943f8969ef8068a8e1dbaf8b230b6647d407cbb12974d5796c",
+      "name": "concat-stream",
+      "source": "https://registry.npmjs.org/concat-stream/2.0.0",
+      "version": "2.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1c81b9c385bf3e0de8a6c91f887acb9b39dccda84dccd9b10c4641186322aa1b",
+      "name": "readable-stream",
+      "source": "https://registry.npmjs.org/readable-stream/3.6.2",
+      "version": "3.6.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b268afc41ce4b2772412cb09e15986a86f19fd5c408de1daad1b02895b760a3e",
+      "name": "debug",
+      "source": "https://registry.npmjs.org/debug/4.4.3",
+      "version": "4.4.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b98c3b07007ce1a74a016a0b06d123872585e7b6ac556e92636b80de997292cf",
+      "name": "event-target-shim",
+      "source": "https://registry.npmjs.org/event-target-shim/5.0.1",
+      "version": "5.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "093f035c32b4aab14fefbe70e526213b7b8397082093a090eed432b6a2696e8c",
+      "name": "events",
+      "source": "https://registry.npmjs.org/events/3.3.0",
+      "version": "3.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "32bedfaba319460ac1b62ebcfe9bfc2e775cab7895e8bbaa39ccd73e4ef5aa2c",
+      "name": "fast-unique-numbers",
+      "source": "https://registry.npmjs.org/fast-unique-numbers/9.0.27",
+      "version": "9.0.27"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3ff1edda3cd94ff084abb93399a7ff95812908e9ae966de6120866ea1cebb5d4",
+      "name": "help-me",
+      "source": "https://registry.npmjs.org/help-me/5.0.0",
+      "version": "5.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "metadata_sha256": "0a3a6743198b377e785ff443a59d8df8ce474f09cafc498c00db2f66c0cf0651",
+      "name": "ieee754",
+      "source": "https://registry.npmjs.org/ieee754/1.2.1",
+      "version": "1.2.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "6233fbf9bf6e4e86273b53362522435f4772ea9a74a0fa3f82801625432c8f96",
+      "name": "inherits",
+      "source": "https://registry.npmjs.org/inherits/2.0.4",
+      "version": "2.0.4"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b2f791c525879e69183dfc09fb5c0fff3f5d2829b9dbb72d1b8239d4746bde76",
+      "name": "ip-address",
+      "source": "https://registry.npmjs.org/ip-address/10.7.5",
+      "version": "10.7.5"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "81312fd758caa7138bb0e18192cb97131ad69a8bc759208b1fe742ea714365e5",
+      "name": "lru-cache",
+      "source": "https://registry.npmjs.org/lru-cache/10.4.3",
+      "version": "10.4.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "53fa9d5c2818e5c69e8f765fb95152f4d4fff7c86a9da33453aa30a3c98ceac1",
+      "name": "minimist",
+      "source": "https://registry.npmjs.org/minimist/1.2.8",
+      "version": "1.2.8"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f00486cf51be61e768ff543f7ee6df417864820c55f7885a99c17f1f213f5f3a",
+      "name": "mqtt",
+      "source": "https://registry.npmjs.org/mqtt/5.16.1",
+      "version": "5.16.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "344be374a8e21b354e0ebe7aa7bb9c3e934570de63f5167465a57381651d3179",
+      "name": "mqtt-packet",
+      "source": "https://registry.npmjs.org/mqtt-packet/9.0.2",
+      "version": "9.0.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "c698094a3017fb8d801c34a94da18a98158a4cec1580d8829a6c631990ab892b",
+      "name": "ms",
+      "source": "https://registry.npmjs.org/ms/2.1.3",
+      "version": "2.1.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "250506a63afdc63af0b9f32534dcf36474e21ccaded7cb5209efc66bce0fc37f",
+      "name": "process",
+      "source": "https://registry.npmjs.org/process/0.11.10",
+      "version": "0.11.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ae4f8d22c3be3ac9f85d21c9d7ef2bedeca4ee7bb72e07af35bc061afc03a33a",
+      "name": "process-nextick-args",
+      "source": "https://registry.npmjs.org/process-nextick-args/2.0.1",
+      "version": "2.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "036a7f22b9486371a09566c2751068beb7b8ca14fd80beb4093e765ce1c7e4e3",
+      "name": "readable-stream",
+      "source": "https://registry.npmjs.org/readable-stream/4.8.0",
+      "version": "4.8.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "fecbd7d31461f018c263e071d783000dd31c9449412446a5a81384bdf98e6720",
+      "name": "rfdc",
+      "source": "https://registry.npmjs.org/rfdc/1.4.1",
+      "version": "1.4.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "7b3423533cb6b58bf259ad692aa9f87866f6dd2590dc192d977801488ed75917",
+      "name": "safe-buffer",
+      "source": "https://registry.npmjs.org/safe-buffer/5.2.1",
+      "version": "5.2.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1e2b1f4921fd6c372a37c8482dd1414c6d5065f9c908abac4cfca39f69f63ab9",
+      "name": "smart-buffer",
+      "source": "https://registry.npmjs.org/smart-buffer/4.2.0",
+      "version": "4.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "2c992b68febd8dae55765744ffce29f85614c3cec9b551fefb8c93dfc4fd162c",
+      "name": "socks",
+      "source": "https://registry.npmjs.org/socks/2.8.10",
+      "version": "2.8.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "5835f2f1b3a8d347f43cf4afb2db341e7bcd428617606af3aed30b61151f8ae6",
+      "name": "split2",
+      "source": "https://registry.npmjs.org/split2/4.2.0",
+      "version": "4.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4823d456faeba235ce324984e3a5fcc80c2d5630878f62d7de23db7afa4a0dfe",
+      "name": "string_decoder",
+      "source": "https://registry.npmjs.org/string_decoder/1.3.0",
+      "version": "1.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "0BSD"
+          }
+        }
+      ],
+      "metadata_sha256": "c0422c6174a7d64c318b42bda107700ba38e738233419091a06916625a0ee83a",
+      "name": "tslib",
+      "source": "https://registry.npmjs.org/tslib/2.8.1",
+      "version": "2.8.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "82a2b1c9af6fe9d3404eb51f4ca73807d0706028d616daa2a3f004e1cb99b92f",
+      "name": "typedarray",
+      "source": "https://registry.npmjs.org/typedarray/0.0.6",
+      "version": "0.0.6"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "46fed606b0deb71334108039e2ea5785fe587a7ee7a55596e0c5dc1c6aa5f6f7",
+      "name": "undici-types",
+      "source": "https://registry.npmjs.org/undici-types/8.9.0",
+      "version": "8.9.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ed2a52f244a05a768ad951439b2cee969a0c4761f1fc2bf2b4f6070f875153d9",
+      "name": "util-deprecate",
+      "source": "https://registry.npmjs.org/util-deprecate/1.0.2",
+      "version": "1.0.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "025b025aca43677ca8d7384f8b2f8dd1cae99103d97b85646c80fe0c5a948936",
+      "name": "worker-factory",
+      "source": "https://registry.npmjs.org/worker-factory/7.0.50",
+      "version": "7.0.50"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1bfd42204a738b5e80b20f9deef22baebccd729b7b27edf4961b4e83968904b8",
+      "name": "worker-timers",
+      "source": "https://registry.npmjs.org/worker-timers/8.0.34",
+      "version": "8.0.34"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8b7eb5c22a8f684b230c4f179eaba666eb4288d7ed0043a60de293b3997390ae",
+      "name": "worker-timers-broker",
+      "source": "https://registry.npmjs.org/worker-timers-broker/8.0.18",
+      "version": "8.0.18"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "e8d526fc181a5d2204185b1f388422dee5781d81716920cff23e4457cca58855",
+      "name": "worker-timers-worker",
+      "source": "https://registry.npmjs.org/worker-timers-worker/9.0.15",
+      "version": "9.0.15"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "5215f393ed9acee525b3eab3579f34e33fbd9848a53680d3f5a24b49f647a1f3",
+      "name": "ws",
+      "source": "https://registry.npmjs.org/ws/8.22.0",
+      "version": "8.22.0"
+    }
+  ],
+  "source": "npm exact-version registry metadata"
+}

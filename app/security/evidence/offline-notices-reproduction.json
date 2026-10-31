@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "checked_at": "2026-10-31T20:29:50Z",
+  "check": "Re-generated into a separate workspace-local directory from pinned official sources and resolved cached Maven archives; all 9 files identical byte-for-byte.",
+  "resolved_maven_components": 72,
+  "original_legal_texts": 7,
+  "offline_index_sha256": "5c5a02ba856bc8b44f9efc92ada6e0e993d57ee279f153d63a965a54d79fe25f"
+}

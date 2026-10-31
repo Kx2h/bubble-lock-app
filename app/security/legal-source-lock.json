@@ -1,0 +1,30 @@
+{
+  "legal_texts": [
+    {
+      "file": "Apache-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+    },
+    {
+      "file": "MPL-2.0.txt",
+      "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+      "source": "https://www.mozilla.org/media/MPL/2.0/index.txt"
+    },
+    {
+      "file": "MapLibre-13.7.1-Android-LICENSE.md",
+      "sha256": "db3cc41e2c79f394a1dddd890c55c263426175029a898d5167820498ddebf152",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/platform/android/LICENSE.md"
+    },
+    {
+      "file": "MapLibre-13.7.1-LICENSE.md",
+      "sha256": "554cff8b6f6d2e77629e8c6eab769844ab86adc610ca2d60401ba2e0dce3c229",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/LICENSE.md"
+    },
+    {
+      "file": "MapLibre-13.7.1-core-LICENSES.md",
+      "sha256": "751ce813c861e62623cceffc394d9dc2ec7401735761eb58c93610a3dece25ba",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/LICENSES.core.md"
+    }
+  ],
+  "version": "official sources downloaded for MapLibre Android 13.7.1 release notices"
+}

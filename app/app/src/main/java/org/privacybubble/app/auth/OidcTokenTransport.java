@@ -7,8 +7,8 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
 import org.privacybubble.app.net.Tls13SocketFactory;
+import org.privacybubble.app.net.StrictJson;
 
-/** Single, bounded token endpoint attempt; caller must not replay an uncertain exchange. */
 final class OidcTokenTransport {
     private static final int MAX_BODY = 65536;
     private OidcTokenTransport() { }
@@ -32,7 +32,9 @@ final class OidcTokenTransport {
                     out.write(buffer, 0, n);
                 }
                 if (System.nanoTime() - deadline >= 0) throw new IllegalArgumentException("Token exchange timed out");
-                return new String(out.toByteArray(), StandardCharsets.UTF_8);
+                String response = StrictJson.utf8(out.toByteArray(), MAX_BODY);
+                StrictJson.object(response, MAX_BODY);
+                return response;
             }
         } finally { conn.disconnect(); }
     }

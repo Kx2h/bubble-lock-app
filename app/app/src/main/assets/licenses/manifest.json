@@ -1,0 +1,1130 @@
+{
+  "format": "privacy-bubble.offline-notices.v1",
+  "index_sha256": "5c5a02ba856bc8b44f9efc92ada6e0e993d57ee279f153d63a965a54d79fe25f",
+  "legal_texts": [
+    {
+      "file": "Apache-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+    },
+    {
+      "file": "AppAuth-0.11.1-LICENSE.txt",
+      "sha256": "59899c6091b540582ed617e8eeaac4919dc985ccfc35459ee9752b699be5205b",
+      "source": "vendored app/vendor/appauth/LICENSE; upstream AppAuth-Android 0.11.1"
+    },
+    {
+      "file": "MPL-2.0.txt",
+      "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+      "source": "https://www.mozilla.org/media/MPL/2.0/index.txt"
+    },
+    {
+      "file": "MapLibre-13.7.1-Android-LICENSE.md",
+      "sha256": "db3cc41e2c79f394a1dddd890c55c263426175029a898d5167820498ddebf152",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/platform/android/LICENSE.md"
+    },
+    {
+      "file": "MapLibre-13.7.1-LICENSE.md",
+      "sha256": "554cff8b6f6d2e77629e8c6eab769844ab86adc610ca2d60401ba2e0dce3c229",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/LICENSE.md"
+    },
+    {
+      "file": "MapLibre-13.7.1-core-LICENSES.md",
+      "sha256": "751ce813c861e62623cceffc394d9dc2ec7401735761eb58c93610a3dece25ba",
+      "source": "https://raw.githubusercontent.com/maplibre/maplibre-native/android-v13.7.1/LICENSES.core.md"
+    },
+    {
+      "file": "artifact-c51fa7ee2be0d516.txt",
+      "sha256": "8a9c58fbded5ea3474315e4a9824ca8b1486098a1a03e897e0b19419d5e1876a",
+      "source": "com.squareup.okhttp3:okhttp:4.12.0!/okhttp3/internal/publicsuffix/NOTICE"
+    }
+  ],
+  "limitations": "Upstream MapLibre Android/core legal notices are preserved verbatim. They are not an independently verified inventory of every static native component/version. npm host dependencies are catalogued in the separate supply-chain BOM, not bundled into Android.",
+  "local_fork": "net.openid:appauth:0.11.1-privacybubble.1",
+  "maven_components": [
+    {
+      "coordinate": "androidx.activity:activity:1.8.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.activity:activity:1.8.1",
+          "pom_sha256": "c0ccbb0f6bd3f3a4fe338811dd8aee19b4919f4197613ee801bf33dd6dd702d7"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-experimental:1.4.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.annotation:annotation-experimental:1.4.0",
+          "pom_sha256": "41d2b9d879fc9221acda8e873ec7d26b153b9b8e04770ac79491e0576baef038"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation-jvm:1.8.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.annotation:annotation-jvm:1.8.2",
+          "pom_sha256": "7d3b2860ea36511153a9713559dab60d77f72167fadc9c1c3198c23035fbc480"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.annotation:annotation:1.8.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.annotation:annotation:1.8.2",
+          "pom_sha256": "79db4699a8499afea1c05bdde152fdf22c12f10a3e42e95c06931cb3e237c7d2"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat-resources:1.7.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.appcompat:appcompat-resources:1.7.0",
+          "pom_sha256": "bbf2a5b9ac78904c9da792e16731793274f95fb4a61230719140b3e0ef736baa"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.appcompat:appcompat:1.7.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.appcompat:appcompat:1.7.0",
+          "pom_sha256": "a57b428f428a9337d7b483a2162a570d4e672bceff411a6465e53e8747506ac3"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.arch.core:core-common:2.2.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.arch.core:core-common:2.2.0",
+          "pom_sha256": "1e17d4af8d6425be2a69f8af4d654a87e0456259a9eef1542869bcb023547e28"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.arch.core:core-runtime:2.2.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.arch.core:core-runtime:2.2.0",
+          "pom_sha256": "0f953706598140d9d8735cdd5aeb1fa35933f4e2f31c0bf3eb81a053a4c8c1a5"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.browser:browser:1.3.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.browser:browser:1.3.0",
+          "pom_sha256": "d82e1df52624a1fe2757055258e225ccc3aebc3f5a3d523414d7f1bbc80055f8"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.cardview:cardview:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.cardview:cardview:1.0.0",
+          "pom_sha256": "e64ef4e08b58358fe27b599e6fe80a1b153db014c644beee630ab271061c3e6c"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.collection:collection:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.collection:collection:1.1.0",
+          "pom_sha256": "67e9066ca4acfdc6e3cc508293c31ba0398057ff118e4f70b1e1813c9a3456d1"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.concurrent:concurrent-futures:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.concurrent:concurrent-futures:1.1.0",
+          "pom_sha256": "748a34eb5d13d19d187adecaea82667fded5f1b0b98a655e13ed2e4a8b3d8ae6"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.constraintlayout:constraintlayout-solver:2.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.constraintlayout:constraintlayout-solver:2.0.1",
+          "pom_sha256": "81beab01fd168168c6f8428a13359ab3fc2f406740a96f6d9121e807a3baeddb"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.constraintlayout:constraintlayout:2.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.constraintlayout:constraintlayout:2.0.1",
+          "pom_sha256": "e25665eff711bb3f6511e86a143f9f3bd2b46a7fe571bf9e114cfc299c1df307"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.coordinatorlayout:coordinatorlayout:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.coordinatorlayout:coordinatorlayout:1.1.0",
+          "pom_sha256": "a67c52c9ddfaff2ffb2fd4b97cd94fa382e837ea8a5874d029e0a04fa63e5caf"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.core:core-ktx:1.13.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.core:core-ktx:1.13.1",
+          "pom_sha256": "31cc345b8c6cdd2046dcf67872df8a8cb4f44ea0cade4df80002caa7e3b71809"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.core:core:1.13.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.core:core:1.13.1",
+          "pom_sha256": "527abfa5a8d6af748b37e1c0162d1633a2d5ea4387b0205a8b436b6214ba1cf6"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.cursoradapter:cursoradapter:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.cursoradapter:cursoradapter:1.0.0",
+          "pom_sha256": "62d95c89850af21030b19f14d5f7ecd6d8bcc9a3014c59002ec99624caac8100"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.customview:customview:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.customview:customview:1.1.0",
+          "pom_sha256": "c814d435f73e9e6d169886d0eb96b5c5361feb48449fbbb315c908c03c588c94"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.documentfile:documentfile:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.documentfile:documentfile:1.0.0",
+          "pom_sha256": "013288a9317a552706ce625fb24493e8223288529223ec578cf855a5ae9c16e5"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.drawerlayout:drawerlayout:1.1.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.drawerlayout:drawerlayout:1.1.1",
+          "pom_sha256": "c12fa903ba53005962a72405f37896608718f41673fc4a62312e4536132f6f45"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.dynamicanimation:dynamicanimation:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.dynamicanimation:dynamicanimation:1.0.0",
+          "pom_sha256": "44ce22ee620d28f17301bcc60ad49b69b7d0596c2a87b054ad1e3feac7b4a898"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.emoji2:emoji2-views-helper:1.3.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.emoji2:emoji2-views-helper:1.3.0",
+          "pom_sha256": "2673b0f5859d4361a4e9a30457852a6745d0c3c85b5e0412070483f3963ef526"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.emoji2:emoji2:1.3.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.emoji2:emoji2:1.3.0",
+          "pom_sha256": "14ebbea8234f013211965fdd08b42ee907ce0075af321018c8c2865c2e5db0eb"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.fragment:fragment:1.8.9",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.fragment:fragment:1.8.9",
+          "pom_sha256": "8135a58b3ec9379c8afb4acce863f35e7654fddf1c602191f8d3feec13afed36"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.interpolator:interpolator:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.interpolator:interpolator:1.0.0",
+          "pom_sha256": "0ddc07cc39699f48ecd9ec894b5830c0f09e22e82959294edf37217224c88b7b"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.legacy:legacy-support-core-utils:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.legacy:legacy-support-core-utils:1.0.0",
+          "pom_sha256": "8fd093008b3ee7c06e52c78da2af980a7b47b69b967fa91dad7af466f7a00a38"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-common:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-common:2.6.2",
+          "pom_sha256": "57304cdac4da289a6ecdd0738e16b1d8858f1ef8e9fabe2d65a963719fd81dba"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.6.2",
+          "pom_sha256": "1faf8ebf53f28b2f0ae2c2095371ae67d0ca16ac328fce7f163609a43214b5a4"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-livedata:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-livedata:2.6.2",
+          "pom_sha256": "d7c9e019cf68779387481877878f6c499d1786b85f2c0480e9264dd5097c51c0"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-process:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-process:2.6.2",
+          "pom_sha256": "1f14396ec764b44d37c143adacee01e5b68cb5f35a21bcd9cdebd7c83ea7d2e9"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-runtime:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-runtime:2.6.2",
+          "pom_sha256": "8175255546e2a5f510865f84ace680660954730240b1905d9175b4345beda977"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2",
+          "pom_sha256": "7fc854440644cf52c35894d58d946b208e42769e8517d71a5efcba17865432de"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.6.2",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.lifecycle:lifecycle-viewmodel:2.6.2",
+          "pom_sha256": "a9fb0b39a8360beef7bdc8f3953d4d78f3d85304fc80adac3c8eaf530d758050"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.loader:loader:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.loader:loader:1.0.0",
+          "pom_sha256": "c978d550808b47434aa49a63164110a50b55b0bcc6160a93a2e37d5110df8c5e"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0",
+          "pom_sha256": "a000041f5a1f79283c5175e1bb60cf3683780f401c6a9d34fbe9751253fa6ff9"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.print:print:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.print:print:1.0.0",
+          "pom_sha256": "62482c0594841bee24bb996abb6cb7b320a6a3b77dca9f0a0ba4fe3be5530aa7"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.profileinstaller:profileinstaller:1.3.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.profileinstaller:profileinstaller:1.3.1",
+          "pom_sha256": "08263eb70a814a7cb26d11d3a83825f84c29f3e4b59f9134724e0e02e2bbd768"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.recyclerview:recyclerview:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.recyclerview:recyclerview:1.1.0",
+          "pom_sha256": "fe321062a6e4e168b9c2b39a1137564c8784a2e5849402729768d5d7c4d972ef"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.resourceinspection:resourceinspection-annotation:1.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.resourceinspection:resourceinspection-annotation:1.0.1",
+          "pom_sha256": "b8eb4938ed95d7fcdaa2712ebca363e46a0f9228b8be7f23154def56846815dc"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.savedstate:savedstate:1.2.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.savedstate:savedstate:1.2.1",
+          "pom_sha256": "0d33bc285df1e12f22780f1624a6f0b38ea2a6181b0955ec6641caf620c50cbf"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.startup:startup-runtime:1.1.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.startup:startup-runtime:1.1.1",
+          "pom_sha256": "f4114b5c6859bb1bc3caf281cb6d6f25998fa7f7292c64ceaea74a93210e746b"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.tracing:tracing:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.tracing:tracing:1.0.0",
+          "pom_sha256": "cd0299a90d4720d78f1cfb5ff7505f4dbc1a70d05fe23fd9f4d4b77ea59ca05e"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.transition:transition:1.5.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.transition:transition:1.5.0",
+          "pom_sha256": "db6c7497f0f094ff2eecfb329e1700658f0d6c56fb088482f7e9b774de9ad53f"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable-animated:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.vectordrawable:vectordrawable-animated:1.1.0",
+          "pom_sha256": "276a20116b705fb75b9003ee9496c56f6fd3b32375fb232472811eba60a040bd"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.vectordrawable:vectordrawable:1.1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.vectordrawable:vectordrawable:1.1.0",
+          "pom_sha256": "5b0e2d5b2179e54804785cbc21ce5f473b5e1ddd55a57da482e94dcd39492bb2"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.versionedparcelable:versionedparcelable:1.1.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.versionedparcelable:versionedparcelable:1.1.1",
+          "pom_sha256": "5f51e65873ca612de3838fa90d2ee95b8d040efd31b9c390a19bf94d615cdb2f"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.viewpager2:viewpager2:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.viewpager2:viewpager2:1.0.0",
+          "pom_sha256": "4063bca7fe94fe65c98f4168f97ae10e02da0248598ad3ac21c432c7f608a17a"
+        }
+      ]
+    },
+    {
+      "coordinate": "androidx.viewpager:viewpager:1.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "androidx.viewpager:viewpager:1.0.0",
+          "pom_sha256": "1f72f836339d03c6eb013f65075e76ca87075a577578eb4f95f74a3a5d253128"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.android.material:material:1.12.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.google.android.material:material:1.12.0",
+          "pom_sha256": "53693b7e8191e9707f1cc0f2788217a6c4d9de0ebcf548151af69ffa7e12b1d4"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.code.gson:gson:2.10.1",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.google.code.gson:gson:2.10.1",
+          "pom_sha256": "d2b115634f5c085db4b9c9ffc2658e89e231fdbfbe2242121a1cd95d4d948dd7"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.errorprone:error_prone_annotations:2.15.0",
+      "licenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.google.errorprone:error_prone_annotations:2.15.0",
+          "pom_sha256": "7bae617e32681ebbb289c203c905f646c2a0397598af786d961a54aaa3d2b1e6"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.google.guava:listenablefuture:1.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.google.guava:listenablefuture:1.0",
+          "pom_sha256": "53873caf26bc1ed8a567ea6c939ab2aaa3f47a5e32d5cade95ddf5080d23238a"
+        },
+        {
+          "coordinate": "com.google.guava:guava-parent:26.0-android",
+          "pom_sha256": "f8698ab46ca996ce889c1afc8ca4f25eb8ac6b034dc898d4583742360016cc04"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.jakewharton.timber:timber:5.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.jakewharton.timber:timber:5.0.1",
+          "pom_sha256": "47caeb2d78b331edf9eebff21de4599cec469ec75f9c9cf118e42455412ce917"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.nimbusds:nimbus-jose-jwt:10.10",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.nimbusds:nimbus-jose-jwt:10.10",
+          "pom_sha256": "ffde352127bbf74d868d6c307791321f38911afd8458c56d89522cfe9793e11e"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+          "pom_sha256": "7c737040a9419522e7c50cc027416a70fe7c7629e52b219935ade6b4119c7d38"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+          "pom_sha256": "61b4d7c515a0894ffad925fd7052620c1425a86433fd35113b5fab0de890a57f"
+        }
+      ]
+    },
+    {
+      "coordinate": "com.squareup.okio:okio:3.6.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "com.squareup.okio:okio:3.6.0",
+          "pom_sha256": "aeb3b70a24c103ed0c54541f35f5c511d27ce60cae376a596d7d653697f8cc95"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-bom:1.8.22",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlin:kotlin-bom:1.8.22",
+          "pom_sha256": "c8d794eb761888d34369e677de8eaba0b01f9e8a756cfbff53215ccfa5c58c3f"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-common:2.2.10",
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-common:2.2.10",
+          "pom_sha256": "e199b04f736f0c7334ed5deb737899233442b36238a59310790b216b6934c067"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10",
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10",
+          "pom_sha256": "c7fa67c7961320b89d85a3ca59a2e18c2c65850845595dcae4b46af6945edcd5"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10",
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10",
+          "pom_sha256": "5f4b94dd3065a7764c37fa15de2ad6d81f40d59f8cb33f17d181c6384fb7a72e"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.2.10",
+      "licenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.2.10",
+          "pom_sha256": "454ba507a3d36b4ac253df6df96f8739bd26ea19df3f332b10b13f2c5715f787"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2",
+          "pom_sha256": "b92d3672e7f9e8f4c4e2ab187c3e31fecc506496396f4a5f27ee1c957a42b319"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2",
+          "pom_sha256": "faf0c6538e53ddc0499a63664d8e763c216580b2e18e722ccbdf1b431a6afe26"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2",
+          "pom_sha256": "658f576b96c832e7382406adb197d64d8e2e97de10e96dfa3700decfa2a60def"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2",
+      "licenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2",
+          "pom_sha256": "519da5400096f3462a4dae80783ad050413d4bc81ec7ae53fae76aef0ccbed4c"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.jetbrains:annotations:23.0.0",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.jetbrains:annotations:23.0.0",
+          "pom_sha256": "c9490f655132328df2cfbcfdf743f53fc3916d6c1d10437175a6ca6e3a67771c"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk-geojson:6.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.maplibre.gl:android-sdk-geojson:6.0.1",
+          "pom_sha256": "c4c5d3ca85dc344e0fbdf2c40a22eb2e55bdc5892b44e94377e54fa7bd0c28e2"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk-turf:6.0.1",
+      "licenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.maplibre.gl:android-sdk-turf:6.0.1",
+          "pom_sha256": "d1412707b1caac09be5bc25338189b9d89250806f7eb6be90655c0ff54b3f6f9"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1",
+      "licenses": [
+        {
+          "name": "BSD",
+          "url": "https://opensource.org/licenses/BSD-2-Clause"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.maplibre.gl:android-sdk-vulkan-opengl:13.7.1",
+          "pom_sha256": "bd0002ceb2c50169be86939e2614d5a06c6e7215a6d2e6518451db466683bec9"
+        }
+      ]
+    },
+    {
+      "coordinate": "org.maplibre.gl:maplibre-android-gestures:0.0.4",
+      "licenses": [
+        {
+          "name": "BSD",
+          "url": "https://opensource.org/licenses/BSD-2-Clause"
+        }
+      ],
+      "pom_provenance": [
+        {
+          "coordinate": "org.maplibre.gl:maplibre-android-gestures:0.0.4",
+          "pom_sha256": "4f7f178c649295c89a4b5fa3927bc714ffb9e29866d66ca635c5f0415ea83f2e"
+        }
+      ]
+    }
+  ],
+  "resolved_configuration": "releaseRuntimeClasspath"
+}

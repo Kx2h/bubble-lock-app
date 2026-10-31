@@ -6,10 +6,10 @@ java=${JAVA:-java}
 out="$app_dir/build/client-test"
 mkdir -p "$out"
 "$javac" --add-modules jdk.httpserver -d "$out" \
-  "$app_dir/app/src/main/java/org/privacybubble/app/TestStateClient.java" \
-  "$app_dir/app/src/main/java/org/privacybubble/app/TestResourceTimestamp.java" \
-  "$app_dir/app/src/main/java/org/privacybubble/app/TestRefreshState.java" \
-  "$app_dir/app/src/main/java/org/privacybubble/app/TestObservation.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/TestStateClient.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/TestResourceTimestamp.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/TestRefreshState.java" \
+  "$app_dir/app/src/debug/java/org/privacybubble/app/TestObservation.java" \
   "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticReceiptLabels.java" \
   "$app_dir/app/src/debug/java/org/privacybubble/app/SyntheticReceiptMonitor.java" \
   "$app_dir/tests/manual/org/privacybubble/app/TestStateClientTest.java" \

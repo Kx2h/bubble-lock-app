@@ -2,7 +2,6 @@ package org.privacybubble.app.location;
 
 import java.time.Instant;
 
-/** A server-authorized keyring and its explicitly dated location, never phone GPS. */
 public final class KeyringLocation {
     public final String id, name, status, source, observedAt, receivedAt, expiresAt, connectivity;
     public final Double latitude, longitude, accuracyMeters;

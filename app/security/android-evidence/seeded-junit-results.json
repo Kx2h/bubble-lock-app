@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-01",
+  "baselineCommit": "0159653",
+  "dependencies": {
+    "java": "17",
+    "nimbus": "10.10",
+    "org.json": "20260814",
+    "junit": "4.13.2"
+  },
+  "seededCorpora": [
+    {
+      "suite": "IdTokenBoundaryFuzzTest",
+      "seedHex": "0x425542424C45",
+      "claimMutations": 256,
+      "signatureMutations": 512,
+      "jwkMutations": 128,
+      "arbitraryCompactTokens": 1024,
+      "signatureSeedHex": "0x425542424C45 XOR 0x4A574B",
+      "compactSeedHex": "0x425542424C45 XOR 0x4A5754"
+    },
+    {
+      "suite": "OidcRedirectFuzzTest",
+      "seedHex": "0x5245444952454354",
+      "validTransactions": 512,
+      "decodedDuplicateParameters": 512,
+      "wrongStates": 512
+    },
+    {
+      "suite": "OidcProviderFuzzTest",
+      "seedHex": "0x4F4944434D455441",
+      "endpointAndCapabilityMutations": 512
+    },
+    {
+      "suite": "StrictJsonFuzzTest",
+      "seedHex": "0x5354524943544A53",
+      "validUnicodeDocuments": 1024,
+      "escapedDuplicateDocuments": 1024
+    },
+    {
+      "suite": "LocationRepositoryFuzzTest",
+      "seedHex": "0x4C4F434154494F4E",
+      "rangeAndTypeMutations": 1024
+    },
+    {
+      "suite": "AuthorizationAttemptTest",
+      "seedHex": "0x504B434553544154",
+      "transactions": 1024,
+      "timeOriginEpochRejections": 4096,
+      "validPreExpiryChecks": 1024,
+      "validSingleUseClaims": 1024
+    }
+  ],
+  "runs": [
+    {
+      "kind": "Final clean Gradle unit tests",
+      "variant": "debug",
+      "tests": 56,
+      "suiteCount": 13,
+      "failures": 0,
+      "errors": 0,
+      "sessionOriginTestsIncluded": 3,
+      "suites": [
+        {
+          "name": "org.privacybubble.app.auth.AuthorizationAttemptTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "6711869ab76baafe056dcb46b9658f42cc62c4903026e96dcc5ad6512722bcd7"
+        },
+        {
+          "name": "org.privacybubble.app.auth.IdTokenBoundaryFuzzTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "f6acc0e6df922d711b7f47a952ae9cbed109d5c8561f3f408a6124d34f7b8de0"
+        },
+        {
+          "name": "org.privacybubble.app.auth.IdTokenVerifierTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "60b39260e8eec405b254c563858f3bad944bed8455f59865026042791fa3fcfa"
+        },
+        {
+          "name": "org.privacybubble.app.auth.MobileTokenBoundaryFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "a82856ef8e9834ec41a19a9174321b0d32b77d6cbcc2697e382df9760685828f"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcProviderFuzzTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "e8ba42fb2945680d24a5b5a192cb403eba7206f7a756854aa551023ca3182833"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcProviderTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "f2140deb49ef15d08cb71acd088e0cefdd574c9091fab9f041a4d47010132b8e"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcRedirectFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "2efb964635f201ffd95061cfb1e7845fdd7ceaf833251e31a4ba4adc9fb8c150"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcRedirectTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "98c762c763ebb9f1899f298340204458bdbaea0cad5e01a51359d1a76ae6e412"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcScopesTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "795a02d0c82bc878376ef22c4efa81372f654c1eb22bbb8571bfc5f02142d37e"
+        },
+        {
+          "name": "org.privacybubble.app.auth.RotatingSessionTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "0982b78f3568d5ff013e51da41db714f67b87e28e856fe6fe93162e94c48607c"
+        },
+        {
+          "name": "org.privacybubble.app.location.LocationRepositoryFuzzTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "511ca388e434575198a7d4f4b77369e2a3ce5e3ca75c02e7f6cb5c8c83d79e32"
+        },
+        {
+          "name": "org.privacybubble.app.net.StrictJsonFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "9a5cb51104551fd9140b9cbde109bb3557ad5d09f23cc0b7c4b7939273cea56b"
+        },
+        {
+          "name": "org.privacybubble.app.session.ServiceOriginTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "7e323668b9acdecbfccf58c69ff2c438763f4bee133d6d7394690f0ea5980112"
+        }
+      ]
+    },
+    {
+      "kind": "Final clean Gradle unit tests",
+      "variant": "release",
+      "tests": 47,
+      "suiteCount": 11,
+      "failures": 0,
+      "errors": 0,
+      "sessionOriginTestsIncluded": 3,
+      "suites": [
+        {
+          "name": "org.privacybubble.app.auth.AuthorizationAttemptTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "8dfa6b011f4f88c8404154fd56c7545c3b39705537ea2463070109cf3aa4497e"
+        },
+        {
+          "name": "org.privacybubble.app.auth.IdTokenBoundaryFuzzTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "bdce019830c000d782e796e1e9f4b3a98ab5ae13fa6fdb2319a8a9834c4bfed0"
+        },
+        {
+          "name": "org.privacybubble.app.auth.IdTokenVerifierTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "c091877d6d93d6bf994201a79c39c3589b64e09addea99ec08103ed9da5f10b7"
+        },
+        {
+          "name": "org.privacybubble.app.auth.MobileTokenBoundaryFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "4b2db6fc91684bbf1b48b41149c9222b341bc4ed82c52ac7fe63fd59daa3c88d"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcProviderFuzzTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "ef048e52e6b8a2199cf8cf36f760d2bf3da3b8bbd039fba91920069fde83e53e"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcProviderTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "94505b86a9e25e0664a906f12f3cc103c7c27e71ce51131431a042599130b3b4"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcRedirectFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "c5a42192624513929f184652b9e08c115399e081739fba721438ab38c2ed4d49"
+        },
+        {
+          "name": "org.privacybubble.app.auth.OidcRedirectTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "3d4b0353f32a95b605500b3ef8ceade4da87ecac56c35ec591d535792e8a7807"
+        },
+        {
+          "name": "org.privacybubble.app.location.LocationRepositoryFuzzTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "80b3da97efeca0b280cf991ffa7dd4be6a68d1e28bd28f3e7ca173bd24c90bea"
+        },
+        {
+          "name": "org.privacybubble.app.net.StrictJsonFuzzTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "6fedf35a3b2a592b56a868d97bc768c7d6e5bdf006ebbc7dc791a4f4441d451b"
+        },
+        {
+          "name": "org.privacybubble.app.session.ServiceOriginTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "reportSha256": "a69dffac7cd4edd2d3c2aba6e56fcf44b1126a9441deadcaaa82a004ab5a8c25"
+        }
+      ]
+    },
+    {
+      "kind": "standalone JDK17 compile and JUnitCore after decimal-precision fixes",
+      "variant": "common and debug suites",
+      "tests": 56,
+      "failures": 0,
+      "errors": 0,
+      "sessionOriginTestsIncluded": 3
+    },
+    {
+      "kind": "Final Android instrumentation APK build",
+      "result": "passed",
+      "authSecurityAssertionsCompiled": 12,
+      "deviceExecution": "passed on the connected physical Samsung test phone"
+    },
+    {
+      "kind": "lintRelease",
+      "result": "passed",
+      "issues": 0,
+      "reportSha256": "ec3908dd3b2afc027400bb62e53ac64e0c076fd545a93e094383263982dc65dc"
+    },
+    {
+      "kind": "Final physical-device instrumentation",
+      "result": "passed",
+      "assertions": 27,
+      "sessionAssertions": 15,
+      "authAssertions": 12,
+      "authScope": [
+        "AppAuth intent contains only the public transport verifier",
+        "Original S256 challenge remains in browser request",
+        "Placeholder cannot satisfy the original challenge",
+        "Model restoration without retained memory clears credentials and advances epoch",
+        "Browser-launch cancellation leaves terminal FAILED observable to a new owner"
+      ],
+      "excluded": [
+        "No production IdP endpoint or token used",
+        "No system/browser CA trust change",
+        "No full real-browser login/rotation/process-kill claim"
+      ]
+    },
+    {
+      "kind": "Physical-device optimized release installation check",
+      "result": "passed",
+      "signing": "Workspace QA signature applied to a copy of the unsigned release artifact",
+      "debuggable": false,
+      "runAs": "denied",
+      "productionSigningValidated": false
+    }
+  ],
+  "limitations": [
+    "Deterministic generated property/adversarial corpus; no coverage-guided native fuzzing or independent penetration-test certification.",
+    "JVM tests use actual org.json, but production location and token numeric checks consume the strict BigDecimal map before Android JSON number conversion.",
+    "Production IdP login, real browser rotation and process-kill lifecycle tests require a configured operator environment.",
+    "Physical instrumentation directly checks model restoration and observer replacement; it does not replace a complete operator-IdP browser login with real rotation and process termination."
+  ]
+}

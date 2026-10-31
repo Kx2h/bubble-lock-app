@@ -1,0 +1,95 @@
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.maven.MavenModule
+import org.gradle.maven.MavenPomArtifact
+import groovy.xml.XmlSlurper
+
+tasks.register('exportReleaseSecurityInventory') {
+    group = 'verification'
+    description = 'Exports the resolved release graph and SHA-256 artifact/native inventory without local cache paths.'
+    dependsOn ':appauth-patched:bundleReleaseAar'
+    doLast {
+        def runtime = configurations.releaseRuntimeClasspath
+        def componentId = { id ->
+            if (id instanceof ModuleComponentIdentifier) return "maven:${id.group}:${id.module}:${id.version}".toString()
+            if (id instanceof ProjectComponentIdentifier) return "project:${id.projectPath}".toString()
+            throw new GradleException('Unsupported release dependency identity')
+        }
+        def digest = { input ->
+            def sha = MessageDigest.getInstance('SHA-256')
+            byte[] buffer = new byte[65536]
+            int size
+            while ((size = input.read(buffer)) != -1) sha.update(buffer, 0, size)
+            sha.digest().encodeHex().toString()
+        }
+        def result = runtime.incoming.resolutionResult
+        def components = result.allComponents.collect { component ->
+            def identity = component.id
+            def record = [id: componentId(identity), dependencies: component.dependencies.findAll { dependency ->
+                !(identity instanceof ProjectComponentIdentifier && identity.projectPath == project.path && dependency.isConstraint())
+            }.collect { dependency ->
+                if (dependency instanceof UnresolvedDependencyResult) throw new GradleException('Unresolved release dependency')
+                if (!(dependency instanceof ResolvedDependencyResult)) throw new GradleException('Unsupported dependency result')
+                componentId(dependency.selected.id)
+            }.unique().sort(), artifacts: [], nativeFiles: []]
+            if (identity instanceof ModuleComponentIdentifier) {
+                record.putAll([kind: 'maven', group: identity.group, name: identity.module, version: identity.version])
+            } else if (identity.projectPath == ':appauth-patched') {
+                record.putAll([kind: 'local-fork', group: 'net.openid', name: 'appauth', version: '0.11.1-privacybubble.1', upstreamVersion: '0.11.1'])
+            } else if (identity.projectPath == project.path) {
+                record.putAll([kind: 'application', group: android.namespace, name: 'bubble-lock-android', version: android.defaultConfig.versionName])
+            } else throw new GradleException('Unmapped local dependency; add its provenance before release')
+            record
+        }.sort { it.id }
+        def byId = components.collectEntries { [(it.id): it] }
+        def mavenIds = result.allComponents.findAll { it.id instanceof ModuleComponentIdentifier }.collect { it.id }
+        def poms = dependencies.createArtifactResolutionQuery().forComponents(mavenIds).withArtifacts(MavenModule, MavenPomArtifact).execute()
+        if (poms.components.size() != poms.resolvedComponents.size()) throw new GradleException('Release POM metadata resolution failed')
+        poms.resolvedComponents.each { component ->
+            def record = byId[componentId(component.id)]
+            component.getArtifacts(MavenPomArtifact).each { artifact ->
+                if (!(artifact instanceof ResolvedArtifactResult)) throw new GradleException('Release POM artifact resolution failed')
+                def parser = new XmlSlurper(false, false)
+                parser.setFeature('http://apache.org/xml/features/disallow-doctype-decl', true)
+                parser.setFeature('http://xml.org/sax/features/external-general-entities', false)
+                parser.setFeature('http://xml.org/sax/features/external-parameter-entities', false)
+                def pom = parser.parse(artifact.file)
+                record.pomSha256 = artifact.file.withInputStream { digest(it) }
+                record.licenses = pom.licenses.license.collect { license -> [name: license.name.text(), url: license.url.text()] }
+            }
+        }
+        byId['project::appauth-patched'].licenses = [[name: 'Apache License, Version 2.0', url: 'https://www.apache.org/licenses/LICENSE-2.0']]
+        def recordArtifact = { record, file ->
+            def hash = file.withInputStream { digest(it) }
+            record.artifacts.add([name: file.name, type: file.name.tokenize('.').last(), sha256: hash, size: file.length()])
+            if (file.name.endsWith('.aar')) {
+                new ZipFile(file).withCloseable { archive ->
+                    archive.entries().findAll { !it.directory && it.name.matches('jni/[^/]+/[^/]+\\.so') }.sort { it.name }.each { entry ->
+                        archive.getInputStream(entry).withCloseable { stream ->
+                            record.nativeFiles.add([name: entry.name, sha256: digest(stream), size: entry.size])
+                        }
+                    }
+                }
+            }
+        }
+        def external = runtime.incoming.artifactView { componentFilter { it instanceof ModuleComponentIdentifier } }.artifacts
+        external.failures.each { throw new GradleException('Unresolved release artifact', it) }
+        external.artifacts.each { artifact -> recordArtifact(byId[componentId(artifact.id.componentIdentifier)], artifact.file) }
+        def localAar = project(':appauth-patched').layout.buildDirectory.file('outputs/aar/appauth-patched-release.aar').get().asFile
+        if (!localAar.isFile()) throw new GradleException('Built patched AppAuth AAR is required')
+        recordArtifact(byId['project::appauth-patched'], localAar)
+        components.each { it.artifacts.sort { a, b -> a.name <=> b.name }; it.nativeFiles.sort { a, b -> a.name <=> b.name } }
+        def destination = providers.gradleProperty('securityInventory').orNull
+        def output = destination == null ? layout.buildDirectory.file('reports/security/release-inventory.json').get().asFile : file(destination)
+        output.parentFile.mkdirs()
+        output.setText(JsonOutput.prettyPrint(JsonOutput.toJson([format: 'privacy-bubble.security-inventory.v1', configuration: 'releaseRuntimeClasspath',
+                applicationId: android.defaultConfig.applicationId, version: android.defaultConfig.versionName, root: componentId(result.root.id), components: components])).replaceAll('(?m)[ \\t]+$', '') + '\n', 'UTF-8')
+        logger.lifecycle('Exported release security inventory: {} resolved components', components.size())
+    }
+}

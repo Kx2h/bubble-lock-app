@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "assertions": 27,
+  "session_assertions": 15,
+  "auth_assertions": 12,
+  "runner": "SessionSecurityInstrumentation"
+}

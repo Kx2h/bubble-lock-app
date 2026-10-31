@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
 import org.privacybubble.app.net.Tls13SocketFactory;
 
-/** HTTPS transport boundary; the caller owns API semantics and trusted-origin provisioning. */
 public final class HttpsApiTransport {
     private static final int MAX_BODY = 65536;
     private static final long BUDGET_NANOS = 10_000_000_000L;
@@ -23,7 +22,6 @@ public final class HttpsApiTransport {
     private static final Set<String> RESERVED = new HashSet<>(Arrays.asList("host", "connection", "content-length", "transfer-encoding", "proxy-authorization"));
     private final URI origin;
 
-    /** Origin must be provisioned by trusted configuration, not by a redirect or a remote response. */
     public HttpsApiTransport(URI origin) {
         if (origin == null || !"https".equalsIgnoreCase(origin.getScheme()) || origin.getHost() == null
                 || origin.getUserInfo() != null || origin.getRawQuery() != null || origin.getRawFragment() != null
@@ -34,7 +32,6 @@ public final class HttpsApiTransport {
         this.origin = origin;
     }
 
-    /** Performs one application-level attempt. An IOException after a write can leave its outcome unknown. */
     public Response request(String method, String relative, Map<String, String> headers, byte[] body) throws IOException {
         if (!METHODS.contains(method)) throw new IllegalArgumentException("Unsupported method");
         if (body != null && (body.length > MAX_BODY || method.equals("GET"))) throw new IllegalArgumentException("Invalid request body");
@@ -85,8 +82,7 @@ public final class HttpsApiTransport {
                 || !path.normalize().equals(path) || raw.toLowerCase(Locale.ROOT).matches(".*%(25|2e|2f|5c|0a|0d).*")) {
             throw new IllegalArgumentException("Invalid path");
         }
-        // URI.normalize() retains leading ".." segments instead of removing them.
-        // Reject them explicitly even when they cannot change the target origin.
+
         for (String segment : raw.split("/", -1)) {
             if (segment.equals(".") || segment.equals("..")) throw new IllegalArgumentException("Invalid path");
         }
@@ -140,7 +136,7 @@ public final class HttpsApiTransport {
         }
         public int status() { return status; }
         public byte[] body() { return body.clone(); }
-        /** Returns null for absent or repeated headers. Do not log sensitive values. */
+
         public String header(String name) { return name == null ? null : headers.get(name.toLowerCase(Locale.ROOT)); }
         @Override public String toString() { return "HttpsApiResponse[redacted]"; }
     }

@@ -1,0 +1,20 @@
+{
+  "representation": "UTF-8 JSON, sorted keys, indent 2, final newline; exact canonical snapshots used by validator",
+  "schemas": [
+    {
+      "name": "bom-1.6.schema.json",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/bom-1.6.schema.json",
+      "sha256": "9fe10d461c8ca16a8f32b777b01a46418b0bcca380812da6d15a3c81ec3cb512"
+    },
+    {
+      "name": "jsf-0.82.schema.json",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/jsf-0.82.schema.json",
+      "sha256": "6c5b63ea535f47f1f6fe86e4e7084cd1d5b973b8574a3a7d542901103af857a6"
+    },
+    {
+      "name": "spdx.schema.json",
+      "source": "https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/spdx.schema.json",
+      "sha256": "8bcce78231e337edef159eef41b2d6fdcc2fb2a684a9722fec6e9e8e9f926d98"
+    }
+  ]
+}

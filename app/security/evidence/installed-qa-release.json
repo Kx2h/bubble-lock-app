@@ -1,0 +1,8 @@
+{
+  "version": "0.3.0",
+  "debuggable": false,
+  "run_as_denied": true,
+  "signing": "workspace QA key; not organization production signing",
+  "unsigned_sha256": "9df451c0814e541f7b3f4fe569d2eb0bedc91b4c271fe6a12fbb2161769ea2d4",
+  "qa_signed_sha256": "0d721eb6b76d5f87508a8db405c9be6327ef0edbdef19f4aa2e263620a4c5b7a"
+}

@@ -4,13 +4,12 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import org.privacybubble.app.net.Tls13SocketFactory;
+import org.privacybubble.app.net.StrictJson;
 
-/** Trust boundary for a provisioned OIDC issuer. No login is performed here. */
 public final class OidcProvider {
     private static final int MAX_BODY_BYTES = 65536;
     private static final long TOTAL_TIMEOUT_NANOS = 10_000_000_000L;
@@ -26,7 +25,6 @@ public final class OidcProvider {
         this.jwksUri = jwksUri;
     }
 
-    /** The issuer must come from trusted configuration, never a redirect. Call on a background thread. */
     public static OidcProvider discover(String trustedIssuer) throws Exception {
         URI issuerUri = secureUri(trustedIssuer);
         String base = issuerUri.toString();
@@ -37,11 +35,11 @@ public final class OidcProvider {
     static OidcProvider parse(String trustedIssuer, String metadata) throws Exception {
         secureUri(trustedIssuer);
         if (metadata == null || metadata.length() > MAX_BODY_BYTES) throw new IllegalArgumentException("Invalid discovery document");
-        Map<String, Object> doc = JSONObjectUtils.parse(metadata);
+        Map<String, Object> doc = StrictJson.object(metadata, MAX_BODY_BYTES);
         if (!trustedIssuer.equals(JSONObjectUtils.getString(doc, "issuer"))) throw new IllegalArgumentException("Issuer mismatch");
         requireCapability(doc, "response_types_supported", "code");
         requireCapability(doc, "id_token_signing_alg_values_supported", "RS256");
-        // Refuse providers that do not explicitly advertise the S256 PKCE method.
+
         requireCapability(doc, "code_challenge_methods_supported", "S256");
         return new OidcProvider(trustedIssuer,
             secureUri(JSONObjectUtils.getString(doc, "authorization_endpoint")),
@@ -49,29 +47,21 @@ public final class OidcProvider {
             secureUri(JSONObjectUtils.getString(doc, "jwks_uri")));
     }
 
-    /**
-     * Fetch signing keys only from the HTTPS JWKS URI in this validated discovery document,
-     * then return a verified subject. Call on a background thread; failures never authenticate.
-     * Expiry and not-before are checked against the system clock after the JWKS fetch.
-     */
     public String verifyIdToken(String jwt, String clientId, String nonce) throws Exception {
         String keys = fetch(jwksUri.toString());
         return IdTokenVerifier.verify(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000);
     }
 
-    /** @deprecated Caller-supplied time is ignored; use the three-argument method. */
     @Deprecated
     public String verifyIdToken(String jwt, String clientId, String nonce, long ignoredNowEpochSeconds) throws Exception {
         return verifyIdToken(jwt, clientId, nonce);
     }
 
-    /** Context for rotation is created only from the verified initial ID token. */
     IdTokenVerifier.Identity verifyIdentityToken(String jwt, String clientId, String nonce, String accessToken) throws Exception {
         String keys = fetch(jwksUri.toString());
         return IdTokenVerifier.verifyInitial(jwt, keys, issuer, clientId, nonce, System.currentTimeMillis() / 1000, accessToken);
     }
 
-    /** Verify a refreshed ID token using the same trusted provider and initial transaction. */
     void verifyRefreshIdToken(String jwt, IdTokenVerifier.Identity initial, String clientId, long started, String accessToken) throws Exception {
         if (initial == null || !initial.matches(issuer, clientId)) throw new IllegalArgumentException("ID token validation failed");
         String keys = fetch(jwksUri.toString());
@@ -118,7 +108,7 @@ public final class OidcProvider {
                     out.write(buffer, 0, count);
                 }
                 requireWithinDeadline(deadline);
-                return new String(out.toByteArray(), StandardCharsets.UTF_8);
+                return StrictJson.utf8(out.toByteArray(), MAX_BODY_BYTES);
             }
         } finally { conn.disconnect(); }
     }

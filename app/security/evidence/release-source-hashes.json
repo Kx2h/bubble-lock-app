@@ -1,0 +1,463 @@
+{
+  "scope": "Android product/release/provisioned source, vendored AppAuth, build/lock/checksum inputs, Node API source and host npm lock; files are hashes of the delivered working tree",
+  "file_count": 114,
+  "canonical_file_list_sha256": "5de677913eea555b8d5ad8ae32dbf883b161d0ed425534b0a0c596aed6478d9c",
+  "files": [
+    {
+      "path": "app/app/build.gradle",
+      "sha256": "98cbc6c8b57f7185ca97f4d592d3bab49bf011acba4d4d0bc7ecc2eb9d8cca88"
+    },
+    {
+      "path": "app/app/gradle.lockfile",
+      "sha256": "b5af252ac99e245b92f7b034072e427d83123a133ed293660a3bf9a86c7979aa"
+    },
+    {
+      "path": "app/app/proguard-rules.pro",
+      "sha256": "4efbcfc534a971071a4a99664e963748d059f13eef5a05895bf272ed9fe62ebd"
+    },
+    {
+      "path": "app/app/src/main/AndroidManifest.xml",
+      "sha256": "8d2dda1c9889fe92939de531bf30622612f126df3d9e4d63f30d98185bc3212e"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/Apache-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/AppAuth-0.11.1-LICENSE.txt",
+      "sha256": "59899c6091b540582ed617e8eeaac4919dc985ccfc35459ee9752b699be5205b"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/MPL-2.0.txt",
+      "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/MapLibre-13.7.1-Android-LICENSE.md",
+      "sha256": "db3cc41e2c79f394a1dddd890c55c263426175029a898d5167820498ddebf152"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/MapLibre-13.7.1-LICENSE.md",
+      "sha256": "554cff8b6f6d2e77629e8c6eab769844ab86adc610ca2d60401ba2e0dce3c229"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/MapLibre-13.7.1-core-LICENSES.md",
+      "sha256": "751ce813c861e62623cceffc394d9dc2ec7401735761eb58c93610a3dece25ba"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/artifact-c51fa7ee2be0d516.txt",
+      "sha256": "8a9c58fbded5ea3474315e4a9824ca8b1486098a1a03e897e0b19419d5e1876a"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/manifest.json",
+      "sha256": "f39e9cac892d4a90e9e9ec6afdd3eaf8c33a2b223e9b58b4366625117481b400"
+    },
+    {
+      "path": "app/app/src/main/assets/licenses/open_source_licenses.txt",
+      "sha256": "5c5a02ba856bc8b44f9efc92ada6e0e993d57ee279f153d63a965a54d79fe25f"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/MainActivity.java",
+      "sha256": "a50cb3a97989f7386127eb7c87e4affc6c33b52b893634c4d325404e87ff0d4c"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/api/HttpsApiTransport.java",
+      "sha256": "26708962c87d73c1d4180db94d43b72a51676a4a6d32b64580104bc38fb5f535"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/AuthorizationAttempt.java",
+      "sha256": "04914efad01c43c202806c7042f76753483236e6da7b02275d92359ddcaa133f"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/IdTokenVerifier.java",
+      "sha256": "5904637a517222347d304442d6a0fd98c642af8994db5c886303212044fac968"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/MobileSignInActivity.java",
+      "sha256": "55c7917c34edd283c089c0330239a6675dc5687e60c5d9843f3a40ee1ac18ddf"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/MobileTokenManager.java",
+      "sha256": "ad1aad00d7ab2394351d4a48823921a2cc44c0a3f1ea866e690656b301736688"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/OidcProvider.java",
+      "sha256": "e93628eceef932e33445cfaab1807e206a1d61df759578fe9bb103e733a0e5a5"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/OidcRedirect.java",
+      "sha256": "237e74d4fe429e9d7b3f3129afca9b9bf49925ef29d1464ce767fe1d349edfae"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/auth/OidcTokenTransport.java",
+      "sha256": "5af235ab41123bdb81ea805355ae9734695da7fe5eb60a9eed46fcfcfb584a2c"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/location/KeyringLocation.java",
+      "sha256": "4767da6c33c97f341febde566d500ab0c6f313d3dab2e6e495d43d07be49687b"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/location/LocationRepository.java",
+      "sha256": "8fc86b9d697dd0431c58df91bbc8ccf69a135b3ca8dabef7ffb3e88f405327ed"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/location/LocationSnapshot.java",
+      "sha256": "69328f7d470cd47418e6c405eec18e6e9b9c4df12f3b9292c7229ab1e68578b6"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/net/BearerToken.java",
+      "sha256": "83dfa2376d15eddd5d3d0a9dc8521d73b67f76bbf7298f4af30ab26df6a6e1b2"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/net/StrictJson.java",
+      "sha256": "8851f2816b5c05f4db4cc1967e1d02290451c397cf5993e2f749e12bb352d712"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/net/Tls13SocketFactory.java",
+      "sha256": "33652e22817053854dc71f3ccdbf15001feeec55bdd7989ff384309d9ed8fc76"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/session/MobileSessionStore.java",
+      "sha256": "d1551cf653e6a173960f75c6461f8f3e430d0fc4017cd391023750d73dc2bebe"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/session/ServiceOrigin.java",
+      "sha256": "1515e0492448e338fe6c8fee46b3b900c22d6ef92f404d0ff5cdecd07d801481"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/ui/AppTheme.java",
+      "sha256": "6f7cd82a85de7cd6cd357079a24fde6d9e87b181f405774546141dcb80b81981"
+    },
+    {
+      "path": "app/app/src/main/java/org/privacybubble/app/ui/KeyringMapView.java",
+      "sha256": "25a79ed8b13e96ecd5e994ba3624e777fb227a85aa6cdbabedb790755e3f279c"
+    },
+    {
+      "path": "app/app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "30bf055f7538e7ac7d67d89acb4f23ba9720b24be9572cdc16cfacbd28888120"
+    },
+    {
+      "path": "app/app/src/main/res/mipmap-anydpi/ic_launcher.xml",
+      "sha256": "f2a0c01e8cc8b1474cb77443acda9c95025f5aeb82d827b913eb4a09bd2e97f0"
+    },
+    {
+      "path": "app/app/src/main/res/values/colors.xml",
+      "sha256": "7441bb5acc00f17e244461077dc2ccf364c7338045da697edb566c04ae606567"
+    },
+    {
+      "path": "app/app/src/main/res/values/ids.xml",
+      "sha256": "478c03192fb24dac27ebfc81e10ecb9b515c0f1d04bdcdf61fd23ce1fb4faadd"
+    },
+    {
+      "path": "app/app/src/main/res/values/strings.xml",
+      "sha256": "ca5222895677685c9fb447a971d679dc5667e613abc39079d379ee7931ddd1b8"
+    },
+    {
+      "path": "app/app/src/main/res/values/styles.xml",
+      "sha256": "c9355137ef29029a3220dc7d947d50178c4c571e8db8373e91b62d18971f9f6a"
+    },
+    {
+      "path": "app/app/src/main/res/values-night/colors.xml",
+      "sha256": "0559386ba273eb5c48c8185bd4fa87d683607afc3df636e30b8e43070ec07f52"
+    },
+    {
+      "path": "app/app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "3336e7ffc9a2fbd23db76c340bf51a03a59ce6ef3997a866dc274578a2c7e2ec"
+    },
+    {
+      "path": "app/app/src/main/res/xml/network_security_config.xml",
+      "sha256": "8260961f76fff6abce17dd698e69121d1537ddb68abcbff8988826bb9641fa2e"
+    },
+    {
+      "path": "app/app/src/productionAuth/AndroidManifest.xml",
+      "sha256": "ebfecf1d2058485fb4e80691aff5503ae7e9984acd1f60b5a1a4c3a0d765c695"
+    },
+    {
+      "path": "app/app/src/release/AndroidManifest.xml",
+      "sha256": "3bc117f82c736cfdaecde01048dded1da3fa3218fecbbfcd32a4375691ed987c"
+    },
+    {
+      "path": "app/app/src/release/java/org/privacybubble/app/VariantFeatures.java",
+      "sha256": "8029fde609bc52bb8fa9a5bb15e9d631dc0df0022ad38330322881f7479b9814"
+    },
+    {
+      "path": "app/build.gradle",
+      "sha256": "bbfa78ce9a66071fc990fd5d8358685949cffa71554e95891daa7843ba3b4a29"
+    },
+    {
+      "path": "app/gradle/verification-metadata.xml",
+      "sha256": "139b624b4dc90acad477a87f4f9052cbd227e2c64f03d02d01e1d2afa6dd5fbe"
+    },
+    {
+      "path": "app/gradle.properties",
+      "sha256": "fb298af7d84d0e20523e7172625a8d975a11efa043c573ca97f8997a0e84fb5f"
+    },
+    {
+      "path": "app/settings.gradle",
+      "sha256": "030c2d61f4ce6e67654fafe2e0b16071fa5204229d86953d64ae0acdb66ed565"
+    },
+    {
+      "path": "app/vendor/appauth/AndroidManifest.xml",
+      "sha256": "ce55320a15ad003ab15173d76bce8590d72872c4c23603a16e6f6402dbdfc575"
+    },
+    {
+      "path": "app/vendor/appauth/LICENSE",
+      "sha256": "59899c6091b540582ed617e8eeaac4919dc985ccfc35459ee9752b699be5205b"
+    },
+    {
+      "path": "app/vendor/appauth/README.md",
+      "sha256": "5c9a1a461973976669d6387eb1760cf499424a993a0e823faf402e14761f01d6"
+    },
+    {
+      "path": "app/vendor/appauth/build.gradle",
+      "sha256": "949ad42a80d86138be4945898054f06742b0ce0036707e5f593f7377cf26f137"
+    },
+    {
+      "path": "app/vendor/appauth/gradle.lockfile",
+      "sha256": "072cb119141b6aeb146af323676a3503f6515c8f6677d956b0f226ca0646634a"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AdditionalParamsProcessor.java",
+      "sha256": "3a61d09fc9524db3f273542016d74ca393f5c8b34bafa5bb79ae60c3fc9425e1"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AppAuthConfiguration.java",
+      "sha256": "6dc1d81d01e1bc688e2343e29beb06d3a39291fd9d2c954c646a3cd06dca5b32"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AsciiStringListUtil.java",
+      "sha256": "0942241cb1fcf2e3031e36a4d62370fc35f70775dc3a1d9a2850ae4d06a80ce2"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthState.java",
+      "sha256": "58fbba73a2beef7d9fb967bc51ceeeb4af62a3e156cdc58ee17be1245099a3bc"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationException.java",
+      "sha256": "776b2e6ce230dd356cd71e64addfb88ef8e6616c6958ae73d6df250c74e6a817"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationManagementActivity.java",
+      "sha256": "68c15672aeb84d3aa9db26767c8c54c4a6dea0b5db5d67a2f9e92fa100ad0537"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationManagementRequest.java",
+      "sha256": "998bb74927951016d3024cf8ac673aac83bd507bea0d6d026895b7e670e42528"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationManagementResponse.java",
+      "sha256": "805984adb8cf7843f6cd2bb432011f20bbe9afdd64bb94d0f9853490b57cfef9"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationManagementUtil.java",
+      "sha256": "cefa9265111cb9ec13375f8e613c1e8909fd701ead2b4f8514c1ce27ef455439"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationRequest.java",
+      "sha256": "0338c395332fe5c09112d2dc6a0866569cc9a61e69dbe9be97ca5b597bf0dcb8"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationResponse.java",
+      "sha256": "40da6565e94ea9453d8fafaccc3c99382be9a53a211444abaf465b7381c433a8"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationService.java",
+      "sha256": "4181fd7762de89932f88bac3ba4312510b977e89bddfdf9e8089bc4cd0954eb2"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationServiceConfiguration.java",
+      "sha256": "58ea11dedb87a6c2372fee1ecb060043090efa8788ba89f39a72b57fcdcef5a3"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/AuthorizationServiceDiscovery.java",
+      "sha256": "c39df4b4dcaec4899d65a6742ad766820da422bea3c237ca944fd13252504f1b"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/ClientAuthentication.java",
+      "sha256": "c882ba5a78008addcf6410949603c30271d40c4c1a4f530e2b53511b360bdddf"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/ClientSecretBasic.java",
+      "sha256": "dab142fea03f1876aed5838eae8854c75a18d99bb994e11568362ca1252a3702"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/ClientSecretPost.java",
+      "sha256": "13139a33bf138233a7388842e70bf253e9d2ef31202bcd5a209a11c2fb119f1a"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/Clock.java",
+      "sha256": "217e49650d81941b2c89013b2d122a0bd0e3faccd73f463d93a0a128bc7282bb"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/CodeVerifierUtil.java",
+      "sha256": "21867f3cbbc6c7353a53360d20858c72f94b5824f42d99e1e0ae150b15830ef8"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/EndSessionRequest.java",
+      "sha256": "70662c3be23dd3d6c63a8dbd4052caa3a1244c2add7e3bca10499c5ecedad99e"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/EndSessionResponse.java",
+      "sha256": "c5e1df3fca7d0555f0a51d3575e989a241654373508fbbea90df7dbabe69bf3b"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/GrantTypeValues.java",
+      "sha256": "8bcc47483177dcdb331418746274256b582acd4ff313fe5efaed05952a3ccdf7"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/IdToken.java",
+      "sha256": "8bf65fb68f091737f160e7758132b3a74272670e465062f4274f072af6c3af03"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/JsonUtil.java",
+      "sha256": "793acdbd0c32325a356e21305b88b4147545463315572220dc5f393c55bdf448"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/NoClientAuthentication.java",
+      "sha256": "8b937c4775176eb8e3df22b57ca7b5b4d11b571bbf9ad3d6320f671cb7fe2929"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/Preconditions.java",
+      "sha256": "d517b8d1ba0b80ba3d4b66cd742e66e83efc24dd5dbfa879a40867e0471d6540"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/RedirectUriReceiverActivity.java",
+      "sha256": "7a54cd9bb9892e5fb257b8eded87a430dcb4b00f014cf72830ae3e1ae4efe7a0"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/RegistrationRequest.java",
+      "sha256": "b2c2424bb6561ef3691cd77dca274ea501d654b1e0e199d2302aba98f4ad1ede"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/RegistrationResponse.java",
+      "sha256": "d55ed7707c40a2e6593562c3bbe05ed731fc56b452431f1d4e806caa4a9d160d"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/ResponseTypeValues.java",
+      "sha256": "b355438d7de17673158a31d4665a4d7b8a4ed3b00e7d00be532e79aae365460e"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/SystemClock.java",
+      "sha256": "f35eb14ddf596ef049a76ffa8b47dbf6b4ffd3f78f755fddb15372d608487129"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/TokenRequest.java",
+      "sha256": "df9525eed968384b20e76b01c5dc2f42de5e6d87759cfa457f9b73bb34e9b43f"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/TokenResponse.java",
+      "sha256": "cc58cd5d821d3e5b8d4329f545bf1f3f6931253014a7f0cbed9c64f23ce2e82c"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/Utils.java",
+      "sha256": "3b6f68f999b0c72e84aeb985c6bff4b84852da10dc2bd5b0dce05c5c1f9b88b9"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/AnyBrowserMatcher.java",
+      "sha256": "fc8bdada8a5752925b657a0b42181c01215b9afc45b3cddae6af19560ddc5037"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/BrowserAllowList.java",
+      "sha256": "2886db0bf11d2ce85664c78539010e5ae9f9cef88d7822bc9ab6720ae1427aeb"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/BrowserDenyList.java",
+      "sha256": "43a022a4c388928c53288586851fed36288694d3ca4f0bd3ddbd7aa69f89c1ee"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/BrowserDescriptor.java",
+      "sha256": "0f738144d2521f52dc803290494026eeef41b31672c8f3ed41c2d828775782f6"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/BrowserMatcher.java",
+      "sha256": "bb488ed4bc27ad854391d2db98bd362464927313195458375104d2be3dd2e114"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/BrowserSelector.java",
+      "sha256": "e30b662d425be55a0672dbc91707d2a7e1b24de592b26a990a5ebd2aa5815ed2"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/Browsers.java",
+      "sha256": "da341611975ff7126b800801776f96ba3a1aba8c7b8cd9d8546f059f2f57200b"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/CustomTabManager.java",
+      "sha256": "0bc4e0cb20489bbb247bc9e6c1c7585c177f22d46b05656520cd2b166fa1c188"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/DelimitedVersion.java",
+      "sha256": "f7b38aee962c953bf99ebf2a0bc4db25b44ec2fe64d33e46be5c0f38d4a3af17"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/ExactBrowserMatcher.java",
+      "sha256": "03d6bf774e6cf8f131ba6bd8376df7bd646ff18f8f6fbb8df40053d337292574"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/VersionRange.java",
+      "sha256": "c4d73678ce030b0f8abeb6675e13658308a8b558a01eb9213b10aa41cdfce2d1"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/VersionedBrowserMatcher.java",
+      "sha256": "efe3f10ed4bd1be6e54328528b5a376c89420810c96574e698e8bb5a54f546af"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/browser/package-info.java",
+      "sha256": "f167892b33051514a35d5c437cea822f7ecc38921102caf943900204135795df"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/connectivity/ConnectionBuilder.java",
+      "sha256": "ea6f41ef205c1a0d995a896f520b8bbe7aea539f0df00836883e36dbd097b920"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/connectivity/DefaultConnectionBuilder.java",
+      "sha256": "1054fd0098c7b1adc9e6fe544ae0868fd8c8437c51d96888313cb3aa9c38755f"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/connectivity/package-info.java",
+      "sha256": "a35705e2d86616bbda4809ee52ba17643d5aca83be55dea3054f178e9c72b9c2"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/internal/Logger.java",
+      "sha256": "cf0f575dd9c76a3ee93b0a41b4ece432ed46fbfa2cc4c21f382f717b039345a1"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/internal/UriUtil.java",
+      "sha256": "f2119427ba0ceac4ab04ff204c301a1f75b64dbb2072ade9fed383c59f2fabc8"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/internal/package-info.java",
+      "sha256": "82dd6fd42d5bfce5c6777ee762eca313c80db25529d1361882072d29cc89d786"
+    },
+    {
+      "path": "app/vendor/appauth/java/net/openid/appauth/package-info.java",
+      "sha256": "021defc33de018ae8d843f0794cbfda48d3bcb94861c3dcdd292f35692d709c2"
+    },
+    {
+      "path": "app/vendor/appauth/res/values/styles.xml",
+      "sha256": "1f204b6ce6d6bfb81dc64ea67fe7762596af2ace424e0883d9cd6f297f69c258"
+    },
+    {
+      "path": "app/vendor/appauth/verify-upstream.py",
+      "sha256": "72592f37e8607cfa4c608ac06ebcd3903b41f814a45d531cdb50b2b531e4b0b8"
+    },
+    {
+      "path": "pc-mobius/mobile-api/auth.mjs",
+      "sha256": "815505d47fdf5f7658caaf92fd96351970e4e012eb460992768ed97ee564dd09"
+    },
+    {
+      "path": "pc-mobius/mobile-api/location-reader.mjs",
+      "sha256": "561c52f090678dbe47b25684778d6a00bdecdd17de25dc5d290c101a22ebf406"
+    },
+    {
+      "path": "pc-mobius/mobile-api/server.mjs",
+      "sha256": "1f88451c19f2daf979673caae5788b5e5d4c93dce7ab052e872b17a5dc63bae3"
+    },
+    {
+      "path": "pc-mobius/mobile-api/strict-json.mjs",
+      "sha256": "053a76fbef7e9dfb9379c5ba01bc1baf88864ead60483aac1bac2b83719a9132"
+    },
+    {
+      "path": "pc-mobius/package-lock.json",
+      "sha256": "e40271302598acbd93661ba18c8ee0cc38bcb72b2b8569c9c4926a4461786356"
+    }
+  ]
+}

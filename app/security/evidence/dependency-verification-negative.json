@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "control": "Exact checked-in SHA256 metadata resolved Nimbus10.10 successfully under strict verification",
+  "negative": "An isolated copy with its Nimbus10.10 JAR expected SHA256 changed to zeros was rejected by Gradle dependency verification",
+  "production_metadata_unchanged": true,
+  "verification_metadata_sha256": "139b624b4dc90acad477a87f4f9052cbd227e2c64f03d02d01e1d2afa6dd5fbe",
+  "scope": "Checksum pinning behavior; bootstrap is not independent publisher authenticity verification"
+}

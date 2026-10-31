@@ -1,0 +1,190 @@
+TAP version 13
+# Subtest: configuration fails closed without trusted signing material or HTTPS issuer
+ok 1 - configuration fails closed without trusted signing material or HTTPS issuer
+  ---
+  duration_ms: 0.775858
+  type: 'test'
+  ...
+# Subtest: signed access token authenticates exact issuer/audience and required scope
+ok 2 - signed access token authenticates exact issuer/audience and required scope
+  ---
+  duration_ms: 2.360416
+  type: 'test'
+  ...
+# Subtest: forged signatures, unsigned algorithms, wrong issuer/audience, expiry and future nbf are rejected
+ok 3 - forged signatures, unsigned algorithms, wrong issuer/audience, expiry and future nbf are rejected
+  ---
+  duration_ms: 2.819672
+  type: 'test'
+  ...
+# Subtest: trusted JWKS selects a configured key id and rejects unknown ids
+ok 4 - trusted JWKS selects a configured key id and rejects unknown ids
+  ---
+  duration_ms: 0.74044
+  type: 'test'
+  ...
+# Subtest: only administrator-bound keyrings are disclosed, missing coordinates are not invented
+ok 5 - only administrator-bound keyrings are disclosed, missing coordinates are not invented
+  ---
+  duration_ms: 0.978334
+  type: 'test'
+  ...
+# Subtest: valid MEC fix keeps observed time, bounded accuracy, battery and freshness
+ok 6 - valid MEC fix keeps observed time, bounded accuracy, battery and freshness
+  ---
+  duration_ms: 0.323887
+  type: 'test'
+  ...
+# Subtest: older out-of-order callbacks do not replace a newer observed fix
+ok 7 - older out-of-order callbacks do not replace a newer observed fix
+  ---
+  duration_ms: 0.111453
+  type: 'test'
+  ...
+# Subtest: invalid latest coordinates clear prior coordinates instead of falling back to a fresh old fix
+ok 8 - invalid latest coordinates clear prior coordinates instead of falling back to a fresh old fix
+  ---
+  duration_ms: 0.216102
+  type: 'test'
+  ...
+# Subtest: undatable latest event remains unavailable even if followed by an older valid callback
+ok 9 - undatable latest event remains unavailable even if followed by an older valid callback
+  ---
+  duration_ms: 0.203127
+  type: 'test'
+  ...
+# Subtest: invalid calendar, future time, numeric-string coordinates and negative accuracy are unavailable
+ok 10 - invalid calendar, future time, numeric-string coordinates and negative accuracy are unavailable
+  ---
+  duration_ms: 0.33086
+  type: 'test'
+  ...
+# Subtest: expired fixes remain explicitly stale, never gain time from a recent receipt
+ok 11 - expired fixes remain explicitly stale, never gain time from a recent receipt
+  ---
+  duration_ms: 0.122504
+  type: 'test'
+  ...
+# Subtest: upstream expiry caps freshness and invalid expiry clears a fix
+ok 12 - upstream expiry caps freshness and invalid expiry clears a fix
+  ---
+  duration_ms: 0.192827
+  type: 'test'
+  ...
+# Subtest: permission denial and disabled binding clear coordinates and location metadata
+ok 13 - permission denial and disabled binding clear coordinates and location metadata
+  ---
+  duration_ms: 0.119218
+  type: 'test'
+  ...
+# Subtest: grant revocation, consent revocation, expiry, wrong principal and revision revoke visible coordinates
+ok 14 - grant revocation, consent revocation, expiry, wrong principal and revision revoke visible coordinates
+  ---
+  duration_ms: 0.304951
+  type: 'test'
+  ...
+# Subtest: binding/result/store limits fail closed without truncating another user keyring into a response
+ok 15 - binding/result/store limits fail closed without truncating another user keyring into a response
+  ---
+  duration_ms: 7.080809
+  type: 'test'
+  ...
+# Subtest: HTTP requires signed auth, rejects mutation/body/query, returns no-store without CORS
+ok 16 - HTTP requires signed auth, rejects mutation/body/query, returns no-store without CORS
+  ---
+  duration_ms: 45.837388
+  type: 'test'
+  ...
+# Subtest: actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules
+ok 17 - actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules
+  ---
+  duration_ms: 8.126244
+  type: 'test'
+  ...
+# Subtest: JWT attack corpus rejects algorithm/key confusion, JOSE directives and ambiguous protected JSON
+ok 18 - JWT attack corpus rejects algorithm/key confusion, JOSE directives and ambiguous protected JSON
+  ---
+  duration_ms: 17.772224
+  type: 'test'
+  ...
+# Subtest: signed claim type/identity/scope corpus fails closed rather than coercing untrusted claims
+ok 19 - signed claim type/identity/scope corpus fails closed rather than coercing untrusted claims
+  ---
+  duration_ms: 14.870181
+  type: 'test'
+  ...
+# Subtest: seeded strict JSON compatibility and duplicate-key mutations exercise parser boundaries
+ok 20 - seeded strict JSON compatibility and duplicate-key mutations exercise parser boundaries
+  ---
+  duration_ms: 115.609864
+  type: 'test'
+  ...
+# Subtest: seeded JWT wire mutation rejects every altered signed token and enforces canonical encoding
+ok 21 - seeded JWT wire mutation rejects every altered signed token and enforces canonical encoding
+  ---
+  duration_ms: 86.078126
+  type: 'test'
+  ...
+# Subtest: grant and consent corruption, inherited maps and revision/scope omissions never disclose a fix
+ok 22 - grant and consent corruption, inherited maps and revision/scope omissions never disclose a fix
+  ---
+  duration_ms: 1.249239
+  type: 'test'
+  ...
+# Subtest: seeded location and identity-map mutations preserve tenant isolation, clearing and input immutability
+ok 23 - seeded location and identity-map mutations preserve tenant isolation, clearing and input immutability
+  ---
+  duration_ms: 67.893998
+  type: 'test'
+  ...
+# Subtest: real HTTP corpus covers duplicate auth/host, smuggling framing, methods, paths, headers and body bounds
+ok 24 - real HTTP corpus covers duplicate auth/host, smuggling framing, methods, paths, headers and body bounds
+  ---
+  duration_ms: 27.275115
+  type: 'test'
+  ...
+# Subtest: seeded real HTTP malformed-target/header mutations never reach protected state readers
+ok 25 - seeded real HTTP malformed-target/header mutations never reach protected state readers
+  ---
+  duration_ms: 78.849962
+  type: 'test'
+  ...
+# Subtest: seeded HTTP byte fuzz rejects control octets and malformed syntax without exposing protected state
+ok 26 - seeded HTTP byte fuzz rejects control octets and malformed syntax without exposing protected state
+  ---
+  duration_ms: 89.851729
+  type: 'test'
+  ...
+# Subtest: bounded strict file reads reject malformed/duplicate/deep/oversize JSON without altering files
+ok 27 - bounded strict file reads reject malformed/duplicate/deep/oversize JSON without altering files
+  ---
+  duration_ms: 50.822264
+  type: 'test'
+  ...
+# Subtest: resource boundaries cap concurrent reads and retain health after HTTP parser rejection
+ok 28 - resource boundaries cap concurrent reads and retain health after HTTP parser rejection
+  ---
+  duration_ms: 43.194264
+  type: 'test'
+  ...
+# Subtest: slow incomplete header sockets expire within the configured HTTP boundary
+ok 29 - slow incomplete header sockets expire within the configured HTTP boundary
+  ---
+  duration_ms: 5003.288649
+  type: 'test'
+  ...
+# Subtest: a failed binding read cannot release concurrency slots while a state read is still pending
+ok 30 - a failed binding read cannot release concurrency slots while a state read is still pending
+  ---
+  duration_ms: 8.341269
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5687.445757

@@ -18,7 +18,6 @@ import android.graphics.drawable.RippleDrawable;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
@@ -82,7 +81,7 @@ import static org.maplibre.android.style.layers.PropertyFactory.textHaloBlur;
 import static org.maplibre.android.style.layers.PropertyFactory.textHaloColor;
 import static org.maplibre.android.style.layers.PropertyFactory.textHaloWidth;
 
-/** Native basemap and authorized server locations. Never enables the phone location component. */
+@android.annotation.SuppressLint("ViewConstructor")
 public final class KeyringMapView extends FrameLayout {
     public static final String DEFAULT_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
     private static final String DEFAULT_DARK_STYLE_URL = "https://tiles.openfreemap.org/styles/dark";
@@ -185,7 +184,7 @@ public final class KeyringMapView extends FrameLayout {
         legend.setBackgroundColor(surface);
         legend.setVisibility(GONE);
         legend.setContentDescription("채워진 초록 점은 최근 확인 위치, 빈 테두리와 황토색 점은 이전 위치 기록입니다.");
-        // Text can grow to 200% without covering the SDK's attribution or map controls.
+
         column.addView(legend, 1, new LinearLayout.LayoutParams(-1, -2));
 
         errorPanel = new ScrollView(context);
@@ -197,7 +196,7 @@ public final class KeyringMapView extends FrameLayout {
         errorContent.setPadding(dp(20), dp(18), dp(20), dp(12));
         errorTitle = label("지도를 불러오지 못했어요", 17, text);
         errorTitle.setTypeface(null, android.graphics.Typeface.BOLD);
-        if (Build.VERSION.SDK_INT >= 28) errorTitle.setAccessibilityHeading(true);
+        errorTitle.setAccessibilityHeading(true);
         errorTitle.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         errorContent.addView(errorTitle);
         errorMessage = label("인터넷 연결을 확인하고 다시 시도해 주세요. 키링 목록에서도 위치 정보를 확인할 수 있어요.", 14, muted);
@@ -220,6 +219,7 @@ public final class KeyringMapView extends FrameLayout {
         initializeMap();
     }
 
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
     private void initializeMap() {
         if (destroyed || mapView != null) return;
         try {
@@ -230,10 +230,10 @@ public final class KeyringMapView extends FrameLayout {
             mapView = new MapView(getContext(), options);
             mapView.setContentDescription("키링 위치 지도. 같은 위치 정보는 키링 목록에서도 확인할 수 있습니다.");
             mapHost.addView(mapView, 0, new LayoutParams(-1, -1));
-            // Camera restore is deferred until an authorized location response arrives.
+
             mapView.onCreate(null);
             mapView.addOnDidFailLoadingMapListener(message -> {
-                if (!destroyed) showError(false); // Never expose native error messages or URLs.
+                if (!destroyed) showError(false);
             });
             mapView.addOnDidFinishRenderingMapListener(fully -> {
                 if (!destroyed && styleReady && fully) {
@@ -256,7 +256,7 @@ public final class KeyringMapView extends FrameLayout {
                 map.setMinZoomPreference(2);
                 map.setMaxZoomPreference(20);
                 map.getUiSettings().setAttributionEnabled(true);
-                // Retain SDK attribution margins: it reserves space beside its logo.
+
                 map.getUiSettings().setCompassMargins(dp(12), 0, 0, dp(48));
                 map.addOnMapClickListener(this::selectAt);
                 resetOverview();
@@ -370,7 +370,7 @@ public final class KeyringMapView extends FrameLayout {
         Set<String> currentlyAuthorized = new HashSet<>();
         for (KeyringLocation item : locations) if (item.hasCoordinates()) currentlyAuthorized.add(item.id);
         if (!currentlyAuthorized.containsAll(previouslyAuthorized)) {
-            // Revoked or removed coordinates must not survive indirectly in the last viewport.
+
             pendingCamera = null;
             cameraPositioned = false;
             resetOverview();
@@ -599,7 +599,7 @@ public final class KeyringMapView extends FrameLayout {
 
     @Override protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        // View construction can dispatch this before this class's fields are initialized.
+
         if (main == null) return;
         main.removeCallbacks(loadTimeout);
         if (!destroyed && resumed && !fullyRendered && isShown()) main.postDelayed(loadTimeout, 25_000);
@@ -636,7 +636,7 @@ public final class KeyringMapView extends FrameLayout {
 
     private void openCredits() {
         try { getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.openstreetmap.org/copyright"))); }
-        catch (ActivityNotFoundException unavailable) { /* The native attribution dialog remains available. */ }
+        catch (ActivityNotFoundException unavailable) {   }
     }
 
     private final class ControlIcon extends Drawable {

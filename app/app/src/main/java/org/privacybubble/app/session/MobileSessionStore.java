@@ -7,7 +7,7 @@ import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import org.json.JSONObject;
 import org.privacybubble.app.BuildConfig;
-import java.net.URI;
+import org.privacybubble.app.net.BearerToken;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import javax.crypto.Cipher;
@@ -15,7 +15,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-/** Credentials are encrypted with a non-exportable Android Keystore key, never in saved UI state. */
 public final class MobileSessionStore {
     private static final Object LOCK = new Object();
     private static final String ALIAS = "privacy-bubble.mobile.session.v1";
@@ -26,7 +25,7 @@ public final class MobileSessionStore {
         preferences = context.getApplicationContext().getSharedPreferences("mobile_session", Context.MODE_PRIVATE);
     }
 
-    public String getApiBaseUrl() { return preferences.getString("api_base", BuildConfig.MOBILE_API_BASE_URL); }
+    public String getApiBaseUrl() { return ServiceOrigin.effective(BuildConfig.MOBILE_API_BASE_URL, preferences.getString("api_base", null), BuildConfig.DEBUG); }
     public String getIssuer() { return BuildConfig.OIDC_ISSUER; }
     public String getClientId() { return BuildConfig.OIDC_CLIENT_ID; }
     public boolean isSignInConfigured() {
@@ -34,27 +33,16 @@ public final class MobileSessionStore {
     }
 
     public void saveConnection(String baseUrl, String issuer, String clientId) {
-        String normalized = validateBase(baseUrl);
+        String normalized = ServiceOrigin.normalize(baseUrl, BuildConfig.DEBUG);
         if (!getIssuer().equals(issuer == null ? "" : issuer) || !getClientId().equals(clientId == null ? "" : clientId))
             throw new IllegalArgumentException("로그인 서비스 설정을 확인해 주세요.");
-        if (!BuildConfig.DEBUG && !BuildConfig.MOBILE_API_BASE_URL.isEmpty()
-                && !validateBase(BuildConfig.MOBILE_API_BASE_URL).equals(normalized))
+        if (!BuildConfig.DEBUG && (BuildConfig.MOBILE_API_BASE_URL.isEmpty()
+                || !ServiceOrigin.normalize(BuildConfig.MOBILE_API_BASE_URL, false).equals(normalized)))
             throw new IllegalArgumentException("등록된 서비스 주소를 사용해 주세요.");
         synchronized (LOCK) {
             if (!getApiBaseUrl().equals(normalized)) clearSession();
             if (!preferences.edit().putString("api_base", normalized).commit()) throw new IllegalStateException("설정을 저장하지 못했습니다.");
         }
-    }
-
-    private static String validateBase(String value) {
-        try {
-            if (value == null || value.isBlank() || value.length() > 2048 || !value.equals(value.trim())) throw new Exception();
-            URI uri = new URI(value);
-            boolean loopback = BuildConfig.DEBUG && "http".equals(uri.getScheme()) && "127.0.0.1".equals(uri.getHost()) && uri.getPort() == 8787;
-            if ((!"https".equals(uri.getScheme()) && !loopback) || uri.getHost() == null || uri.getUserInfo() != null
-                    || uri.getQuery() != null || uri.getFragment() != null || (uri.getRawPath() != null && !uri.getRawPath().matches("/?"))) throw new Exception();
-            return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null).toString();
-        } catch (Exception error) { throw new IllegalArgumentException("HTTPS 서비스 주소를 확인해 주세요."); }
     }
 
     public String getAccessToken() {
@@ -70,7 +58,6 @@ public final class MobileSessionStore {
     public String getNonce() { synchronized (LOCK) { JSONObject value = read(); return value == null ? "" : value.optString("nonce", ""); } }
     public long epoch() { synchronized (LOCK) { return preferences.getLong("epoch", 0); } }
 
-    /** Consume the refresh credential durably before its single network attempt. */
     public RefreshTicket takeRefreshTicket() {
         synchronized (LOCK) {
             JSONObject value = read();
@@ -109,7 +96,8 @@ public final class MobileSessionStore {
     }
     private void saveTokens(String access, String refresh, String subject, long expiresAtEpochSeconds, String nonce, String identityContext) {
         synchronized (LOCK) {
-            if (!tokenText(access) || (refresh != null && !refresh.isEmpty() && !tokenText(refresh)) || subject == null || subject.isEmpty()
+            if (!BearerToken.isValid(access) || (refresh != null && !refresh.isEmpty() && !tokenText(refresh)) || subject == null || subject.isEmpty() || subject.length() > 256
+                    || (nonce != null && nonce.length() > 1024) || (identityContext != null && identityContext.length() > 8192)
                     || expiresAtEpochSeconds <= System.currentTimeMillis() / 1000 || expiresAtEpochSeconds > System.currentTimeMillis() / 1000 + 604800)
                 throw new IllegalArgumentException("로그인 응답을 확인하지 못했습니다.");
             try {
@@ -126,15 +114,13 @@ public final class MobileSessionStore {
         }
     }
 
-    /** Workspace device QA only; a release package cannot provision a bearer this way. */
-    public void setDebugAccessToken(String token) {
-        if (!BuildConfig.DEBUG) throw new IllegalStateException("개발자 연결을 사용할 수 없습니다.");
-        saveTokens(token, "", "debug-device-session", System.currentTimeMillis() / 1000 + 1800, "");
-    }
-
     public void clearSession() {
         synchronized (LOCK) {
-            if (!preferences.edit().remove("credentials").remove("iv").putLong("epoch", epoch() + 1).commit()) throw new IllegalStateException("로그인 정보를 지우지 못했습니다.");
+            if (!preferences.edit().remove("credentials").remove("iv").putLong("epoch", epoch() + 1).commit()) {
+                try { KeyStore keys = KeyStore.getInstance("AndroidKeyStore"); keys.load(null); keys.deleteEntry(ALIAS); }
+                catch (Exception failure) { throw new IllegalStateException("안전한 저장소를 사용할 수 없습니다."); }
+                throw new IllegalStateException("로그인 정보를 지우지 못했습니다.");
+            }
         }
     }
     public void clearAll() { synchronized (LOCK) { clearSession(); long value=epoch(); if (!preferences.edit().clear().putLong("epoch",value).commit()) throw new IllegalStateException("설정을 지우지 못했습니다."); } }
@@ -150,7 +136,7 @@ public final class MobileSessionStore {
             JSONObject value = new JSONObject(new String(cipher.doFinal(Base64.decode(encrypted, Base64.NO_WRAP)), StandardCharsets.UTF_8));
             if (!getApiBaseUrl().equals(value.optString("origin")) || !getIssuer().equals(value.optString("issuer")) || !getClientId().equals(value.optString("client"))) throw new Exception();
             return value;
-        } catch (Exception invalid) { preferences.edit().remove("credentials").remove("iv").putLong("epoch",epoch()+1).commit(); return null; }
+        } catch (Exception invalid) { clearSession(); return null; }
     }
 
     private static SecretKey key() throws Exception {
