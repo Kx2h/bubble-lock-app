@@ -11,6 +11,7 @@ ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 - [모바일 위치 응답 계약](app/contracts/mobile-location.v1.json)
 - [팀 이벤트를 읽는 위치 서비스](pc-mobius/mobile-api/README.md)
 - [지도 제공자·출처·데이터 경계](app/docs/MAP_PROVIDER.md)
+- [제품 지도·목록·큰 글자 기기 화면과 시험](app/evidence/product-map-device.md)
 - [팀 INTEGRATION 구현](pc-mobius/integration/README.md)
 - [기기 시험·과거 합성 시험 증거](app/evidence/)
 

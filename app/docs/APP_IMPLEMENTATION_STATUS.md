@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-31 (Asia/Seoul) · APP 0.2.0 / versionCode 2.
 
-현재 소스는 지도·키링 목록·설정의 제품 앱과 인증된 위치 읽기 경로를 제공한다. 이전의 “release는 대기 안내만 표시하고 API caller가 없다”는 상태는 더 이상 현재 구현을 설명하지 않는다. 새 CORE/INTEGRATION의 정책·MEC·handover·FL·MCP 구현을 인수했고, 그중 저장된 MEC 위치 이벤트를 APP 읽기 API로 연결했다. [공통 계획](../../PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md)의 전체 APP 요구와 실제 배포·실물 시험은 아래와 같이 남아 있다. 상용 release나 전체 프로젝트 완료를 선언하지 않는다.
+현재 소스는 지도·키링 목록·설정의 제품 앱과 인증된 위치 읽기 경로를 제공한다. 새 CORE/INTEGRATION의 정책·MEC·handover·FL·MCP 구현을 인수했고, 그중 저장된 MEC 위치 이벤트를 APP 읽기 API로 연결했다. [공통 계획](../../PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md)의 전체 APP 요구와 실제 배포·실물 시험은 아래와 같이 남아 있다. 상용 release나 전체 프로젝트 완료를 선언하지 않는다.
 
 ## 현재 실행 경로
 
@@ -34,7 +34,7 @@ ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-31 (Asia/Seoul) · APP 0.2.0 /
 | command receipt | 과거 KEYRING SQLite/outbox→MQTT→CORE→격리 CSE→기기 조회 증거를 유지한다. 합성 결과이며 제품의 실제 승인·장치 실행 증거가 아니다. | 앱 승인과 같은 사용자·기기·commandId의 실제 dispatch/ACK/readback·구성원별 결과와 미확정 정산 |
 | API retry/idempotency/reconnect | 제품 `GET /v1/keyrings`는 HTTPS·응답 계약/크기/필드 검증·no-store·redirect 거부를 적용한다. 전경 주기·수동 갱신과 화면 세대 검사를 사용하고 401/403에서 위치를 지운다. [클라이언트](../app/src/main/java/org/privacybubble/app/location/LocationRepository.java) | 운영 공통 correlation/API version·Retry-After·구조화 오류 계약, mutation idempotency·유실 정산, 장시간 네트워크 전환·재연결 검증 |
 | 사용자 권한·UI 일치 | 읽기 API가 RS256 JWT와 명시 principal binding을 검증하고, grant가 요구되는 binding에서는 최신 grant/consent를 확인한다. `denied`·`unavailable`에 좌표가 없다. 앱은 역할 문자열로 권한을 부여하지 않는다. | 실제 IdP·principal provisioning·소유권 변경과 회수의 교차 사용자 부정 시험, upstream mutation/ingress의 운영 보안 통합 |
-| UI·AX·기기 receipt·녹화 | Material DayNight, scalable sp·48dp 주요 컨트롤·텍스트 상태·이름 있는 지도 액션·갱신 중 안정적인 View 재사용·시스템바/IME 대응을 구현했다. 기존 합성 영상은 해당 이전 버전에 한정한다. | 제품 앱의 큰 글자·가로/세로·다크/라이트·오류·접근 거절·로그아웃 기기 QA 기록, 실제 사용자→실물 위치·명령 전체 경로의 receipt와 발표 녹화 |
+| UI·AX·기기 receipt·녹화 | Material DayNight, scalable sp·48dp 주요 컨트롤·텍스트 상태·이름 있는 지도 액션·갱신 중 안정적인 View 재사용·시스템바/IME 대응을 구현했다. [제품 기기 QA](../evidence/product-map-device.md)에서 큰 글자·회전·테마·오류·접근 제한·로그아웃을 확인했다. 기존 합성 영상은 해당 이전 버전에 한정한다. | 수동 화면 읽기 프로그램·다른 OS/GPU 사용성, 실제 사용자→실물 위치·명령 전체 경로의 receipt와 발표 녹화 |
 
 ## 위치 정보의 해석과 개인정보
 
@@ -47,8 +47,8 @@ ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-31 (Asia/Seoul) · APP 0.2.0 /
 ## 현재 검증과 그 한계
 
 - JDK 17 / SDK 35 / AGP 8.11.1 / Gradle 8.13의 workspace 격리 도구로 debug와 release 빌드를 통과했다. 앱 버전은 0.2.0이다.
-- Android JVM 단위시험 28개와 모바일 위치 서비스·팀 모듈 관련 호스트시험 24개가 통과했다. JWT/권한/잘못된 위치/유효기간/회수·만료 등 자동시험은 생성한 키와 명시 fixture를 사용한다.
-- 제품 공기계 QA는 현재 진행 중이다. 최종 APK·설정·지도 화면·상태·해시·파일 정리는 `app/evidence/product-map-device.md`에 고정할 예정이다. 그 파일의 실제 확인 범위가 작성되기 전에는 해당 기기 결과를 완료로 취급하지 않는다.
+- Android JVM 단위시험 28개와 CORE/INTEGRATION·모바일 위치 서비스의 호스트시험 38개가 통과했다. JWT/권한/잘못된 위치/유효기간/회수·만료 등 자동시험은 생성한 키와 명시 fixture를 사용한다.
+- [제품 공기계 QA 기록](../evidence/product-map-device.md)에 실제 지도·목록·라이트/다크·200% 글자·가로/세로·무효/거부/빈 위치·연결 중단·인증 거절·로그아웃·연결 해제의 14개 시나리오를 고정했다. 새 APK를 기기에 유지하고 QA 인증·주소·서버·USB 중계·키를 정리했으며 전역 설정을 복원했다. 실제 운영 IdP·실물 위치와 수동 화면 읽기 프로그램 전체 사용성·다른 OS/GPU 행렬은 남아 있다.
 - [기존 85초 합성 시연](../evidence/mobile-integration-demo.md), [합성 동의·refresh](../evidence/auth-consent-refresh-device.md), [이전 설정 시험](../evidence/settings-draft-device.md)은 당시 APK·상황의 기록이다. 새 제품 버전의 운영 IdP·실물 키링·상용 배포 검증으로 합산하지 않는다.
 
 ## 실제 배포에 필요한 입력과 다음 구현
@@ -59,4 +59,4 @@ ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-10-31 (Asia/Seoul) · APP 0.2.0 /
 4. **남은 APP 업무**: 기기/household·초대, 실제 consent·approval·incident/Group/receipt, handover·FL 상태, push와 mutation 재정산을 버전 고정 계약으로 연결한다.
 5. **배포와 release 증거**: 제품 기기 QA·접근성·실제 IdP 및 실물 시험, 서명·운영 프로필·배포 정책과 최종 commit/APK/로그/영상 hash를 함께 고정하고 계획의 담당자·검토자·gate를 인수한다. 공식 gate ID나 승인자는 만들어내지 않는다.
 
-현재 남은 작업은 “사용자 API가 전혀 없으므로 아무 것도 연결할 수 없음”이 아니라, 구현된 위치 읽기·지도·인증 경로를 실제 배포에 인수하고 아직 없는 사용자 mutation·서비스 화면을 완성하는 작업이다.
+다음 단계는 구현된 위치 읽기·지도·인증 경로의 실제 배포 인수와 사용자 mutation·서비스 화면 구현이다.

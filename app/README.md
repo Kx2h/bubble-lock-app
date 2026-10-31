@@ -33,7 +33,7 @@ access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 �
   -PoidcClientId=registered-android-client
 ```
 
-기본 미설정 release에서는 로그인 callback receiver를 제거합니다. 세 값을 모두 고정한 release는 `src/productionAuth/AndroidManifest.xml`의 callback을 사용합니다. 공급자에 등록한 redirect와 실제 도메인·API audience·scope·서버 principal binding을 맞춰야 합니다. 현재 실제 운영 IdP·계정의 전체 브라우저 로그인과 실물 키링 위치는 검증하지 않았습니다.
+기본 미설정 release에서는 로그인 callback receiver를 제거합니다. 세 값을 모두 고정한 release는 `src/productionAuth/AndroidManifest.xml`의 callback을 사용합니다. 등록 redirect는 `org.privacybubble.app:/oauth2redirect`, 요청 scope는 `openid offline_access location:read`이며 공급자는 응답의 `iss`를 제공해야 합니다. API audience와 서버 principal binding도 맞춰야 합니다. 현재 실제 운영 IdP·계정의 전체 브라우저 로그인과 실물 키링 위치는 검증하지 않았습니다.
 
 debug 빌드에만 `설정 → 개발 도구 → 개발 인증 연결`과 `http://127.0.0.1:8787`의 명시적인 loopback 예외가 있습니다. 이는 통제된 기기 QA용이며 제품 release에서 임시 bearer를 직접 입력하는 기능을 제공하지 않습니다. 개발 인증도 서버의 서명·권한 검증을 통과해야 합니다.
 
@@ -53,7 +53,7 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 
 APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
 
-현재 개발 검증에서 debug/release 빌드, Android JVM 단위시험 28개, 위치 서비스와 팀 연동 관련 호스트시험 24개가 통과했습니다. 이 결과는 실제 운영 IdP·물리 키링이나 공식 release gate의 완료를 뜻하지 않습니다. 제품 앱의 공기계 지도·상태·회전·큰 글자 시험은 진행 중이며, 결과를 `evidence/product-map-device.md`에 별도로 고정합니다. 기존 `evidence/android-build.log`와 2026-10-28~29의 스크린샷은 당시 버전의 기록입니다.
+현재 개발 검증에서 debug/release APK와 release AAB 빌드, Android JVM 단위시험 28개, CORE/INTEGRATION·위치 서비스 호스트시험 38개가 통과했습니다. [제품 기기 기록](evidence/product-map-device.md)에 실제 지도·상태·회전·200% 글자 등 14개 시나리오와 해시를 고정했습니다. 실제 운영 IdP·물리 키링·공식 release 검증은 남아 있습니다. 기존 `evidence/android-build.log`와 2026-10-28~29의 스크린샷은 당시 버전의 기록입니다.
 
 ## 공기계 설치·업그레이드·복원
 
@@ -70,7 +70,7 @@ WSL wrapper는 `install -r`의 최종 로컬 APK 경로도 Windows 경로로 변
 
 versionCode 2에서 이전 debug APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
 
-이번 제품 QA는 사용자가 검토할 수 있도록 최신 APK를 기기에 남기고 시험용 인증·연결 프로필을 지우는 방식으로 진행할 계획입니다. 실제 남긴 버전·백업·설정 및 파일 정리는 제품 기기 기록을 기준으로 확인합니다. 시스템·브라우저 인증서 신뢰는 변경하지 않습니다.
+이번 제품 QA에서 새 0.2.0 APK를 기기에 남기고 시험용 인증·연결 프로필·서버·USB 중계·키를 정리했습니다. 전역 설정을 복원했고 기존 앱 전체 데이터는 지우지 않았습니다. 원본 APK 백업·최종 APK 해시·정리 결과는 [제품 기기 기록](evidence/product-map-device.md)에 있습니다. 시스템·브라우저 인증서 신뢰는 변경하지 않았습니다.
 
 ## 소유권을 확인하는 개발 시험 설치·정리 도구
 

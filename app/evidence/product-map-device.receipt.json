@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "1.0.0",
+  "testId": "APP-PRODUCT-MAP-DEVICE-20261031",
+  "role": "APP",
+  "docRev": "2.0.0",
+  "recordedAt": "2026-10-31T14:52:41.303252+00:00",
+  "implementationCommit": "f2200d1a75e8ff756680d40c4d9661c2392ae1ac",
+  "versionName": "0.2.0",
+  "versionCode": 2,
+  "releaseGateStatus": "not-evaluated",
+  "performer": "APP",
+  "reviewer": "APP independent source and native SDK review; root device and visual review",
+  "device": {
+    "model": "SM_S908N",
+    "androidVersion": "14",
+    "package": "org.privacybubble.app",
+    "buildType": "debug"
+  },
+  "scope": {
+    "nativeMapProvider": "MapLibre13.7.1/OpenFreeMap",
+    "actualNetworkMapRendered": true,
+    "locationSource": "actual IntegrationStore/MecCallbackIngress classes with explicit QA-only Location events",
+    "physicalKeyringLocationVerified": false,
+    "operatingIdpBrowserLoginVerified": false,
+    "fixturesNotShippedAsProductDefaults": true
+  },
+  "apkSha256": "f7c2a3ae77c932593c54f60411ef0af002c49b6afc3ebf974a9f74060aa47625",
+  "postCommitBuildConfirmedSameDebugArtifact": true,
+  "releaseApkSha256": "2719fa5e3659723906f9d6adbcdef4da419ce141b5ab890edec03f5181e2a17d",
+  "releaseBundleSha256": "5457431c6f4071a6b6cfb3b77fa6bcf8601c61df7f3cde0db9e535a072b70e64",
+  "releaseArtifactSignedForDistribution": false,
+  "buildToolchain": {
+    "jdk": "17",
+    "androidSdk": "35",
+    "agp": "8.11.1",
+    "gradle": "8.13"
+  },
+  "checksArtifact": "product-map-device.checks.json",
+  "executedAssertions": 25,
+  "distinctCheckNames": 22,
+  "deviceScenarios": [
+    "fresh",
+    "accessible list",
+    "light",
+    "dark",
+    "portrait 200% font",
+    "landscape 200% font",
+    "stale",
+    "invalid",
+    "denied",
+    "empty",
+    "network failure",
+    "rejected session",
+    "explicit logout",
+    "service disconnect"
+  ],
+  "hostTests": 38,
+  "jvmTests": 28,
+  "profileBoundary": {
+    "sampleBuildOnly": true,
+    "actualIdpExercised": false,
+    "releaseApkSha256": "0cc33f3ad02be6bd0dc0847a08dd471601c201f24250e223c4b52e2d2a5ad4f6",
+    "callbackReceiverPresent": true,
+    "developerToolsAbsent": true,
+    "phoneLocationAndWifiPermissionsAbsent": true,
+    "networkIsolationPassed": true
+  },
+  "nativePackaging": {
+    "debugAndReleasePhoneLocationAndWifiPermissionsAbsent": true,
+    "release16KBZipAlignmentPassed": true,
+    "arm64AndX86_64NativeELF16KBAlignmentPassed": true
+  },
+  "vaultCheck": {
+    "plaintextTokenAbsent": true,
+    "ciphertextPresent": true,
+    "authenticatedAfterApkUpgrade": true
+  },
+  "cleanup": {
+    "at": "2026-10-31T14:45:50.846098+00:00",
+    "installedNewProductApk": true,
+    "installedApkSha256": "f7c2a3ae77c932593c54f60411ef0af002c49b6afc3ebf974a9f74060aa47625",
+    "originalApkBackupSha256": "bb9dc64aebefbc89c9812b7954181d88e00432ee844e5b8610ba50b463d5ee24",
+    "originalApkRetainedInWorkspace": true,
+    "testCredentialsAndProfileCleared": true,
+    "originalExistingAppDataNotCleared": true,
+    "appUninstalled": false,
+    "systemSettingsRestored": {
+      "font_scale": "1.0",
+      "accelerometer_rotation": "0",
+      "user_rotation": "0"
+    },
+    "nightModeRestored": true,
+    "stayOnRestored": true,
+    "ownedReverseRemoved": true,
+    "originalReverseRestored": true,
+    "ownedDeviceXmlRemoved": true,
+    "hostQaKeysAndTokenRemoved": true,
+    "systemOrBrowserTrustChanged": false
+  },
+  "sourceHashArtifact": "product-app-source.sha256.json",
+  "logSha256": {
+    "host": "1bc2fa521652e14e8535c642553ea9821f20c5d9eaa9052517af6b1c679737bc",
+    "build": "cb79a9704efb83ba1f2b385b29605c2c0a3201c6f4e14cce2671c9e363cd0fdd",
+    "jvm": "b784fe873de8a05471da22eae7a4b85894edd02e802216b62d6e9877ed77c8d1",
+    "deviceChecks": "8c4ca83e15be81271e1511770d75dcbaff617b2259c5311eb30796b1b567159b"
+  },
+  "screenshots": [
+    "product-map-light.png",
+    "product-map-dark.png",
+    "product-keyrings-light.png",
+    "product-large-font.png",
+    "product-large-font-landscape.png",
+    "product-stale-location.png",
+    "product-unavailable-location.png",
+    "product-permission-denied.png",
+    "product-empty-keyrings.png",
+    "product-network-stale.png",
+    "product-session-rejected.png",
+    "product-logged-out.png",
+    "product-disconnected.png",
+    "product-installed-clean.png"
+  ],
+  "limits": [
+    "No production IdP/account or physical keyring location feed was provided.",
+    "TalkBack-labelled tree, text contrast, 200% font and rotation were checked; a full human screen-reader usability session and other OS/GPU matrix were not performed.",
+    "QA loopback and generated signing keys validated the real read API; operating HTTPS deployment and authenticated upstream MEC ingress remain deployment work.",
+    "Registration, consent/command mutations, push, handover and FL app screens remain in the implementation status document."
+  ],
+  "buildLogNormalization": "Trailing whitespace removed from the committed console log; raw log retained in workspace .local.",
+  "rawBuildLogSha256": "30a3eaa63f2e0bd0c5530a756bbe37a735acdd4de8a1230d66a2e78d85c83c16"
+}

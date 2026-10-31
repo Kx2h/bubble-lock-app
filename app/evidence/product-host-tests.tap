@@ -1,0 +1,238 @@
+TAP version 13
+# Subtest: configuration fails closed without trusted signing material or HTTPS issuer
+ok 1 - configuration fails closed without trusted signing material or HTTPS issuer
+  ---
+  duration_ms: 0.687867
+  type: 'test'
+  ...
+# Subtest: signed access token authenticates exact issuer/audience and required scope
+ok 2 - signed access token authenticates exact issuer/audience and required scope
+  ---
+  duration_ms: 1.805923
+  type: 'test'
+  ...
+# Subtest: forged signatures, unsigned algorithms, wrong issuer/audience, expiry and future nbf are rejected
+ok 3 - forged signatures, unsigned algorithms, wrong issuer/audience, expiry and future nbf are rejected
+  ---
+  duration_ms: 2.511595
+  type: 'test'
+  ...
+# Subtest: trusted JWKS selects a configured key id and rejects unknown ids
+ok 4 - trusted JWKS selects a configured key id and rejects unknown ids
+  ---
+  duration_ms: 0.674792
+  type: 'test'
+  ...
+# Subtest: only administrator-bound keyrings are disclosed, missing coordinates are not invented
+ok 5 - only administrator-bound keyrings are disclosed, missing coordinates are not invented
+  ---
+  duration_ms: 0.763621
+  type: 'test'
+  ...
+# Subtest: valid MEC fix keeps observed time, bounded accuracy, battery and freshness
+ok 6 - valid MEC fix keeps observed time, bounded accuracy, battery and freshness
+  ---
+  duration_ms: 0.41573
+  type: 'test'
+  ...
+# Subtest: older out-of-order callbacks do not replace a newer observed fix
+ok 7 - older out-of-order callbacks do not replace a newer observed fix
+  ---
+  duration_ms: 0.130899
+  type: 'test'
+  ...
+# Subtest: invalid latest coordinates clear prior coordinates instead of falling back to a fresh old fix
+ok 8 - invalid latest coordinates clear prior coordinates instead of falling back to a fresh old fix
+  ---
+  duration_ms: 0.135237
+  type: 'test'
+  ...
+# Subtest: undatable latest event remains unavailable even if followed by an older valid callback
+ok 9 - undatable latest event remains unavailable even if followed by an older valid callback
+  ---
+  duration_ms: 0.190472
+  type: 'test'
+  ...
+# Subtest: invalid calendar, future time, numeric-string coordinates and negative accuracy are unavailable
+ok 10 - invalid calendar, future time, numeric-string coordinates and negative accuracy are unavailable
+  ---
+  duration_ms: 0.34963
+  type: 'test'
+  ...
+# Subtest: expired fixes remain explicitly stale, never gain time from a recent receipt
+ok 11 - expired fixes remain explicitly stale, never gain time from a recent receipt
+  ---
+  duration_ms: 0.16314
+  type: 'test'
+  ...
+# Subtest: upstream expiry caps freshness and invalid expiry clears a fix
+ok 12 - upstream expiry caps freshness and invalid expiry clears a fix
+  ---
+  duration_ms: 0.114788
+  type: 'test'
+  ...
+# Subtest: permission denial and disabled binding clear coordinates and location metadata
+ok 13 - permission denial and disabled binding clear coordinates and location metadata
+  ---
+  duration_ms: 0.076205
+  type: 'test'
+  ...
+# Subtest: grant revocation, consent revocation, expiry, wrong principal and revision revoke visible coordinates
+ok 14 - grant revocation, consent revocation, expiry, wrong principal and revision revoke visible coordinates
+  ---
+  duration_ms: 0.18433
+  type: 'test'
+  ...
+# Subtest: binding/result/store limits fail closed without truncating another user keyring into a response
+ok 15 - binding/result/store limits fail closed without truncating another user keyring into a response
+  ---
+  duration_ms: 4.659863
+  type: 'test'
+  ...
+# Subtest: HTTP requires signed auth, rejects mutation/body/query, returns no-store without CORS
+ok 16 - HTTP requires signed auth, rejects mutation/body/query, returns no-store without CORS
+  ---
+  duration_ms: 26.953928
+  type: 'test'
+  ...
+# Subtest: actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules
+ok 17 - actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules
+  ---
+  duration_ms: 7.879312
+  type: 'test'
+  ...
+# Subtest: oneM2M contract keeps the CORE ownership and release headers
+ok 18 - oneM2M contract keeps the CORE ownership and release headers
+  ---
+  duration_ms: 1.162249
+  type: 'test'
+  ...
+# Subtest: oneM2M flow covers resource creation, state update, retrieve, subscription and group
+ok 19 - oneM2M flow covers resource creation, state update, retrieve, subscription and group
+  ---
+  duration_ms: 0.298819
+  type: 'test'
+  ...
+# Subtest: Raspberry Pi Gateway contract binds BLE, MQTT, HTTPS and oneM2M mapping
+ok 20 - Raspberry Pi Gateway contract binds BLE, MQTT, HTTPS and oneM2M mapping
+  ---
+  duration_ms: 0.103226
+  type: 'test'
+  ...
+# Subtest: GatewayBridge publishes oneM2M MQTT primitive and settles response rqi/rsc
+ok 21 - GatewayBridge publishes oneM2M MQTT primitive and settles response rqi/rsc
+  ---
+  duration_ms: 1.926301
+  type: 'test'
+  ...
+# Subtest: GatewayBridge maps Raspberry Pi telemetry to oneM2M state and deduplicates sequence
+ok 22 - GatewayBridge maps Raspberry Pi telemetry to oneM2M state and deduplicates sequence
+  ---
+  duration_ms: 2.050598
+  type: 'test'
+  ...
+# Subtest: GatewayBridge publishes command and settles it with ACK/readback
+ok 23 - GatewayBridge publishes command and settles it with ACK/readback
+  ---
+  duration_ms: 0.813968
+  type: 'test'
+  ...
+# Subtest: GatewayBridge keeps a reviewable telemetry event available for retry
+ok 24 - GatewayBridge keeps a reviewable telemetry event available for retry
+  ---
+  duration_ms: 1.043433
+  type: 'test'
+  ...
+# Subtest: GroupDispatcher fans out a command and settles member readback
+ok 25 - GroupDispatcher fans out a command and settles member readback
+  ---
+  duration_ms: 1.36752
+  type: 'test'
+  ...
+# Subtest: GroupDispatcher retries the member whose ACK remains pending
+ok 26 - GroupDispatcher retries the member whose ACK remains pending
+  ---
+  duration_ms: 0.321541
+  type: 'test'
+  ...
+# Subtest: OIDC/mTLS principal, consent, grant, revoke lifecycle
+ok 27 - OIDC/mTLS principal, consent, grant, revoke lifecycle
+  ---
+  duration_ms: 10.005036
+  type: 'test'
+  ...
+# Subtest: MEC Location/RNIS callback dedup and policy reconciliation
+ok 28 - MEC Location/RNIS callback dedup and policy reconciliation
+  ---
+  duration_ms: 5.410271
+  type: 'test'
+  ...
+# Subtest: handover epoch, security context, rollback
+ok 29 - handover epoch, security context, rollback
+  ---
+  duration_ms: 2.715822
+  type: 'test'
+  ...
+# Subtest: ESTIMED FL selection, artifact fence, recovery, round completion
+ok 30 - ESTIMED FL selection, artifact fence, recovery, round completion
+  ---
+  duration_ms: 4.949147
+  type: 'test'
+  ...
+# Subtest: MCP multi-server approval hash, checkpoint, resume, persistent run
+ok 31 - MCP multi-server approval hash, checkpoint, resume, persistent run
+  ---
+  duration_ms: 6.599636
+  type: 'test'
+  ...
+# Subtest: integration API exposes contract-shaped routes
+ok 32 - integration API exposes contract-shaped routes
+  ---
+  duration_ms: 2.158985
+  type: 'test'
+  ...
+# Subtest: fault fixtures cover duplicate, replay, drain, crash and resume paths
+ok 33 - fault fixtures cover duplicate, replay, drain, crash and resume paths
+  ---
+  duration_ms: 1.152872
+  type: 'test'
+  ...
+# Subtest: CORE migration defines event, dispatch, receipt and oneM2M binding tables
+ok 34 - CORE migration defines event, dispatch, receipt and oneM2M binding tables
+  ---
+  duration_ms: 0.714228
+  type: 'test'
+  ...
+# Subtest: INTEGRATION migration defines policy, MEC, handover, FL, MCP and audit tables
+ok 35 - INTEGRATION migration defines policy, MEC, handover, FL, MCP and audit tables
+  ---
+  duration_ms: 0.238353
+  type: 'test'
+  ...
+# Subtest: ReceiptJournal writes a hash-recorded JSONL receipt
+ok 36 - ReceiptJournal writes a hash-recorded JSONL receipt
+  ---
+  duration_ms: 5.472718
+  type: 'test'
+  ...
+# Subtest: CORE release manifest maps runtime artifacts and replay commands
+ok 37 - CORE release manifest maps runtime artifacts and replay commands
+  ---
+  duration_ms: 0.497827
+  type: 'test'
+  ...
+# Subtest: Gateway event schema preserves BLE-to-Mobius payload contract
+ok 38 - Gateway event schema preserves BLE-to-Mobius payload contract
+  ---
+  duration_ms: 0.372087
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 196.031349

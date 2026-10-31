@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites tests="28" failures="0" errors="0"><testsuite name="org.privacybubble.app.auth.IdTokenVerifierTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-31T14:49:54.764Z" hostname="DESKTOP-I79D1BH" time="0.132">
+  <properties />
+  <testcase name="refreshRejectsExplicitNullAndWrongClaimTypes" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.037" />
+  <testcase name="encryptedStoreContextRetainsStrictRefreshChecks" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.009" />
+  <testcase name="refreshIdTokenBindsIssuerSubjectAudienceAndNonce" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.013" />
+  <testcase name="acceptsVerifiedTokenAndOptionalMatchingAzp" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.001" />
+  <testcase name="accessTokenHashBindsInitialAndRefreshedResponses" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.01" />
+  <testcase name="rejectsWrongSignatureMissingOrDuplicateKeys" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.003" />
+  <testcase name="refreshIdTokenAcceptsOmittedAndMatchingNonce" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.006" />
+  <testcase name="rejectsAlgorithmConfusionMissingKidAndUntrustedKeyUrl" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.015" />
+  <testcase name="rejectsWrongUseAndUntrustedConfiguration" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.002" />
+  <testcase name="rejectsMissingWrongOrExpiredClaims" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.008" />
+  <testcase name="rejectsWrongIssuerAudienceAndAzp" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.005" />
+  <testcase name="refreshIdTokenChecksAuthTimeAzpAndIssuance" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.011" />
+  <testcase name="subjectMustBeAtMost255AsciiCharacters" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.006" />
+  <testcase name="rejectsExplicitNullNotBeforeOnInitialAndRefresh" classname="org.privacybubble.app.auth.IdTokenVerifierTest" time="0.005" />
+  <system-out />
+  <system-err />
+</testsuite><testsuite name="org.privacybubble.app.auth.OidcProviderTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-31T14:49:54.899Z" hostname="DESKTOP-I79D1BH" time="0.002">
+  <properties />
+  <testcase name="refusesDowngradedProviderAndMalformedDocument" classname="org.privacybubble.app.auth.OidcProviderTest" time="0.001" />
+  <testcase name="acceptsVerifiedDiscoveryCapabilities" classname="org.privacybubble.app.auth.OidcProviderTest" time="0.0" />
+  <testcase name="rejectsIssuerSubstitutionAndNonHttpsEndpoints" classname="org.privacybubble.app.auth.OidcProviderTest" time="0.0" />
+  <system-out />
+  <system-err />
+</testsuite><testsuite name="org.privacybubble.app.auth.OidcRedirectTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-31T14:49:54.902Z" hostname="DESKTOP-I79D1BH" time="0.002">
+  <properties />
+  <testcase name="rejectsWrongAndAmbiguousRedirects" classname="org.privacybubble.app.auth.OidcRedirectTest" time="0.002" />
+  <testcase name="acceptsBoundCode" classname="org.privacybubble.app.auth.OidcRedirectTest" time="0.0" />
+  <system-out />
+  <system-err />
+</testsuite><testsuite name="org.privacybubble.app.auth.OidcScopesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-31T14:49:54.905Z" hostname="DESKTOP-I79D1BH" time="0.001">
+  <properties />
+  <testcase name="initialScopeCannotExpandOrDropRequestedScope" classname="org.privacybubble.app.auth.OidcScopesTest" time="0.0" />
+  <testcase name="syntheticScopesRemainExactRegardlessOfOrder" classname="org.privacybubble.app.auth.OidcScopesTest" time="0.001" />
+  <system-out />
+  <system-err />
+</testsuite><testsuite name="org.privacybubble.app.auth.RotatingSessionTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-31T14:49:54.907Z" hostname="DESKTOP-I79D1BH" time="0.009">
+  <properties />
+  <testcase name="rotatesAndAllowsRefreshAfterAccessExpiry" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.002" />
+  <testcase name="malformedOrAmbiguousResponsePermanentlyClosesWithoutRetry" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.002" />
+  <testcase name="expirationIsMeasuredFromBeforeExchange" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.0" />
+  <testcase name="simultaneousRefreshAndCloseCannotResurrectSession" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.002" />
+  <testcase name="syntheticConsentScopeCannotExpandOrDropOnRefresh" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.001" />
+  <testcase name="fatalTransportFailureAlsoDropsCredentials" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.0" />
+  <testcase name="subjectFollowsIdTokenRulesRatherThanBearerSyntax" classname="org.privacybubble.app.auth.RotatingSessionTest" time="0.001" />
+  <system-out />
+  <system-err />
+</testsuite></testsuites>

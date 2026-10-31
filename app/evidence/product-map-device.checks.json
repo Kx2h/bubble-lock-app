@@ -1,0 +1,177 @@
+[
+  {
+    "at": "2026-10-31T14:26:47.555793+00:00",
+    "name": "200% landscape uses compact shell",
+    "expected": false,
+    "actual": false,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:26:49.987462+00:00",
+    "name": "200% landscape keyring content remains reachable",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:27:36.512344+00:00",
+    "name": "Light theme selected",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:27:43.715889+00:00",
+    "name": "fresh API state",
+    "expected": "available",
+    "actual": "available",
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:27:46.180577+00:00",
+    "name": "fresh phone label",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:27:54.224543+00:00",
+    "name": "Accessible list exposes accuracy",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:27:56.631558+00:00",
+    "name": "Accessible list exposes source",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:28:25.537792+00:00",
+    "name": "Dark theme selected",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:28:39.306743+00:00",
+    "name": "200% portrait navigation remains usable",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:29:54.791078+00:00",
+    "name": "Light theme selected",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:00.927322+00:00",
+    "name": "stale API state",
+    "expected": "stale",
+    "actual": "stale",
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:03.345639+00:00",
+    "name": "stale phone label",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:12.436662+00:00",
+    "name": "invalid API state",
+    "expected": "unavailable",
+    "actual": "unavailable",
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:14.869796+00:00",
+    "name": "invalid phone label",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:14.870014+00:00",
+    "name": "invalid API clears coordinates",
+    "expected": null,
+    "actual": null,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:23.968071+00:00",
+    "name": "denied API state",
+    "expected": "denied",
+    "actual": "denied",
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:26.482134+00:00",
+    "name": "denied phone label",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:26.482408+00:00",
+    "name": "denied API clears coordinates",
+    "expected": null,
+    "actual": null,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:30:35.510599+00:00",
+    "name": "Empty authorized list has no fabricated keyring",
+    "expected": 0,
+    "actual": 0,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:33:13.925541+00:00",
+    "name": "fresh API state",
+    "expected": "available",
+    "actual": "available",
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:33:16.365090+00:00",
+    "name": "fresh phone label",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:34:26.239243+00:00",
+    "name": "Network failure retains only labelled stale information",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:36:02.718518+00:00",
+    "name": "Rejected session clears visible locations",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:42:46.437607+00:00",
+    "name": "Explicit logout clears location views",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  },
+  {
+    "at": "2026-10-31T14:42:59.555755+00:00",
+    "name": "Explicit service disconnect clears saved profile and locations",
+    "expected": true,
+    "actual": true,
+    "passed": true
+  }
+]
