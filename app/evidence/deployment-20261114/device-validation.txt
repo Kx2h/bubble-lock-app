@@ -7,4 +7,3 @@ Paging assertions: 49; render ms: [533, 109, 92]
 PASS: 32 isolated HTTPS/Main lease assertions
 Expiry/denial/total ms: [4124, 7198, 13531]
 Synthetic JWT; OIDC login and visible UI are outside this fixture.
-
