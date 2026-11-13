@@ -4,6 +4,8 @@ ROLE KEYRING · DOC-REV 2.0.0 · 선택형 소스 구현. 실물 시험은 아�
 
 `KEYRING_ENABLE_AUDIO=1`, `KEYRING_AUDIO_OUTPUT=2`가 MAX9850 헤드폰 PCM을 선택한다. 기본 출력 1은 MAX98357A 스피커다. 하나의 I2S 송신기와 승인된 모터 pulse의 세대 번호·마감 시각을 공유한다. `KEYRING_HEADPHONE_VOLUME=0x20`은 증폭기 -45.5dB 감쇠 설정이며 PCM amplitude 기본값은 512다. 실제 음압·권장 청취량은 실물 계측 항목이다.
 
+`firmware_options.h`는 출력 선택을 1 또는 2로 제한하며 volume에는 MAX9850 Rev4 p24 Table13의 VOL(5:0) 값 `0x00..0x3f`만 허용한다. `0x00`은 +6dB, `0x28..0x3f`는 완전 감쇠다. MUTE·SLEW 비트는 드라이버가 관리하므로 volume 설정에 섞을 수 없다. 유효한 레지스터 범위는 실제 청취 음량의 안전성을 검증한 값이 아니다.
+
 ## 회로와 제조사 근거
 
 [MAX9850 Rev4](https://www.analog.com/media/en/technical-documentation/data-sheets/max9850.pdf) p12 핀 표, p16 HPS, p18 Table5, p23~28 레지스터, p32~33 시작·종료 순서와 r18 회로·PCB U16 패드를 대조했다. 구조화 추출은 [MAX9850ETI+](../pcb/r18/datasheets/extracted/MAX9850ETI__07c924.json)에 있고 추출 완성도 점수는 9.5/10이다. 이 검토 범위는 펌웨어의 핀·클록·제어 계약이다.
@@ -38,6 +40,8 @@ worker는 승인 세대·deadline·인증 연결·모터·전원 fault 상태를
 `python -m platformio run -e keyring_compile_minimal -e keyring_compile_st7789 -e keyring_compile_jd9853 -e keyring_compile_headphone`으로 4개 환경을 빌드한다. Windows 한글 경로에서는 `PLATFORMIO_BUILD_DIR`를 영문 로컬 cache 경로로 설정한다.
 
 `pip install ziglang==0.13.0` 후 `python test/run_headphone_host.py --output <local-output>`은 실제 C++ 제어 코드를 모의 I2C·시계에 연결해 부팅, register sequence, 취소, 독점 제어, NACK, readback 불일치와 준비 timeout을 실행한다. 실행 로그와 바이너리 해시는 로컬 증거 receipt에 보관한다.
+
+이미 설치된 C++17 컴파일러를 쓸 때는 `--compiler g++` 또는 `--compiler clang++`를 지정한다. 모의 I/O 시험은 같은 드라이버 소스·매크로·include 경로를 사용하며 ESP32용 4개 컴파일 환경 검증은 별도로 실행한다.
 
 | TODO | 실물 receipt 내용 |
 |---|---|

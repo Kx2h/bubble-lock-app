@@ -21,4 +21,22 @@ test('port 443 realm issuer callback and Keycloak hostname share the canonical o
   assert.deepEqual(realm.clients[0].redirectUris, [portal.oidc.redirectUri]);
   assert.match(keycloak, /^KC_HOSTNAME=https:\/\/deployment\.example\.invalid\/identity$/m);
   assert.ok(realm.clients[0].protocolMappers.some((mapper) => mapper.protocolMapper === 'oidc-sub-mapper'));
+  const native = realm.clients.find((client) => client.clientId === 'bubble-lock-android');
+  assert.ok(native, 'Native Android must have its own client rather than the BFF secret');
+  assert.equal(native.publicClient, true);
+  assert.equal(native.secret, undefined);
+  assert.equal(native.standardFlowEnabled, true);
+  assert.equal(native.implicitFlowEnabled, false);
+  assert.equal(native.directAccessGrantsEnabled, false);
+  assert.equal(native.serviceAccountsEnabled, false);
+  assert.equal(native.fullScopeAllowed, false);
+  assert.equal(native.attributes['pkce.code.challenge.method'], 'S256');
+  assert.equal(native.attributes['exclude.issuer.from.auth.response'], 'false');
+  assert.deepEqual(native.redirectUris, ['org.privacybubble.app:/oauth2redirect']);
+  assert.deepEqual(native.defaultClientScopes, []);
+  assert.deepEqual(native.optionalClientScopes, ['portal:read']);
+  assert.ok(native.protocolMappers.some((mapper) => mapper.protocolMapper === 'oidc-sub-mapper'));
+  assert.ok(native.protocolMappers.some((mapper) => mapper.protocolMapper === 'oidc-audience-mapper'
+    && mapper.config['included.custom.audience'] === api.oidc.audience
+    && mapper.config['id.token.claim'] === 'false'));
 });

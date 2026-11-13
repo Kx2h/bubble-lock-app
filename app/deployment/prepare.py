@@ -15,7 +15,7 @@ ORIGIN = "https://bubblelock.iptime.org"
 ISSUER = ORIGIN + "/identity/realms/bubble"
 REDIRECT = "org.privacybubble.app:/oauth2redirect"
 FIELDS = {"schemaVersion", "publicOrigin", "issuer", "nativeClientId", "apiAudience", "keycloakMajorVersion",
-          "basicScopeExcludedFromTokenScope", "publicCertificateSha256", "publicCertificateConfirmed",
+          "publicCertificateSha256", "publicCertificateConfirmed",
           "upstreamOrigin", "upstreamTlsName", "upstreamCaFile", "upstreamVerifiesOidcAndEnrollment"}
 TEMPLATES = {"native-client.template.json": "native-client.json", "portal-read-scope.template.json": "portal-read-scope.json",
              "android-profile.template.properties": "android-profile.properties", "nginx-http.template.conf": "nginx-http.conf",
@@ -74,8 +74,8 @@ def validate_profile(value):
             and result["nativeClientId"] != "bubble-lock-dashboard", "Use a separate registered native client identifier")
     require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}", result["apiAudience"]), "Invalid verified API audience")
     require(type(value["keycloakMajorVersion"]) is int and value["keycloakMajorVersion"] >= 25,
-            "Verify Keycloak version; this template uses the basic client scope introduced by version 25")
-    for key in ["basicScopeExcludedFromTokenScope", "publicCertificateConfirmed", "upstreamVerifiesOidcAndEnrollment"]:
+            "Verify Keycloak version; this template uses the explicit subject mapper from version 25")
+    for key in ["publicCertificateConfirmed", "upstreamVerifiesOidcAndEnrollment"]:
         require(value[key] is True, "Required deployment fact is unconfirmed: " + key)
     fingerprint = result["publicCertificateSha256"].replace(":", "").lower()
     require(re.fullmatch(r"[0-9a-f]{64}", fingerprint), "Expected an independently confirmed SHA256 certificate fingerprint")
@@ -99,7 +99,10 @@ def validate_artifacts(artifacts, profile):
                                                    "serviceAccountsEnabled", "authorizationServicesEnabled", "fullScopeAllowed"]), "Unexpected native grant or privilege")
     require(not any(key.lower() in {"secret", "clientsecret", "password", "credentials"} for key in client), "Client secrets are forbidden")
     require(client.get("redirectUris") == [REDIRECT] and client.get("webOrigins") == [], "Exact native redirect without web wildcard required")
-    require(client.get("defaultClientScopes") == ["basic"] and client.get("optionalClientScopes") == ["offline_access", "portal:read"], "Native scopes must remain minimal")
+    require(client.get("defaultClientScopes") == [] and client.get("optionalClientScopes") == ["portal:read"], "Native scopes must remain minimal")
+    subjects = client.get("protocolMappers", [])
+    require(len(subjects) == 1 and subjects[0].get("protocolMapper") == "oidc-sub-mapper"
+            and subjects[0].get("config", {}).get("access.token.claim") == "true", "Explicit subject mapper required for this realm")
     attrs = client.get("attributes", {})
     require(attrs.get("pkce.code.challenge.method") == "S256" and attrs.get("id.token.signed.response.alg") == "RS256"
             and attrs.get("access.token.signed.response.alg") == "RS256" and attrs.get("exclude.issuer.from.auth.response") == "false", "PKCE/RS256/issuer response settings required")

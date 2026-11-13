@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "recordedAt": "2026-11-13T16:35:16.819493+00:00",
+  "scope": "Local synthetic Nginx native Portal proxy validation",
+  "passed": true,
+  "nginxVersion": "1.30.6",
+  "checks": [
+    "full-template-nginx-syntax",
+    "native-get-with-validated-client-tls-is-bearer-only",
+    "upstream-exact-path-and-no-body",
+    "upstream-only-host-authorization-and-accept",
+    "no-gateway-client-certificate-on-upstream",
+    "upstream-real-tls13-ca-and-api-name",
+    "upstream-no-store-and-contract-survive",
+    "missing-authorization",
+    "cookie-cannot-replace-bearer",
+    "query-blocked",
+    "get-content-length-body-blocked",
+    "get-chunked-body-blocked",
+    "post-blocked",
+    "head-blocked",
+    "adjacent-v1-path-blocked",
+    "trailing-slash-path-blocked",
+    "upstream-rejects-a-different-bearer",
+    "untrusted-upstream-ca-rejected",
+    "wrong-upstream-api-name-rejected",
+    "no-lent-gateway-identity-when-upstream-demands-mtls"
+  ],
+  "productionEndpointsUsed": false,
+  "runtimeCredentialsUsed": false,
+  "templateSha256": "b3d2f8eadb76c0565474ba6c40da08d863c545b0d6141047fdb67da2e3ba7d01",
+  "testSourceSha256": "d6996c022846f65a948758f6471f193347a08ffbf3c61e147df11f44adb6df0b",
+  "infrastructureAdaptations": [
+    "workspace paths and fixture MIME include",
+    "temporary loopback listener/upstream ports",
+    "local DNS resolver",
+    "single foreground worker"
+  ],
+  "cleanup": "owned child processes, sockets and private runtime directory removed in finally",
+  "sourceSha256": {
+    "deployment/nginx.conf.template": "b3d2f8eadb76c0565474ba6c40da08d863c545b0d6141047fdb67da2e3ba7d01",
+    "deployment/configure.mjs": "17afa291d63397bde7b89d3681a9dccbe8785eca50cf0bb7df4798e76bd56bfc",
+    "app/deployment/native-client.template.json": "747eb517ba11d9e6c231e6672b3cc70178cda7f847667c83d9a3b161e0417b46",
+    "deployment/test/native-proxy-local.mjs": "d6996c022846f65a948758f6471f193347a08ffbf3c61e147df11f44adb6df0b"
+  },
+  "buildProvenance": {
+    "sourceUrl": "https://nginx.org/download/nginx-1.30.6.tar.gz",
+    "signatureUrl": "https://nginx.org/download/nginx-1.30.6.tar.gz.asc",
+    "officialSigningKeyUrl": "https://nginx.org/keys/pluknet.key",
+    "signerFingerprint": "D6786CE303D9A9022998DC6CC8464D549AF75C0A",
+    "signatureVerification": "GnuPG GOODSIG and VALIDSIG using the signing key fetched from the official HTTPS key page; no external Web-of-Trust claim",
+    "sourceArchiveSha256": "3cf46f5ed7504d460125866b7bea99fb357f31d887e2e63b35503310e9b8b6c8",
+    "signatureSha256": "42a21739576b5c01a7329667858a5da987672c8cb16a0e5122e5da4aa5238500",
+    "signingKeyFileSha256": "9a70c136946c1d18d5355c41516f1bdc95d4321938919e69065533e2aeb51e0e",
+    "validationBinarySha256": "9320af9654fa1769a0972b89c9748c1cf125880de4ed07551342be646a3ae1b2",
+    "compiler": "gcc 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04.1)",
+    "openssl": "3.0.13",
+    "pcre2": "10.42",
+    "configureArguments": [
+      "--prefix=<workspace>/.local/tools/nginx-validation/install",
+      "--with-http_ssl_module",
+      "--with-http_v2_module",
+      "--with-http_realip_module",
+      "--without-http_gzip_module"
+    ],
+    "buildCommand": "make -j2 && make install",
+    "dependencyInstallation": "None; existing host compiler and development libraries"
+  },
+  "productionDeploymentValidated": false,
+  "keycloakRuntimeLoginValidated": false,
+  "cleanupVerified": {
+    "ownedRuntimeDirectoriesRemoved": true,
+    "privateKeysOrTokensPublished": false
+  }
+}

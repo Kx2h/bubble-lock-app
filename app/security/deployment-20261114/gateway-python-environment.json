@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-13T15:29:41Z",
+  "checked_at": "2026-11-13T16:21:02Z",
   "environment": {
     "implementation_name": "cpython",
     "implementation_version": "3.12.3",
@@ -166,14 +166,14 @@
     {
       "license_expression": null,
       "license_name": null,
-      "metadata_sha256": "c17e428875535929da0f223426cd72910aae62fd9c6ca8f5f17dd7a9f667588a",
+      "metadata_sha256": "269a74375fab3807cd3d6b283337af4d8a4103671174294817b50919ee230b63",
       "name": "privacy-bubble-gateway",
       "requires": [
         "bleak<4,>=1",
         "httpx<1,>=0.27",
         "paho-mqtt<3,>=2"
       ],
-      "version": "0.2.43"
+      "version": "0.2.122"
     },
     {
       "license_expression": "PSF-2.0",

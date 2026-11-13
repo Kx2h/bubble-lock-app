@@ -19,7 +19,6 @@ def profile():
         "nativeClientId": "bubble-android-validation-fixture",
         "apiAudience": "urn:privacy-bubble:validation-fixture",
         "keycloakMajorVersion": 26,
-        "basicScopeExcludedFromTokenScope": True,
         "publicCertificateSha256": "ab" * 32,
         "publicCertificateConfirmed": True,
         "upstreamOrigin": "https://127.0.0.1:8787",
@@ -48,7 +47,7 @@ class DeploymentPreparationTest(unittest.TestCase):
                 prepare.validate_profile(value)
 
     def test_deployment_facts_must_be_explicitly_confirmed(self):
-        for key in ["basicScopeExcludedFromTokenScope", "publicCertificateConfirmed", "upstreamVerifiesOidcAndEnrollment"]:
+        for key in ["publicCertificateConfirmed", "upstreamVerifiesOidcAndEnrollment"]:
             for value in [False, None, 1, "true"]:
                 bad = profile()
                 bad[key] = value
@@ -88,7 +87,8 @@ class DeploymentPreparationTest(unittest.TestCase):
         base = prepare.render(checked)
         for key, value in [("publicClient", False), ("implicitFlowEnabled", True), ("directAccessGrantsEnabled", True),
                            ("serviceAccountsEnabled", True), ("fullScopeAllowed", True), ("secret", "not-allowed"),
-                           ("redirectUris", [prepare.REDIRECT + "*"]), ("optionalClientScopes", ["offline_access", "portal:read", "dashboard:read"])]:
+                           ("redirectUris", [prepare.REDIRECT + "*"]), ("optionalClientScopes", ["offline_access", "portal:read"]),
+                           ("protocolMappers", [])]:
             artifacts = dict(base)
             client = json.loads(artifacts["native-client.json"])
             client[key] = value

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { mkdtemp, mkdir, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -13,6 +13,10 @@ let config;
 before(async () => {
   directory = await mkdtemp(join(tmpdir(), 'bubble-compose-networks-'));
   for (const name of ['tmp', 'node-cache', 'bun-cache']) await mkdir(join(directory, name));
+  // Compose validates env_file existence even with --no-env-resolution.
+  // Empty isolated fixtures keep this a configuration-only inspection.
+  for (const name of ['postgres', 'keycloak', 'app', 'cse-db', 'cse'])
+    await writeFile(join(directory, `${name}.env`), '', { mode: 0o600 });
   const { stdout } = await exec('docker', [
     'compose', '-f', resolve('deployment/compose.yaml'), '--profile', 'tools',
     'config', '--no-env-resolution', '--format', 'json',

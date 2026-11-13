@@ -32,6 +32,10 @@ Paths and profile:
   NPM_ALL_LICENSES_JSON (default: deployment-20261114/npm-all-licenses.json).
   INCLUDE_GATEWAY_PYTHON=1 (default) adds the reviewed local Gateway runtime
   GATEWAY_PYTHON_SNAPSHOT (default: deployment-20261114/gateway-python-environment.json).
+  INCLUDE_CSE_INVENTORY defaults to INCLUDE_WEB_INVENTORY (normally 1).
+  CSE_NPM_LOCK defaults to deployment/cse/artifacts/dependencies/package-lock.json.
+  CSE_SOURCE_MANIFEST defaults to deployment/cse/artifacts/manifest.json and
+  binds the patched source archive, dependency lock and listed source patches.
   Set either INCLUDE_* value to 0 only for an explicitly narrower inventory.
   EXPECT_PRODUCTION_AUTH=1 requires MOBILE_API_BASE_URL, OIDC_ISSUER and
   OIDC_CLIENT_ID. Default 0 explicitly builds an unprovisioned profile.
@@ -100,10 +104,13 @@ all_npm_licenses=${NPM_ALL_LICENSES_JSON:-"$app_root/security/deployment-2026111
 gateway_snapshot=${GATEWAY_PYTHON_SNAPSHOT:-"$app_root/security/deployment-20261114/gateway-python-environment.json"}
 include_web=${INCLUDE_WEB_INVENTORY:-1}
 include_gateway=${INCLUDE_GATEWAY_PYTHON:-1}
-for value in "$include_web" "$include_gateway"; do
-  [[ $value == 0 || $value == 1 ]] || fail 'INCLUDE_WEB_INVENTORY and INCLUDE_GATEWAY_PYTHON must be 0 or 1.'
+include_cse=${INCLUDE_CSE_INVENTORY:-$include_web}
+cse_lock=${CSE_NPM_LOCK:-"$repo_root/deployment/cse/artifacts/dependencies/package-lock.json"}
+cse_manifest=${CSE_SOURCE_MANIFEST:-"$repo_root/deployment/cse/artifacts/manifest.json"}
+for value in "$include_web" "$include_gateway" "$include_cse"; do
+  [[ $value == 0 || $value == 1 ]] || fail 'INCLUDE_WEB_INVENTORY, INCLUDE_GATEWAY_PYTHON and INCLUDE_CSE_INVENTORY must be 0 or 1.'
 done
-output_dir=$("$PYTHON_BIN" - "$workspace_root" "$output_dir" "$npm_licenses" "$all_npm_licenses" "$include_web" "$gateway_snapshot" "$include_gateway" <<'PY'
+output_dir=$("$PYTHON_BIN" - "$workspace_root" "$output_dir" "$npm_licenses" "$all_npm_licenses" "$include_web" "$gateway_snapshot" "$include_gateway" "$include_cse" "$cse_lock" "$cse_manifest" <<'PY'
 import hashlib
 import importlib.metadata
 import json
@@ -113,6 +120,7 @@ import sys
 
 workspace, output, licenses, combined = map(Path, sys.argv[1:5])
 include_web, gateway, include_gateway = sys.argv[5:8]
+include_cse, cse_lock, cse_manifest = sys.argv[8:11]
 output = output.resolve()
 output.relative_to(workspace)
 if output == workspace:
@@ -123,7 +131,7 @@ for line in Path('scripts/security/requirements.txt').read_text().splitlines():
     package, version = line.strip().split('==')
     if importlib.metadata.version(package) != version:
         raise SystemExit('Install the reviewed Python requirements before running the gate: ' + package)
-def verify_licenses(path, applications):
+def verify_licenses(path, applications, allow_extra=False):
     expected, lock_hashes = set(), {}
     for identifier, lock_path in applications:
         raw = Path(lock_path).read_bytes()
@@ -134,17 +142,28 @@ def verify_licenses(path, applications):
         lock_hashes[identifier] = hashlib.sha256(raw).hexdigest()
     snapshot = json.loads(path.read_text())
     actual = {(item['name'], item['version']) for item in snapshot['packages']}
-    if expected != actual or len(actual) != len(snapshot['packages']):
+    if (not expected.issubset(actual) if allow_extra else expected != actual) or len(actual) != len(snapshot['packages']):
         raise SystemExit('Reviewed npm license snapshot coverage differs from the selected lockfiles; update explicitly after review')
     recorded = {item['id']: item['lock_sha256'] for item in snapshot.get('applications', [])}
-    if recorded != lock_hashes or len(recorded) != len(snapshot.get('applications', [])):
+    hashes_match = all(recorded.get(name) == digest for name, digest in lock_hashes.items()) if allow_extra else recorded == lock_hashes
+    if not hashes_match or len(recorded) != len(snapshot.get('applications', [])):
         raise SystemExit('Reviewed npm license snapshot lock hashes differ from the selected inputs')
     if any(not item.get('licenses') for item in snapshot['packages']):
         raise SystemExit('Selected npm license snapshot has unresolved declarations requiring review')
 pc = [('pc-mobius', 'pc-mobius/package-lock.json')]
 verify_licenses(licenses, pc)
+selected = list(pc)
 if include_web == '1':
-    verify_licenses(combined, pc + [('web-dashboard', 'web-dashboard/package-lock.json')])
+    selected.append(('web-dashboard', 'web-dashboard/package-lock.json'))
+if include_cse == '1':
+    for path in (Path(cse_lock), Path(cse_manifest)):
+        path.resolve().relative_to(workspace)
+    selected.append(('cse-runtime', cse_lock))
+    sys.path.insert(0, str(Path('scripts/security').resolve()))
+    import release_inventory
+    release_inventory.verify_npm_source_manifest({'path': cse_lock, 'source_manifest': cse_manifest})
+if include_web == '1' or include_cse == '1':
+    verify_licenses(combined, selected, allow_extra=True)
 if include_gateway == '1':
     sys.path.insert(0, str(Path('scripts/security').resolve()))
     import release_inventory
@@ -183,13 +202,19 @@ gradle=("$GRADLE_BIN" --no-daemon --max-workers=2 --dependency-verification=stri
 inspection=()
 [[ $profile == 0 ]] || inspection+=(--configured-auth)
 bom_inputs=(--npm-licenses "$npm_licenses")
+if [[ $include_web == 1 || $include_cse == 1 ]]; then
+  bom_inputs=(--npm-licenses "$all_npm_licenses")
+fi
 if [[ $include_web == 1 ]]; then
-  bom_inputs=(--npm-application web-dashboard=web-dashboard/package-lock.json --npm-licenses "$all_npm_licenses")
+  bom_inputs+=(--npm-application web-dashboard=web-dashboard/package-lock.json)
+fi
+if [[ $include_cse == 1 ]]; then
+  bom_inputs+=(--npm-application "cse-runtime=$cse_lock" --npm-source-manifest "cse-runtime=$cse_manifest")
 fi
 if [[ $include_gateway == 1 ]]; then
   bom_inputs+=(--python-environment "gateway-validation=$gateway_snapshot")
 fi
-printf 'PASS: release-gate prerequisites; callback profile=%s; API contract=%s; web inventory=%s; Gateway snapshot=%s\n' "$profile" "$api_contract" "$include_web" "$include_gateway"
+printf 'PASS: release-gate prerequisites; callback profile=%s; API contract=%s; web inventory=%s; CSE inventory=%s; Gateway snapshot=%s\n' "$profile" "$api_contract" "$include_web" "$include_cse" "$include_gateway"
 [[ $mode != check ]] || exit 0
 [[ $mode == dry ]] || mkdir -p -- "$output_dir"
 

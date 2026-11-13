@@ -1,0 +1,29 @@
+{
+  "version": "0.4.0",
+  "sdk": 34,
+  "installedQaSignedOptimizedRelease": true,
+  "productionSigning": false,
+  "profile": "default-unprovisioned-keyrings-v1",
+  "apkSha256": "fc19a5ea970a793d75a58f1fa6d21c280684a55fc04e3fda40402278177bb4ab",
+  "matchesLocalQaCopy": true,
+  "debuggable": false,
+  "testPackageInstalledForUser0": false,
+  "reverseConnections": [],
+  "displaySettingsMatchBaseline": true,
+  "fixtureTokenRemoved": true,
+  "credentialsCleared": true,
+  "systemBrowserTrustChanged": false,
+  "screenRemainedLocked": true,
+  "genericDeviceAssertions": 91,
+  "portalHttpsAssertions": 32,
+  "portalNetworkTimingsMillis": [
+    4124,
+    7198,
+    13531
+  ],
+  "pagingRenderMillis": [
+    533,
+    109,
+    92
+  ]
+}

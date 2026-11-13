@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-11-13T16:14:55.129Z",
+  "domain": "bubblelock.iptime.org",
+  "mqtt": {
+    "port": 8883,
+    "verifiedProvidedCa": true,
+    "hostnameVerified": true,
+    "minimumTls": "TLSv1.3",
+    "gatewayClientIdentity": "gateway-1",
+    "readOnlyOneM2mResponse": 2000,
+    "physicalPiDaemonStarted": false,
+    "deviceCommandsSent": 0
+  },
+  "https": {
+    "port": 443,
+    "systemTrustVerified": false,
+    "providedCaTrustVerified": false,
+    "observedSelfSignedLeafSha256": "396F1A7AAD4C417A91D2C87C66B59D4F67FB80A415D0D10D4DC312440E35FD6A",
+    "observedSubjectAlternativeName": "bubblelock.iptime.org",
+    "observationAuthentication": "Unauthenticated protocol discovery; not a verified server identity",
+    "observedUnauthenticatedWebSession": true,
+    "observedNativeV1ProxyStatus": 403,
+    "observedWebClientId": "bubble-lock-dashboard",
+    "observedIssuerPath": "/identity/realms/bubble",
+    "realAccountCredentialsTransmitted": false
+  },
+  "deploymentChangesAppliedRemotely": false,
+  "systemOrBrowserTrustChanged": false,
+  "remaining": [
+    "Verified production HTTPS usable by the phone browser",
+    "Management access/config location to add the distinct Android public client and exact bearer read proxy",
+    "Confirm running issuer/client/API audience/principal enrollment, then browser-to-API login on phone",
+    "Physical Pi/BLE/keyring location and command/ACK acceptance"
+  ]
+}

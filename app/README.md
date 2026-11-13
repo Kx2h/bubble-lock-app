@@ -2,7 +2,7 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 
-DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.3.0 / versionCode 3
+DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.4.0 / versionCode 4
 
 Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 확인하는 Android 앱입니다. 제품 화면은 `위치 / 키링 / 설정`으로 구성합니다. 기존 합성 시험 화면은 debug 빌드의 `설정 → 개발 도구 → 시험 도구 열기`로 옮겼습니다.
 
@@ -10,19 +10,20 @@ Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 
 
 - MapLibre Native Android 13.7.1의 Vulkan/OpenGL ES 지도와 OpenFreeMap 배경을 사용합니다. 키링 핀은 인증된 위치 API의 유효 좌표로만 만듭니다. 기본 한국 광역 배경은 키링의 위치가 아닙니다.
 - 선택한 키링의 정보 시각·정확도·출처·좌표·제공된 연결/배터리 정보를 표시합니다. 지도 제스처를 사용하지 않아도 `키링` 목록에서 같은 정보를 읽고 위치를 선택할 수 있습니다.
-- 유효기간 경과와 연결 실패의 마지막 정보는 이전 위치로 구분합니다. 로그인 만료·접근 거절·로그아웃 시 지도와 목록의 위치를 지웁니다. 위치나 키링이 없을 때 표본 좌표로 대체하지 않습니다.
-- 전경에서 30초 간격으로 조회하고 수동 새로고침을 제공합니다. 화면 이탈 시 반복 조회를 중지하고 진행 요청을 취소하며, 이전 화면의 응답은 generation 검사를 통과하지 못하면 반영하지 않습니다. 네트워크 취소가 서버 처리의 즉시 중단까지 보장하지는 않습니다.
+- Portal 계약은 응답의 `readExpiresAt`과 최대 5초를 함께 적용합니다. wall clock과 monotonic clock 중 먼저 만료되는 순간 지도·목록·선택·카메라 상태를 지우며, 지연된 응답이나 네트워크 오류로 표시 권한을 연장하지 않습니다. 로그인 만료·접근 거절·로그아웃도 위치를 지웁니다.
+- Portal 전경 조회는 남은 표시 수명에 맞춰 0.5–2초 간격으로 갱신합니다. 기존 `keyrings-v1`은 30초 간격입니다. 화면 이탈 시 반복 조회를 중지하고 진행 요청을 취소하며, 이전 화면의 응답은 generation 검사를 통과하지 못하면 반영하지 않습니다.
+- 최대 1,000개의 허용된 관측을 처리하고 목록은 25개씩 표시합니다. 이전·다음 컨트롤은 스크롤 영역 밖에 있으며 페이지 변경을 접근성 서비스에 알립니다. 페이지 전환과 갱신에서 카드 View를 재사용합니다.
 - Material DayNight 테마, sp 글자 크기, 텍스트 상태 표시, 48dp 이상 주요 터치 영역을 사용합니다. 갱신 시 기존 카드 View를 재사용해 읽기 위치와 접근성 포커스를 유지하도록 구현했습니다. 높이가 짧은 화면에서는 헤더·탭 구성을 압축하고 각 탭의 스크롤 상태를 복원합니다. 큰 글자·가로 화면·다크 모드의 실제 확인 범위는 기기 기록에서 구분합니다.
 
-위치 데이터는 새 팀 INTEGRATION의 `IntegrationStore`에 저장된 MEC `Location` 이벤트에서 읽습니다. 상위 이벤트에 별도 `observedAt`이 없으면 이벤트의 `timestamp`를 사용하므로 이는 실물 센서의 측정 시각을 증명하지 않습니다. 앱은 이를 **정보 시각·이전 기록**으로 표시하며, 휴대폰 GPS나 RSSI를 키링 좌표로 바꾸지 않습니다. 휴대폰의 위치 권한도 요청하지 않습니다.
+Portal 위치는 중앙 서비스의 권한 검사를 거친 GPS/MEC/릴레이 관측을 읽습니다. 모의 관측에는 `모의`를 표시하고 BLE RSSI만 있는 관측은 신호 기록으로 표시합니다. 좌표·배터리·연결 상태가 없으면 만들어 넣지 않습니다. 기존 `keyrings-v1`은 `IntegrationStore`의 MEC `Location` 이벤트를 읽는 별도 계약입니다. 정보 시각은 실물 센서의 fix 시각을 증명하지 않으며 휴대폰 GPS나 RSSI를 키링 좌표로 바꾸지 않습니다.
 
-[모바일 응답 계약](contracts/mobile-location.v1.json) · [위치 읽기 서비스](../pc-mobius/mobile-api/README.md) · [지도 제공자·출처·데이터 경계](docs/MAP_PROVIDER.md) · [요구별 구현 상태와 배포 잔여 조건](docs/APP_IMPLEMENTATION_STATUS.md)
+[Portal 응답 계약](contracts/portal-location.v1.json) · [기존 모바일 계약](contracts/mobile-location.v1.json) · [실서버 통합 기록](docs/DEPLOYMENT-20261114.md) · [지도 출처](docs/MAP_PROVIDER.md) · [배포 잔여 조건](docs/APP_IMPLEMENTATION_STATUS.md)
 
 ## 로그인과 연결 설정
 
 release는 현재 빌드에 고정된 서비스 주소를 읽기 전용으로 표시합니다. 업데이트 후 이전 저장 주소로 토큰을 보내지 않으며, 주소가 바뀌면 이전 주소에 묶인 세션을 무효화합니다. `이 기기의 데이터 삭제`는 로그인 정보와 표시된 위치를 지웁니다. debug에서만 서비스 주소를 직접 저장·해제할 수 있습니다. 제품의 issuer와 client ID는 빌드 프로필에 고정하며, 일반 설정 화면에서 임의 공급자나 bearer를 입력하지 않습니다. 브라우저 Authorization Code + PKCE S256 흐름과 discovery/JWKS·ID token 검증을 사용합니다.
 
-access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 비추출 키를 사용하는 AES-GCM 저장소에 암호화합니다. access token이 만료되면 worker에서 refresh를 한 번 수행합니다. 회전하는 refresh credential은 요청 전에 내구성 있게 소비하며, 응답 유실·검증 실패 시 이전 credential을 재전송하지 않고 로그인을 다시 요구합니다. 서비스 변경·로그아웃 후 늦게 도착한 인증 응답은 session epoch와 origin 검사를 통과하지 못하면 저장하지 않습니다. 토큰은 앱 로그나 UI saved state에 넣지 않습니다.
+access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 비추출 키를 사용하는 AES-GCM 저장소에 암호화합니다. 암호문은 API origin·issuer·client·API 계약에 묶이며 0.3.0 세션은 다시 로그인해야 합니다. access token이 만료되면 worker에서 refresh를 한 번 수행합니다. 회전하는 refresh credential은 요청 전에 내구성 있게 소비하며, 응답 유실·검증 실패 시 이전 credential을 재전송하지 않고 로그인을 다시 요구합니다. 토큰은 앱 로그나 UI saved state에 넣지 않습니다.
 
 실제 배포에서는 아래 빌드 절의 환경변수를 설정한 뒤 다음 세 프로필을 함께 제공합니다. 사용자 설정에 비밀키나 client secret을 넣지 않습니다.
 
@@ -30,10 +31,13 @@ access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 �
 "$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon :app:assembleRelease \
   -PmobileApiBaseUrl=https://api.example.org \
   -PoidcIssuer=https://identity.example.org \
-  -PoidcClientId=registered-android-client
+  -PoidcClientId=registered-android-client \
+  -PmobileApiContract=portal-central-v1
 ```
 
-기본 미설정 release에서는 로그인 callback receiver를 제거합니다. 세 값을 모두 고정한 release는 `src/productionAuth/AndroidManifest.xml`의 callback을 사용합니다. 등록 redirect는 `org.privacybubble.app:/oauth2redirect`, 요청 scope는 `openid offline_access location:read`이며 공급자는 응답의 `iss`를 제공해야 합니다. API audience와 서버 principal binding도 맞춰야 합니다. 현재 실제 운영 IdP·계정의 전체 브라우저 로그인과 실물 키링 위치는 검증하지 않았습니다.
+기본 미설정 release에서는 로그인 callback receiver를 제거합니다. 세 값을 모두 고정한 release는 `src/productionAuth/AndroidManifest.xml`의 callback을 사용합니다. 등록 redirect는 `org.privacybubble.app:/oauth2redirect`입니다. Portal의 요청 scope는 `openid portal:read`이며 일반 refresh를 사용합니다. 기존 `keyrings-v1`만 `openid offline_access location:read`를 유지합니다. 공급자의 응답 `iss`, API audience와 서버 principal binding도 맞춰야 합니다. [운영 설정 준비물](deployment/README.md)은 등록·신뢰가 확인되기 전에는 렌더링을 거절합니다.
+
+계약은 빌드 때 고정합니다. `portal-central-v1`은 `/v1/portal/locations`, `portal-web-v1`은 `/api/portal/locations`, `keyrings-v1`은 `/v1/keyrings`를 사용합니다. 자동 endpoint 전환과 브라우저 쿠키·계정 비밀번호로의 대체는 제공하지 않습니다. 배포 웹의 BFF client는 네이티브 public client와 별개입니다.
 
 debug 빌드에만 `설정 → 개발 도구 → 개발 인증 연결`과 `http://127.0.0.1:8787`의 명시적인 loopback 예외가 있습니다. 이는 통제된 기기 QA용이며 제품 release에서 임시 bearer를 직접 입력하는 기능을 제공하지 않습니다. 개발 인증도 서버의 서명·권한 검증을 통과해야 합니다.
 
@@ -54,7 +58,9 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 
 APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
 
-0.3.0 최종 검증은 Debug 56 / Release 47 단위시험, CORE 21 / API 30 고유 호스트시험, API 3개 seed의 38,958개 공격 입력, 기기 27개 보안 assertion을 통과했습니다. Android lint는 0 issues입니다. 최종 QA 서명 release를 삼성 Android 14 기기에 설치해 지도·확대/이동·라이트/다크·200% 글씨와 회전을 확인했습니다. [0.3.0 보안 릴리스 기록](security/RELEASE-0.3.0.md), [SBOM·SCA와 해시](security/README.md), [공격면](security/THREAT_MODEL.md), [릴리스 검증 절차](security/BUILD_GATES.md)를 참고하세요. 최종 미서명 APK/AAB는 운영 IdP/API 프로필과 운영 서명을 아직 포함하지 않습니다.
+현재 0.4.0의 실행 결과와 실서버·격리 기기 시험의 범위는 [통합 기록](docs/DEPLOYMENT-20261114.md), [SBOM·SCA와 해시](security/deployment-20261114/README.md), [릴리스 검증 절차](security/BUILD_GATES.md)에 기록합니다. 기본 미서명 APK/AAB는 운영 IdP/API 프로필과 운영 서명을 아직 포함하지 않습니다.
+
+이전 0.3.0의 Debug 56 / Release 47 단위시험, API 38,958개 공격 입력, 기기 27개 보안 assertion과 지도·큰 글씨·회전 기록은 [0.3.0 보안 릴리스 기록](security/RELEASE-0.3.0.md)의 당시 증거입니다.
 
 기존 [제품 기기 기록](evidence/product-map-device.md)의 14개 시나리오는 0.2.0 기록입니다. 2026-10-28~31 이전 로그와 스크린샷은 해당 시점 버전의 증거로 유지합니다.
 

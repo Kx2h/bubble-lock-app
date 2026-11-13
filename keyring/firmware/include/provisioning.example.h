@@ -21,6 +21,8 @@
 // #define KEYRING_AUDIO_AMPLITUDE 512
 // Select one output: 1 speaker (default), 2 MAX9850 stereo headphone PCM.
 // #define KEYRING_AUDIO_OUTPUT 2
+// MAX9850 VOL(5:0): 0x00..0x3f; default0x20 is -45.5dB attenuation.
+// 0x28..0x3f is full attenuation. Listening levels require physical measurement.
 // #define KEYRING_HEADPHONE_VOLUME 0x20
 // One physical panel per device; both controller profiles are supported in source.
 // 0 = disabled, 1 = ST7789 1.54 inch 240x240, 2 = JD9853 2.01 inch candidate 240x296.

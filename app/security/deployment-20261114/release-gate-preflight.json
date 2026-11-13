@@ -1,9 +1,9 @@
 {
-  "scope": "Shell syntax/help/preflight/dry-run only; no build, host test suite, MQTT/API account request, or OSV query was executed by the release gate in this check",
+  "scope": "Shell syntax/help/preflight/dry-run only; no build, integrated test workflow, MQTT/API account request, or OSV query was executed by the release gate in these checks",
   "passed": true,
   "checks": [
     {
-      "name": "default integrated preflight",
+      "name": "default PC/web/CSE/Gateway preflight",
       "passed": true,
       "expected_success": true,
       "actual_exit_code": 0
@@ -16,6 +16,18 @@
     },
     {
       "name": "legacy narrower PC-only preflight",
+      "passed": true,
+      "expected_success": true,
+      "actual_exit_code": 0
+    },
+    {
+      "name": "explicit CSE subset preflight",
+      "passed": true,
+      "expected_success": true,
+      "actual_exit_code": 0
+    },
+    {
+      "name": "web without CSE subset preflight",
       "passed": true,
       "expected_success": true,
       "actual_exit_code": 0
@@ -51,7 +63,19 @@
       "actual_exit_code": 1
     },
     {
-      "name": "altered reviewed lock hash rejected",
+      "name": "missing CSE manifest rejected",
+      "passed": true,
+      "expected_success": false,
+      "actual_exit_code": 1
+    },
+    {
+      "name": "altered reviewed PC lock hash rejected",
+      "passed": true,
+      "expected_success": false,
+      "actual_exit_code": 1
+    },
+    {
+      "name": "altered reviewed CSE lock hash rejected",
       "passed": true,
       "expected_success": false,
       "actual_exit_code": 1

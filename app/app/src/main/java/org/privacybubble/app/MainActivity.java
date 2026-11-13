@@ -322,7 +322,7 @@ public final class MainActivity extends AppCompatActivity {
         setText(listCaption, locations.isEmpty() ? "위치가 공유된 키링을 확인할 수 있어요." : "총 " + locations.size() + "개 · " + (start+1) + "–" + end + "번째");
         ensureKeyringPager();
         keyringPager.setVisibility(locations.size()>PAGE_SIZE ? View.VISIBLE : View.GONE);
-        keyringPageStatus.setText((state.listPage+1)+" / "+pages+" 페이지");
+        keyringPageStatus.setText(getString(R.string.keyring_page_status,state.listPage+1,pages));
         keyringPrevious.setEnabled(state.listPage>0); keyringNext.setEnabled(end<locations.size());
         if (locations.isEmpty()) {
             String signature = emptySignature(signedIn);
@@ -335,14 +335,18 @@ public final class MainActivity extends AppCompatActivity {
         listEmptySignature = null;
         List<KeyringLocation> visiblePage=locations.subList(start,end);
         Set<String> ids = new HashSet<>(); for (KeyringLocation item : visiblePage) ids.add(item.id);
+        List<LocationCard> reusable = new ArrayList<>();
         Iterator<Map.Entry<String, LocationCard>> obsolete = keyringCards.entrySet().iterator();
         while (obsolete.hasNext()) {
             Map.Entry<String, LocationCard> row = obsolete.next();
-            if (!ids.contains(row.getKey())) { keyringRows.removeView(row.getValue().view); obsolete.remove(); }
+            if (!ids.contains(row.getKey())) { keyringRows.removeView(row.getValue().view); reusable.add(row.getValue()); obsolete.remove(); }
         }
         for (int index = 0; index < visiblePage.size(); index++) {
             KeyringLocation item = visiblePage.get(index); LocationCard card = keyringCards.get(item.id);
-            if (card == null) { card = new LocationCard(false); keyringCards.put(item.id, card); }
+            if (card == null) {
+                card = reusable.isEmpty() ? new LocationCard(false) : reusable.remove(reusable.size()-1);
+                keyringCards.put(item.id, card);
+            }
             if (keyringRows.getChildAt(index) != card.view) {
                 keyringRows.removeView(card.view);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.bottomMargin = theme.dp(16);

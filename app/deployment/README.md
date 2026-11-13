@@ -2,17 +2,23 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · 2026-11-14 KST
 
-이 디렉터리는 기존 웹 BFF와 별도의 Native public OIDC client, 그 client의 사용자 token을 받는 정확한 읽기 API 경로를 준비한다. 원격 Keycloak 등록·Nginx 수정·reload는 실행하지 않는다. 현재 서버의 Native client 등록과 공개 API audience는 확인되지 않았으며, 기본 템플릿은 그 값을 채우기 전 검증에 실패한다.
+이 디렉터리는 기존 웹 BFF와 별도의 Native public OIDC client, 그 client의 사용자 token을 받는 정확한 읽기 API 경로를 준비한다. 원격 Keycloak 등록·Nginx 수정·reload는 실행하지 않는다. 현재 서버의 Native client 등록과 공개 API audience의 운영 설정은 확인되지 않았으며, 기본 템플릿은 그 값을 채우기 전 검증에 실패한다.
 
 공개 관찰의 issuer는 `https://bubblelock.iptime.org/identity/realms/bubble`, 웹 client는 `bubble-lock-dashboard`다. 웹 BFF는 HttpOnly 세션 cookie와 서버 메모리 token을 사용한다. Native 앱이 웹 client secret, 계정 비밀번호, 브라우저 cookie 또는 Gateway 키를 복사하지 않는다. 제공된 Gateway 개인키는 Pi에만 둔다. 443 웹 인증서는 제공 ZIP의 MQTT CA와 다르므로 웹 인증서의 신뢰 경로·fingerprint를 독립적으로 확인해야 한다.
 
+## 운영 원본 확인 상태
+
+이번 작업 환경의 Docker에서 실행/정지 컨테이너·named volume·context를 읽기 전용으로 확인했지만 BubbleLock 운영 배포 대상은 없었다. workspace에서 운영 `public.pem`, `portal.json`, `api.json`, `realm.json` 원본도 찾지 못했다. 따라서 인터넷에서 관찰한 443 인증서의 지문을 신뢰된 운영 원본과 대조하거나 Native client 등록·운영 audience를 확인했다고 판정하지 않는다. 운영 파일을 확보하기 전 placeholder와 `publicCertificateConfirmed=false`를 유지한다.
+
+새 통합 branch의 `deployment/RUNBOOK.md`와 `deployment/configure.mjs`는 서비스별 named volume과 내부 관리 경로를 사용한다. 다른 프로젝트의 컨테이너·volume을 조작하거나 운영 비밀을 출력하지 않았다. source의 기본 audience·mapper와 실제 운영 설정 확인은 별도 근거다.
+
 ## 필요한 실제 값
 
-`deployment.template.json`을 workspace `.local/`의 운영 파일로 복사한다. `__REQUIRED_*__` 값은 예시가 아닌 미확정 항목이다. API audience는 현재 integration API의 OIDC verifier 설정과 일치하는 실제 값을 확인한다. 웹 client ID나 Android client ID로 추정하지 않는다. Native client ID는 웹 client와 별도로 등록할 식별자를 정한다. upstream origin, 인증서 SAN과 CA 파일은 실제 서버 배치에서 확인한다.
+`deployment.template.json`을 workspace `.local/`의 운영 파일로 복사한다. `__REQUIRED_*__` 값은 예시가 아닌 미확정 항목이다. 새 통합 source의 기본 audience는 `privacy-bubble-api`지만 현재 운영 `api.json`을 읽어 확인한 값은 아니므로 placeholder를 유지한다. API audience는 현재 integration API의 OIDC verifier 설정과 일치하는 실제 값을 확인한다. 웹 client ID나 Android client ID로 추정하지 않는다. Native client ID는 웹 client와 별도로 등록할 식별자를 정한다. upstream origin, 인증서 SAN과 CA 파일은 실제 서버 배치에서 확인한다.
 
 확인 여부 필드도 실제 조사 후 채운다. `publicCertificateConfirmed`는 신뢰된 경로로 확인한 인증서를 뜻하며, 인터넷에서 방금 받은 자체서명 인증서를 무조건 신뢰했다는 뜻이 아니다. `upstreamVerifiesOidcAndEnrollment`는 upstream이 issuer·서명·audience·scope와 서버 principal 등록을 검증한다는 확인이다. 이 도구는 그 사실을 원격으로 검사하거나 증명하지 않는다.
 
-Keycloak 25 이상에서는 `basic` client scope가 `sub` 같은 필수 mapper를 제공한다. 해당 scope의 **Include in token scope가 꺼져 있음**을 확인해 `basicScopeExcludedFromTokenScope=true`로 기록한다. 앱의 요청과 허용 응답 scope는 `openid offline_access portal:read`이며 `basic`, `roles`, `profile`, `email`, `dashboard:read` 등 여분 scope를 응답에 더하지 않는다. 기존 realm의 공통 `basic` scope나 웹 client를 이 작업에서 무조건 수정하지 않는다. [Keycloak client scopes와 audience](https://www.keycloak.org/docs/latest/server_admin/index.html)
+새 통합 배포의 `deployment/configure.mjs`는 `basic` client scope를 만들지 않고 `oidc-sub-mapper`를 client에 직접 연결한다. Native 템플릿도 같은 방식으로 `sub`를 명시한다. 기본 client scope는 비우고 선택 scope는 `portal:read`만 연결하며 OAuth 요청은 `openid portal:read`다. `offline_access`는 이 realm의 명시 scope/role 목록에 없으므로 요청하지 않는다. Authorization Code의 일반 refresh와 realm의 rotation 정책을 사용하며 `basic`, `roles`, `profile`, `email`, `dashboard:read` 같은 여분 scope를 추가하지 않는다. 기존 웹 client와 공유 realm 설정을 이 작업에서 덮어쓰지 않는다. [Keycloak client scopes와 subject/audience mapper](https://www.keycloak.org/docs/latest/server_admin/index.html)
 
 ```sh
 python3 app/deployment/prepare.py --config "$WORKSPACE/.local/native-deployment/profile.json"
@@ -29,7 +35,7 @@ python3 app/deployment/prepare.py \
 1. 실제 API verifier audience와 등록된 사용자 subject·scope를 확인한다. guardian/operator 이름만으로 권한을 부여하지 않는다.
 2. `portal-read-scope.json`의 `portal:read` scope와 access-token audience mapper를 검토한다. 같은 이름의 scope가 이미 있으면 덮어쓰지 말고 현재 client 연결과 mapper를 비교한다. mapper는 ID token의 audience를 바꾸지 않는다.
 3. `native-client.json`을 별도 public client로 등록한다. Authorization Code만 켜고 PKCE `S256`을 강제한다. Password/Direct Access, Implicit, Service Accounts와 미사용 Device/CIBA grant는 끈다. client secret을 생성하거나 앱에 넣지 않는다.
-4. redirect는 정확히 `org.privacybubble.app:/oauth2redirect` 하나만 등록한다. wildcard와 웹 BFF callback 재사용을 허용하지 않는다. 선택 scope는 `offline_access`, `portal:read`이고 기본은 검토한 `basic`만 연결한다. 실제 배포 버전의 client-scope 연결과 RS256 발급을 확인한다.
+4. redirect는 정확히 `org.privacybubble.app:/oauth2redirect` 하나만 등록한다. wildcard와 웹 BFF callback 재사용을 허용하지 않는다. 선택 scope는 `portal:read` 하나이고 기본 client scope는 비운다. client의 명시적 `oidc-sub-mapper`로 subject를 발급한다. 실제 배포 버전의 client-scope 연결과 RS256 발급을 확인한다.
 5. realm의 refresh 회전·재사용 탐지·폐기 정책을 확인한다. 공유 realm의 정책을 이 템플릿이 일괄 변경하지 않는다. 실제 계정의 Code/PKCE·만료·refresh·로그아웃 시험 후 Native 등록 완료로 기록한다.
 
 Custom-scheme redirect는 OS가 도메인 소유권을 검증하는 HTTPS App Link와 다른 경계가 있다. 현재 앱의 정확한 redirect·state·issuer와 PKCE 검증을 함께 유지한다. [RFC 8252](https://datatracker.ietf.org/doc/html/rfc8252), [Keycloak PKCE 설정](https://www.keycloak.org/docs/latest/server_admin/index.html)

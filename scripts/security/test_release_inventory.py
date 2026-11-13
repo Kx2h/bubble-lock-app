@@ -3,6 +3,7 @@ import contextlib
 import io
 import pathlib
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import patch
 
@@ -96,6 +97,13 @@ class SecurityInventoryTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 inventory.npm_inputs(argparse.Namespace(npm_lock=pc, npm_application=[value]))
 
+    def test_nested_runtime_lock_keeps_its_actual_repository_source(self):
+        pc = self.write_lock("pc", {})
+        repository = pathlib.Path(inventory.__file__).resolve().parents[2]
+        source = "deployment/cse/artifacts/dependencies/package-lock.json"
+        specs = inventory.npm_inputs(argparse.Namespace(npm_lock=pc, npm_application=["cse-runtime=" + str(repository / source)]))
+        self.assertEqual(specs[1]["source"], source)
+
     def test_optional_peer_absence_is_allowed_but_required_build_dependency_is_not(self):
         path = self.write_lock("web", {"": {"name": "web", "version": "1", "peerDependencies": {"optional": "*"}, "peerDependenciesMeta": {"optional": {"optional": True}}}})
         spec = {"id": "web", "path": path, "source": "web/package-lock.json", "legacy": False}
@@ -139,6 +147,51 @@ class SecurityInventoryTest(unittest.TestCase):
         self.assertIn({"package": {"ecosystem": "PyPI", "name": "network"}, "version": "1.0"}, queries)
         record = next(item for item in inventory.read_json(self.output)["packages"] if item["ecosystem"] == "PyPI")
         self.assertEqual(record["component_contexts"][0]["application"], "gateway-validation")
+
+    def cse_source_fixture(self, unsafe=False):
+        root = pathlib.Path(self.directory.name)
+        lock = self.write_lock("cse-lock", {"": {"name": "cse", "version": "1.0"}})
+        archive = root / "cse.tar.gz"
+        source = b"module.exports = 'reviewed fixture';\n"
+        with tarfile.open(archive, "w:gz") as output:
+            for name, data in [("package-lock.json", lock.read_bytes()), ("cse/handler.js", source)]:
+                entry = tarfile.TarInfo(name); entry.size = len(data); output.addfile(entry, io.BytesIO(data))
+            if unsafe:
+                entry = tarfile.TarInfo("../outside"); entry.size = 0; output.addfile(entry, io.BytesIO())
+        manifest = root / "manifest.json"
+        inventory.write_json(manifest, {"artifact": archive.name, "artifactSHA256": inventory.sha256(archive.read_bytes()),
+                                       "lockSHA256": inventory.sha256(lock.read_bytes()), "repository": "https://example.test/cse", "revision": "a" * 40, "version": "1.0",
+                                       "securityPatch": {"files": [{"file": "cse/handler.js", "sha256": inventory.sha256(source)}]}})
+        return {"id": "cse-runtime", "path": lock, "source_manifest": manifest, "source": "deployment/cse/package-lock.json", "legacy": False}, archive
+
+    def test_cse_source_manifest_binds_archive_patches_and_external_lock_to_graph(self):
+        spec, _ = self.cse_source_fixture()
+        evidence = inventory.verify_npm_source_manifest(spec)
+        self.assertEqual(evidence["verified_patch_files"], ["cse/handler.js", "package-lock.json"])
+        components, graph = [], {"root": set()}
+        inventory.add_npm_application(spec, components, graph, "root", {})
+        inventory.verify_graph(inventory.assemble_bom("root", "test", "1", components, graph, "test"))
+        self.assertIn("source-archive:cse-runtime", graph["application:cse-runtime"])
+
+    def test_cse_source_archive_and_lock_tampering_fail_closed(self):
+        spec, archive = self.cse_source_fixture()
+        archive.write_bytes(archive.read_bytes() + b"tampered")
+        with self.assertRaisesRegex(ValueError, "differs"):
+            inventory.verify_npm_source_manifest(spec)
+        spec, _ = self.cse_source_fixture()
+        spec["path"].write_text("{}")
+        with self.assertRaisesRegex(ValueError, "differs"):
+            inventory.verify_npm_source_manifest(spec)
+
+    def test_cse_source_path_traversal_is_rejected_without_extraction(self):
+        spec, _ = self.cse_source_fixture(unsafe=True)
+        with self.assertRaisesRegex(ValueError, "Unsafe"):
+            inventory.verify_npm_source_manifest(spec)
+        spec, _ = self.cse_source_fixture()
+        manifest = inventory.read_json(spec["source_manifest"]); manifest["artifact"] = "../outside.tar.gz"
+        inventory.write_json(spec["source_manifest"], manifest)
+        with self.assertRaisesRegex(ValueError, "single manifest-relative"):
+            inventory.verify_npm_source_manifest(spec)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-11-13T16:33:39.947046+00:00",
+  "branch": "codex/integrate-all-branches",
+  "originalAppCommit": "844896ff7541a2326bc0e67843f1f6783a30be3c",
+  "baseMergeCommit": "2cf68257ee8d5d299168a00c4283761406716d8a",
+  "branches": [
+    {
+      "ref": "origin/main",
+      "sha": "bc2a45dfcc014b7cdb0a57a03aca2c04ca8eb989",
+      "commitsNotIntegrated": 0
+    },
+    {
+      "ref": "origin/codex/keyring-namho",
+      "sha": "f8bbc9279bd008b0e35e10793d1c5ec9affe8e50",
+      "commitsNotIntegrated": 0
+    },
+    {
+      "ref": "origin/feature/final-integration",
+      "sha": "4f3899b355aaf7a5c10ffc2196fba296ee9825ac",
+      "commitsNotIntegrated": 0
+    },
+    {
+      "ref": "origin/PC-MOBIUS-CORE",
+      "sha": "d54a43a95a7ef9748d795fd614114877efa7787c",
+      "commitsNotIntegrated": 0
+    },
+    {
+      "ref": "origin/feature/web-dashboard",
+      "sha": "80ed37fc526ae5d82482fb835085917d63116941",
+      "commitsNotIntegrated": 0
+    }
+  ],
+  "scope": "Fetched branch ancestry plus current integration worktree; not a deployed-server source assertion"
+}

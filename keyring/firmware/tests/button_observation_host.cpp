@@ -177,13 +177,30 @@ int main() {
   sensors.batteryLow = true;
   detailSection = 1;
   publishObservation();
+  auto boundedEnergy = readFrame(1);
+  assert(boundedEnergy["sensorValues"]["status"] == "payload_too_large");
+  assert(boundedEnergy["sensorValues"]["ina219"].isNull());
+  assert(boundedEnergy["sensorValues"]["batteryAlert"].as<bool>());
+  assert(boundedEnergy["sensorValues"]["buttonPresses"][0].as<uint32_t>() == UINT32_MAX);
+  assert(boundedEnergy["sensorValues"]["buttonPresses"][1].as<uint32_t>() == UINT32_MAX);
+  std::puts("PASS maximum identity and counters retain critical state in a bounded energy fallback");
+
+  std::strcpy(deviceId, "kr-r18");
+  detailSection = 1;
+  publishObservation();
   auto energy = readFrame(1);
   assert(energy["sensorValues"]["ina219"]["status"] == "ok");
+  assert(energy["sensorValues"]["ina219"]["busVoltageMv"].as<int32_t>() == supply.value.busMv);
+  assert(energy["sensorValues"]["ina219"]["currentUa"].as<int32_t>() == supply.value.currentUa);
+  assert(energy["sensorValues"]["ina219"]["loadPowerUw"].as<int32_t>() == supply.value.loadPowerUw);
+  assert(energy["sensorValues"]["ina219"]["shuntVoltageUv"].as<int32_t>() == supply.value.shuntUv);
+  assert(energy["sensorValues"]["ina219"]["readUptimeMs"].as<uint64_t>() == supply.value.readAt);
   assert(energy["sensorValues"]["batteryAlert"].as<bool>());
   assert(energy["sensorValues"]["buttonPresses"][0].as<uint32_t>() == UINT32_MAX);
   assert(energy["sensorValues"]["buttonPresses"][1].as<uint32_t>() == UINT32_MAX);
   std::printf("PASS saturated counters and INA219 fit in %zu bytes\n", observationTx.sections[1].data.size());
 
+  std::memset(deviceId, 'k', sizeof(deviceId) - 1);
   headphone.state.assign(600, 'x'); // Force the real bounded-frame fallback.
   sensors.fuel = false;
   detailSection = 2;
@@ -202,6 +219,7 @@ int main() {
 
   ObservationOnly = true;
   storageHealthy = false;
+  std::strcpy(deviceId, "kr-r18");
   headphone.state = "configured_off";
   detailSection = 2;
   publishObservation();

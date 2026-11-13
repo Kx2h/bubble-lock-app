@@ -1,6 +1,10 @@
 # Release security inventory
 
-Version 0.3.0. Final unsigned, unprovisioned release packages were inventoried after the clean release build. A QA-signed installation copy or a future production-signed/provisioned build has different package bytes and requires its own package hashes/BOM.
+Current: [0.4.0 integrated release evidence](deployment-20261114/README.md), covering Android, PC/web, Gateway validation dependencies and the pinned CSE source/lock. [Actual full release-gate execution](../evidence/deployment-20261114/release-gate.json) also passed after the recorded preflight checks. Production TLS, native client registration and real-account acceptance remain pending.
+
+## Historical 0.3.0
+
+The records below describe version 0.3.0. Final unsigned, unprovisioned release packages were inventoried after the clean release build. A QA-signed installation copy or a future production-signed/provisioned build has different package bytes and requires its own package hashes/BOM.
 
 | Evidence | Result |
 | --- | --- |

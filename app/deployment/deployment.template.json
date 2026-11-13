@@ -5,7 +5,6 @@
   "nativeClientId": "__REQUIRED_REGISTERED_NATIVE_CLIENT_ID__",
   "apiAudience": "__REQUIRED_VERIFIED_API_AUDIENCE__",
   "keycloakMajorVersion": "__REQUIRED_VERIFIED_KEYCLOAK_MAJOR_VERSION__",
-  "basicScopeExcludedFromTokenScope": false,
   "publicCertificateSha256": "__REQUIRED_OUT_OF_BAND_CONFIRMED_HTTPS_CERT_SHA256__",
   "publicCertificateConfirmed": false,
   "upstreamOrigin": "__REQUIRED_HTTPS_INTEGRATION_API_ORIGIN__",

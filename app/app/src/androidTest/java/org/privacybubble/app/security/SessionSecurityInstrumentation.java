@@ -9,8 +9,14 @@ import org.privacybubble.app.session.ServiceOrigin;
 
 public final class SessionSecurityInstrumentation extends Instrumentation {
     private int assertions;
-    @Override public void onCreate(Bundle arguments) { super.onCreate(arguments); start(); }
+    private boolean portalNetwork;
+    @Override public void onCreate(Bundle arguments) {
+        super.onCreate(arguments);
+        portalNetwork=arguments!=null && "portal-network".equals(arguments.getString("mode"));
+        start();
+    }
     @Override public void onStart() {
+        if (portalNetwork) { runPortalNetwork(); return; }
         Bundle result=new Bundle();
         MobileSessionStore store=new MobileSessionStore(getTargetContext());
         SharedPreferences prefs=getTargetContext().getSharedPreferences("mobile_session",0);
@@ -50,6 +56,20 @@ public final class SessionSecurityInstrumentation extends Instrumentation {
         } catch (Throwable failure) {
             try { store.clearAll(); } catch (Exception ignored) { }
             result.putString("stream","FAIL after "+assertions+" assertions: "+failure.getClass().getSimpleName()+(failure instanceof AssertionError?" "+failure.getMessage():"")+"\n");
+            finish(Activity.RESULT_CANCELED,result);
+        }
+    }
+    private void runPortalNetwork() {
+        Bundle result=new Bundle();
+        try {
+            assertions=PortalNetworkAssertions.run(this);
+            result.putString("stream","PASS: "+assertions+" isolated HTTPS/Main lease assertions\n"
+                    +"Expiry/denial/total ms: "+java.util.Arrays.toString(PortalNetworkAssertions.lastTimingsMillis())+"\n"
+                    +"Synthetic JWT; OIDC login and visible UI are outside this fixture.\n");
+            finish(Activity.RESULT_OK,result);
+        } catch (Throwable failure) {
+            result.putString("stream","FAIL portal-network: "+failure.getClass().getSimpleName()
+                    +(failure instanceof AssertionError?" "+failure.getMessage():"")+"\n");
             finish(Activity.RESULT_CANCELED,result);
         }
     }

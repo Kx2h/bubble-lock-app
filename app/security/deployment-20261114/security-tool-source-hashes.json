@@ -1,13 +1,13 @@
 {
-  "scope": "Supply-chain generator/tests/bootstrap pins and release-gate source at final artifact inventory time; Android application source is separately recorded by the parent release task",
+  "scope": "Supply-chain generator/tests/bootstrap pins and release-gate source after all-branch integration; Android production source is recorded separately by the parent release task",
   "files": [
     {
       "path": "app/scripts/verify-release.sh",
-      "sha256": "fc1edde739ebe4e67fec9884eed3e7287445d87521f36545ab7be6ad509e3d20"
+      "sha256": "7f394686c185b58877f349804e90d5700c2eb2f2606b8d8b34b7bc96ec2b0f5e"
     },
     {
       "path": "app/security/BUILD_GATES.md",
-      "sha256": "05bd632055f36b7056687ac936e4ccec9ec39883ee17951ab429cc140f4ddc76"
+      "sha256": "22c6cda8189468e0ce3faa872f3f3c566393d2223e943df9ce969f0225f27e94"
     },
     {
       "path": "app/security/export-dependencies.gradle",
@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/security/SUPPLY_CHAIN.md",
-      "sha256": "7e196410fd910cd8ff81349099297127273eca0438f50b1db9f96b65459d2a9d"
+      "sha256": "33dc7d497f03d973b5e72572994fe6ae33a56379a5b44f6a91178001412b8273"
     },
     {
       "path": "scripts/security/prepare_notices.py",
@@ -23,7 +23,7 @@
     },
     {
       "path": "scripts/security/release_inventory.py",
-      "sha256": "506c80a5d8302455f4825c976d5288d97ecbaa8b17e6dd67cce83a58c702f7a1"
+      "sha256": "8c17d173bffe7b7687c2ae1ef0a6891235b0b7e23b39b2113ef40349e8617a8b"
     },
     {
       "path": "scripts/security/requirements.lock",
@@ -35,7 +35,7 @@
     },
     {
       "path": "scripts/security/test_release_inventory.py",
-      "sha256": "de12db4808f1c53dec972d69fc1366630c7afab9f227cd54454cf42e865eb4ca"
+      "sha256": "480ffdc512ec888bfcd89d3ffcc0c0d98481443174ed4dbefe69723511a6f855"
     }
   ]
 }

@@ -161,6 +161,7 @@ test('legacy reader cannot bypass the integrated MEC protected read model', asyn
   const statePath = join(directory, 'runtime.json');
   const store = await new IntegrationStore(statePath).init();
   const ingress = new MecCallbackIngress({ store, clock: () => new Date(NOW).toISOString() });
+  await ingress.cipher.ready;
   const outcome = await ingress.ingest(event());
   assert.equal(outcome.status, 'BINDING_REVIEW');
   const state = JSON.parse(await readFile(statePath, 'utf8'));

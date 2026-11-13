@@ -15,8 +15,19 @@
   "consentRequired": true,
   "redirectUris": ["org.privacybubble.app:/oauth2redirect"],
   "webOrigins": [],
-  "defaultClientScopes": ["basic"],
-  "optionalClientScopes": ["offline_access", "portal:read"],
+  "defaultClientScopes": [],
+  "optionalClientScopes": ["portal:read"],
+  "protocolMappers": [
+    {
+      "name": "subject",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-sub-mapper",
+      "config": {
+        "access.token.claim": "true",
+        "introspection.token.claim": "true"
+      }
+    }
+  ],
   "attributes": {
     "pkce.code.challenge.method": "S256",
     "id.token.signed.response.alg": "RS256",

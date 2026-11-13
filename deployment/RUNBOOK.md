@@ -20,6 +20,16 @@ Keycloak은 Dex보다 무겁지만 별도 사용자 저장소나 로그인 화�
 
 Keycloak 768 MiB(heap 384), PostgreSQL 512, PostGIS 512, CSE 384(heap 192), API 512, 웹 256, 프록시 128, MQTT 128, MQTT 어댑터 128 MiB로 실행 서비스 상한은 3,328 MiB다. 일회성 static 64 MiB를 포함해 3,392 MiB다. 이미지 빌드는 별도이며 서버에서 동시 빌드를 피한다. 4–5 GB 예산 안에서 `docker stats --no-stream`을 확인한다. 실제 유휴·시험 사용량은 실행 증거에 기록한다.
 
+## Android 네이티브 위치 읽기
+
+0.4.0 통합부터 새 `configure.mjs` 실행은 웹 BFF와 별개인 public client `bubble-lock-android`를 생성한다. `NATIVE_CLIENT_ID`로 이름을 바꿀 수 있으나 BFF client ID와 같을 수 없다. Code + PKCE S256, 정확한 `org.privacybubble.app:/oauth2redirect`, `openid portal:read`, 일반 refresh rotation을 사용한다. 비밀번호·implicit·service-account grant와 offline scope를 연결하지 않는다. client 자체에 subject와 API audience mapper를 두므로 realm의 `basic` scope에 의존하지 않는다.
+
+프록시는 정확한 `GET /v1/portal/locations`만 bearer 읽기 경로로 전달한다. query·본문·다른 메서드를 거절하고 Cookie·인증서 주장·forwarded header를 upstream으로 넘기지 않는다. 이 경로에 Gateway 클라이언트 인증서를 대여하지 않으며 API가 사용자 JWT·등록 principal·현재 household/위치 표시 권한을 다시 검증한다. 다른 `/v1` 경로의 외부 거부 정책은 유지한다. 이 절의 한 경로는 앞의 `/v1` 전체 차단 설명에 대한 명시적 예외다.
+
+이미 운영 중인 서버에서 이 추가를 적용하려고 `configure.mjs`나 `init-volumes.mjs` 전체를 재실행하지 않는다. 기존 사용자 subject·DB 비밀값·공개 인증서를 보존한 채 [검증·렌더링 도구](../app/deployment/README.md)로 별도 native client 등록과 정확한 proxy 경로를 준비한다. Keycloak의 기존 realm import 파일만 교체해도 실행 중인 realm에 client가 자동 추가되지는 않는다. 관리자 권한으로 public client를 추가하고 scope·audience·redirect·issuer 응답을 확인한 다음 `nginx -t`와 통제된 proxy reload를 수행한다. 실제 등록·공개 TLS 확인과 휴대폰 브라우저 로그인 시험을 마친 뒤에만 앱의 배포 프로필을 고정한다.
+
+현재 기본 Android APK/AAB는 미설정·미서명 산출물이다. 새 구성의 기본값은 실제 운영 realm에 이미 등록되었다는 증거가 아니다. [실서버 통합 기록](../app/docs/DEPLOYMENT-20261114.md)에 실제 MQTT 조회·기기 격리 시험·남은 운영 입력을 구분한다.
+
 ## 초기 실행
 
 저장소 루트에서 실행한다. Node 22.19 이상, OpenSSL, Docker/Compose를 사용한다.

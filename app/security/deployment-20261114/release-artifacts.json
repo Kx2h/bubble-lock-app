@@ -1,6 +1,6 @@
 {
   "format": "privacy-bubble.release-artifact-inventory.v1",
-  "checked_at": "2026-11-13T15:57:15.073726+00:00",
+  "checked_at": "2026-11-13T16:25:36.687255+00:00",
   "android": {
     "version_name": "0.4.0",
     "version_code": 4,
@@ -12,32 +12,32 @@
   "artifacts": [
     {
       "name": "app-release-unsigned.apk",
-      "sha256": "efb7f288f4653996d6ba78cadb6cc3e886715192e8efc0387dfa084edb0d42b6",
-      "size_bytes": 94433233,
+      "sha256": "5cbdadd2543bc5581ffe9c8cbe1bd8aa757aa21f2de68a3d13c3db7677613ed9",
+      "size_bytes": 94433649,
       "signing": "unsigned default release; no organization production signature asserted"
     },
     {
       "name": "app-release.aab",
-      "sha256": "dd79c603a48ef24fc7a770c512ff300063180d58146c588ab8be33a6b560a3b3",
-      "size_bytes": 35899696,
+      "sha256": "a64e7c3bbc8c2954c7b5fb585c0d0199ffc1182e41e5f151e828f7c1937a3f01",
+      "size_bytes": 35899715,
       "signing": "unsigned default release; no organization production signature asserted"
     }
   ],
   "sbom": {
     "name": "release.cdx.json",
-    "sha256": "0ee9b80d5bb34dec30f79742306481386c192806f85f773ef39426c2c8d184e6",
-    "components": 258,
-    "graph_nodes": 259,
-    "library_components": 228,
-    "licensed_library_components": 228
+    "sha256": "d04baad920ee8a50d6411ffbc8ce725e50b55c642eea8a5e1f17cafadfe51c53",
+    "components": 492,
+    "graph_nodes": 493,
+    "library_components": 460,
+    "licensed_library_components": 460
   },
   "osv": {
     "status": "no-known-findings",
-    "checked_at": "2026-11-13T15:54:21Z",
-    "exact_package_versions": 222,
+    "checked_at": "2026-11-13T16:27:57Z",
+    "exact_package_versions": 417,
     "affected_package_versions": 0,
     "unique_advisories": 0,
-    "querybatch_requests": 3
+    "querybatch_requests": 5
   },
   "operational_profile_verification": "pending native client registration, deployment TLS identity confirmation and real account integration; these are not supplied by this package inventory"
 }

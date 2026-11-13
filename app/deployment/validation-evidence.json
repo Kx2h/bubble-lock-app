@@ -1,6 +1,6 @@
 {
   "schemaVersion": "privacy-bubble.native-deployment-template-check.v1",
-  "checkedAt": "2026-11-13T15:36:51.078306+00:00",
+  "checkedAt": "2026-11-13T16:18:31.179304+00:00",
   "moduleTests": {
     "passed": 9,
     "failed": 0
@@ -20,15 +20,26 @@
   "nginxSyntaxTestExecuted": false,
   "nginxReloadExecuted": false,
   "operatingProfileStillUnconfirmed": true,
+  "integrationRealmAlignment": {
+    "sourceRevision": "4f3899b355aaf7a5c10ffc2196fba296ee9825ac",
+    "defaultBasicScopeRequired": false,
+    "explicitSubjectMapper": "oidc-sub-mapper",
+    "nativeRequestScope": "openid portal:read",
+    "offlineAccessRequested": false,
+    "sourceDefaultAudience": "privacy-bubble-api",
+    "runtimeAudienceVerified": false,
+    "publicCertificateVerifiedOutOfBand": false,
+    "matchingLocalDockerDeploymentFound": false
+  },
   "sourceSha256": {
-    "README.md": "c5a163e7a35a9842234eda83fc16fe8d89b8995718e720986c83fa62a6bab090",
+    "README.md": "1f70153655612c07545c8a97d37b65af1c5f3efe496ad752269804dce4c5ebc7",
     "android-profile.template.properties": "2babfc838e9a80182ab75670d83075d1551c40553819ef318d437154abfaf1b2",
-    "deployment.template.json": "06e77778bfd6bcebdf0404085883f3f5bbcceb7e115762e590d2869d9914a8bc",
-    "native-client.template.json": "c51a96126b7706214e5f682c08ac35a02d02f5b051f68522e082a31e816c1020",
+    "deployment.template.json": "85dc9a4a2e30f447aa8f06b2d9859cd56162b47cb812f3f105b1d8e1ffe98794",
+    "native-client.template.json": "747eb517ba11d9e6c231e6672b3cc70178cda7f847667c83d9a3b161e0417b46",
     "nginx-http.template.conf": "0d448c15e0a4c2b9fc89b3a14be3537f86a154dab16ea5edcbabe010be4a8263",
     "nginx-server.template.conf": "7fa82e38d66c8fb0965807d9291f8b430ab0b33d08dab2ce9f905779e0bbb848",
     "portal-read-scope.template.json": "981518882a21f9fcc7fbb653194e8fe93e04942d37ba352258fac80c19964f1b",
-    "prepare.py": "e01dae1e538e8b24724d76e8def3f82fa8083c18b225ae0c5d9a44a29e141985",
-    "test_prepare.py": "5af156836d22cf5521f5d5e01f4905d20a462e207aabaedd488556b5847701b5"
+    "prepare.py": "6f87d128e7a5fad19873126d46b7be74c9241ad4e3668f6e0d35d12b2bb14479",
+    "test_prepare.py": "89829ec3fec4a6d93e9c2a43d8bdc9195242903aef376348b63fe2752a0ccf1e"
   }
 }

@@ -1,0 +1,94 @@
+{
+  "version": "0.4.0",
+  "unit": {
+    "debug": {
+      "tests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "release": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "lint": "No issues found.",
+  "packagedSecurity": {
+    "format": "privacy-bubble.release-inspection.v1",
+    "apk_sha256": "5cbdadd2543bc5581ffe9c8cbe1bd8aa757aa21f2de68a3d13c3db7677613ed9",
+    "size_bytes": 94433649,
+    "configured_auth": false,
+    "passed": true,
+    "checks": [
+      "Android 10 minimum and API 36 target",
+      "release is not debuggable",
+      "backup disabled",
+      "explicit cloud and device-transfer policy",
+      "no phone GPS or Wi-Fi identifier permissions",
+      "no test components",
+      "callback matches provisioning profile",
+      "HTTPS and system trust only",
+      "credentials excluded from cloud and device transfer",
+      "DEX excludes DeveloperToolsActivity",
+      "DEX excludes SyntheticConsentActivity",
+      "DEX excludes debug-device-session",
+      "DEX excludes TestStateClient",
+      "DEX excludes OidcBrowserFlow",
+      "DEX excludes RotatingSession",
+      "DEX excludes setDebugAccessToken",
+      "DEX excludes build workspace paths",
+      "offline legal notices bundled",
+      "64-bit ELF lib/arm64-v8a/libmaplibre-opengl.so",
+      "16KB load alignment lib/arm64-v8a/libmaplibre-opengl.so",
+      "non-executable stack lib/arm64-v8a/libmaplibre-opengl.so",
+      "RELRO lib/arm64-v8a/libmaplibre-opengl.so",
+      "64-bit ELF lib/arm64-v8a/libmaplibre.so",
+      "16KB load alignment lib/arm64-v8a/libmaplibre.so",
+      "non-executable stack lib/arm64-v8a/libmaplibre.so",
+      "RELRO lib/arm64-v8a/libmaplibre.so",
+      "64-bit ELF lib/x86_64/libmaplibre-opengl.so",
+      "16KB load alignment lib/x86_64/libmaplibre-opengl.so",
+      "non-executable stack lib/x86_64/libmaplibre-opengl.so",
+      "RELRO lib/x86_64/libmaplibre-opengl.so",
+      "64-bit ELF lib/x86_64/libmaplibre.so",
+      "16KB load alignment lib/x86_64/libmaplibre.so",
+      "non-executable stack lib/x86_64/libmaplibre.so",
+      "RELRO lib/x86_64/libmaplibre.so",
+      "both renderers and both 64-bit ABIs covered",
+      "16KB native ZIP alignment"
+    ],
+    "native_files": [
+      {
+        "name": "lib/arm64-v8a/libmaplibre-opengl.so",
+        "sha256": "a4258bffdb021caf3379622f315c4b34210800863d8f59416bd514a57d255a58"
+      },
+      {
+        "name": "lib/arm64-v8a/libmaplibre.so",
+        "sha256": "e74238622f45e8066ecd18034a7707e3fa91188a9dd23ba215e3207acc5323d8"
+      },
+      {
+        "name": "lib/x86_64/libmaplibre-opengl.so",
+        "sha256": "23954081df5cac20c6f910038fe1fd589d8c583aa2ab7c5d4f35844f47b14dff"
+      },
+      {
+        "name": "lib/x86_64/libmaplibre.so",
+        "sha256": "7050123ca5f62971f8000e3e7e9466656b7acee8f692b479bc9521a7c4c8ceb0"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "app/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "5cbdadd2543bc5581ffe9c8cbe1bd8aa757aa21f2de68a3d13c3db7677613ed9",
+      "bytes": 94433649
+    },
+    {
+      "path": "app/app/build/outputs/bundle/release/app-release.aab",
+      "sha256": "a64e7c3bbc8c2954c7b5fb585c0d0199ffc1182e41e5f151e828f7c1937a3f01",
+      "bytes": 35899715
+    }
+  ],
+  "profile": "default unprovisioned keyrings-v1; unsigned APK/AAB; no real-account login"
+}

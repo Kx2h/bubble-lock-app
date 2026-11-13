@@ -25,7 +25,16 @@ const secret = () => randomBytes(24).toString('base64url');
 const origin = new URL(`https://${domain}:${port}`).origin;
 const issuer = `${origin}/identity/realms/bubble`;
 const clientId = 'bubble-lock-dashboard';
+const nativeClientId = process.env.NATIVE_CLIENT_ID ?? 'bubble-lock-android';
+if (!/^[A-Za-z0-9._-]{1,128}$/.test(nativeClientId) || nativeClientId === clientId)
+  throw new TypeError('NATIVE_CLIENT_ID must be a distinct public client identifier');
 const audience = 'privacy-bubble-api';
+const nativeClient = JSON.parse((await readFile(new URL('../app/deployment/native-client.template.json', import.meta.url), 'utf8'))
+  .replaceAll('{{NATIVE_CLIENT_ID}}', nativeClientId));
+nativeClient.protocolMappers.push({
+  name: 'native-api-audience', protocol: 'openid-connect', protocolMapper: 'oidc-audience-mapper',
+  config: { 'included.custom.audience': audience, 'access.token.claim': 'true', 'id.token.claim': 'false', 'introspection.token.claim': 'true' },
+});
 const guardian = ['portal:read', 'household:write', 'device:write', 'consent:write', 'grant:write', 'grant:revoke', 'command:request', 'bubble:command', 'incident:write', 'incident:resolve'];
 const roles = [
   { role: 'guardian', scopes: guardian },
@@ -66,7 +75,7 @@ await save('realm.json', {
       name: 'api-audience', protocol: 'openid-connect', protocolMapper: 'oidc-audience-mapper',
       config: { 'included.custom.audience': audience, 'access.token.claim': 'true', 'id.token.claim': 'false' },
     }],
-  }],
+  }, nativeClient],
   clientScopes: scopes.map((name) => ({ name, protocol: 'openid-connect', attributes: { 'include.in.token.scope': 'true' } })),
   users: accounts.map(({ username, subject, password, role }) => ({
     id: subject, username, enabled: true, emailVerified: true,

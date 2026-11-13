@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "tls": "TLSv1.3",
+  "hostnameVerification": true,
+  "checks": [
+    "private-token-file-mode",
+    "signed-isolated-token-and-explicit-simulation",
+    "protected-response-metadata",
+    "five-second-response-lease",
+    "wrong-token-denied",
+    "missing-token-denied",
+    "tls12-rejected",
+    "authenticated-slow-deny-control",
+    "delayed-denial-after-pending-read",
+    "subsequent-reads-stay-denied",
+    "owned-token-file-cleaned",
+    "wrong-hostname-rejected"
+  ],
+  "delayMillis": 7005,
+  "productionAccountsUsed": false,
+  "physicalKeyringDataUsed": false
+}

@@ -69,13 +69,14 @@ OSV receives exact ecosystem/package/version queries in batches of at most 100. 
 - Android OS, external browser, IdP, map servers, host operating system and build-tool dependencies are outside this product-runtime BOM. The pinned Python requirements describe the validation tool environment separately.
 - First-party code needs the threat review and attack/fuzz tests. SCA does not replace them.
 
-## Integrated PC, web and Gateway inventory
+## Integrated PC, web, CSE and Gateway inventory
 
-The original `--npm-lock pc-mobius/package-lock.json` interface remains supported. Add the web project with `--npm-application web-dashboard=web-dashboard/package-lock.json` to both `licenses` and `generate`. Each project is a separate application with its own lock SHA256 and installation-path references. The scanner deduplicates equal ecosystem/package/version queries while retaining every application context, scope and dependency kind in the result. Thus a development-only finding remains visible without being described as a shipped browser or Android vulnerability.
+The original `--npm-lock pc-mobius/package-lock.json` interface remains supported. Add the web project with `--npm-application web-dashboard=web-dashboard/package-lock.json` and CSE with `--npm-application cse-runtime=deployment/cse/artifacts/dependencies/package-lock.json` to both `licenses` and `generate`. Each project is a separate application with its own lock SHA256 and installation-path references; nested lock sources retain their actual repository-relative paths. The scanner deduplicates equal ecosystem/package/version queries while retaining every application context, scope and dependency kind in the result. Thus a development-only finding remains visible without being described as a shipped browser or Android vulnerability.
 
 ```sh
 python3 scripts/security/release_inventory.py licenses \
   --npm-application web-dashboard=web-dashboard/package-lock.json \
+  --npm-application cse-runtime=deployment/cse/artifacts/dependencies/package-lock.json \
   --output "$REPORT_DIR/npm-all-licenses.json"
 
 "$WORKSPACE/.local/security-tools/venv/bin/python" scripts/security/release_inventory.py python-environment \
@@ -85,6 +86,8 @@ python3 scripts/security/release_inventory.py licenses \
 "$WORKSPACE/.local/security-tools/venv/bin/python" scripts/security/release_inventory.py generate \
   --inventory "$REPORT_DIR/release-inventory.json" \
   --npm-application web-dashboard=web-dashboard/package-lock.json \
+  --npm-application cse-runtime=deployment/cse/artifacts/dependencies/package-lock.json \
+  --npm-source-manifest cse-runtime=deployment/cse/artifacts/manifest.json \
   --npm-licenses "$REPORT_DIR/npm-all-licenses.json" \
   --python-environment "gateway-validation=$REPORT_DIR/gateway-python-environment.json" \
   --apk app/app/build/outputs/apk/release/app-release-unsigned.apk \
@@ -93,6 +96,8 @@ python3 scripts/security/release_inventory.py licenses \
 ```
 
 The optional Python snapshot reads installed distribution metadata from an explicitly selected local interpreter. It records exact versions, metadata SHA256 and target marker environment, follows only the Gateway's declared runtime dependencies using PEP 508 markers/extras and verifies installed versions against their specifiers. Duplicate conflicting distributions, missing runtime dependencies and direct-URL requirements fail collection. Unrelated installed packages such as pip and local test helpers stay outside the product BOM. The snapshot is not a Python lockfile, verified wheel archive inventory, or evidence of the physical Pi/server installation. The separate SBOM validator environment is never added to the Gateway product closure.
+
+`--npm-source-manifest cse-runtime=deployment/cse/artifacts/manifest.json` additionally checks the tracked patched Mobius4 archive SHA256, the external and archive-internal npm lock hash, and every listed security/dependency patch target hash. It rejects archive path traversal, links, duplicate entries, missing targets and excessive content without extracting source files. The verified archive becomes a file component linked to the CSE application, with upstream revision/repository provenance. This identifies reviewed source bytes; it is not a deployed container image inventory, independent upstream signature verification, or a claim that the custom source patch removes every vulnerability. Container base images, Node runtime binaries and OS packages remain outside the npm package-version SCA.
 
 Before a new Android artifact exists, `npm-bom` accepts the same npm and optional Python inputs and produces a clearly labelled host-only preflight BOM. Run its `validate` and `scan --fail-on-findings` checks separately. Do not describe this host-only result as the final APK/AAB inventory. When artifacts are ready, export their final Android graph and use `generate`, then validate and scan that exact BOM again.
 

@@ -80,6 +80,6 @@ npm run api
 
 ## Android 앱 통합
 
-APP의 0.3.0 보안 릴리스를 최신 팀 main과 통합하고 실제 배포 서버 연결을 준비합니다. MapLibre 지도·키링 목록·설정, Keystore 암호화 세션과 릴리스 최적화·보안 시험을 포함합니다. [앱 안내](app/README.md), [보안 릴리스 기록](app/security/RELEASE-0.3.0.md), [SBOM 및 검사 결과](app/security/README.md)를 참고하세요.
+APP 0.4.0은 최신 main·키링·최종 배포 브랜치를 통합하며, 중앙 Portal 위치 계약과 제한된 위치 표시 수명, 1,000개 목록의 페이지 처리, Keystore 세션과 릴리스 최적화를 포함합니다. [앱 안내](app/README.md), [실서버 통합 기록](app/docs/DEPLOYMENT-20261114.md), [현재 공급망 증거](app/security/deployment-20261114/README.md)를 참고하세요.
 
 배포 웹의 인증·위치 API와 기존 모바일 계약은 다르므로 호환 경계를 확인해 연결합니다. 운영 계정·인증서 개인키·로컬 상태는 저장소에 포함하지 않습니다. 시스템·브라우저 인증서 신뢰 설정은 변경하지 않습니다.

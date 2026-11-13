@@ -11,6 +11,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.parse
 import urllib.request
@@ -136,8 +137,65 @@ def npm_inputs(args):
         if identifier in names or pathlib.Path(path).resolve() in paths:
             raise ValueError("Duplicate npm application identity or lockfile")
         names.add(identifier); paths.add(pathlib.Path(path).resolve())
-        result.append({"id": identifier, "path": path, "source": identifier + "/package-lock.json", "legacy": False})
+        try:
+            source = pathlib.Path(path).resolve().relative_to(pathlib.Path(__file__).resolve().parents[2]).as_posix()
+        except ValueError:
+            source = "provided-lock:" + identifier
+        result.append({"id": identifier, "path": path, "source": source, "legacy": False})
+    for identifier, path in (named_input(value) for value in getattr(args, "npm_source_manifest", []) or []):
+        spec = next((item for item in result if item["id"] == identifier), None)
+        if spec is None or "source_manifest" in spec:
+            raise ValueError("Unknown or duplicate npm source-manifest application")
+        spec["source_manifest"] = path
     return result
+
+
+def verify_npm_source_manifest(spec):
+    path = pathlib.Path(spec["source_manifest"])
+    manifest = read_json(path)
+    name = manifest["artifact"]
+    if pathlib.PurePosixPath(name).name != name or "\\" in name or name in ("", ".", ".."):
+        raise ValueError("Source archive must be a single manifest-relative filename")
+    archive_path = (path.parent / name).resolve()
+    archive_path.relative_to(path.parent.resolve())
+    if archive_path.stat().st_size > LIMIT:
+        raise ValueError("Source archive exceeds bound")
+    digest = sha256(archive_path.read_bytes())
+    if digest != manifest["artifactSHA256"] or sha256(pathlib.Path(spec["path"]).read_bytes()) != manifest["lockSHA256"]:
+        raise ValueError("CSE source archive or external lock differs from reviewed manifest")
+    expected = {"package-lock.json": manifest["lockSHA256"]}
+    for section in ("securityPatch", "dependencyPatch"):
+        for record in manifest.get(section, {}).get("files", []):
+            if record["file"] in expected and expected[record["file"]] != record["sha256"]:
+                raise ValueError("Conflicting source patch hashes")
+            expected[record["file"]] = record["sha256"]
+    matched, names, total = set(), set(), 0
+    with tarfile.open(archive_path, "r:gz") as archive:
+        for index, member in enumerate(archive):
+            raw = member.name
+            while raw.startswith("./"):
+                raw = raw[2:]
+            relative = pathlib.PurePosixPath(raw)
+            if relative.is_absolute() or ".." in relative.parts or "\\" in raw or not (member.isfile() or member.isdir()):
+                raise ValueError("Unsafe source archive entry")
+            normalized = relative.as_posix()
+            if normalized in names or index >= 5000:
+                raise ValueError("Repeated or excessive source archive entries")
+            names.add(normalized); total += member.size
+            if total > 64 * 1024 * 1024 or member.size > LIMIT:
+                raise ValueError("Source archive expanded content exceeds bound")
+            if normalized in expected:
+                if not member.isfile():
+                    raise ValueError("Source patch target is not a regular file")
+                stream = archive.extractfile(member)
+                with stream:
+                    if sha256(stream.read(LIMIT + 1)) != expected[normalized]:
+                        raise ValueError("Patched source file differs from reviewed manifest: " + normalized)
+                matched.add(normalized)
+    if matched != set(expected):
+        raise ValueError("Source archive omits reviewed patch/lock files")
+    return {"archive": name, "archive_sha256": digest, "manifest_sha256": sha256(path.read_bytes()),
+            "repository": manifest["repository"], "revision": manifest["revision"], "version": manifest["version"], "verified_patch_files": sorted(matched)}
 
 
 def add_npm_application(spec, components, graph, parent_ref, license_records):
@@ -147,10 +205,12 @@ def add_npm_application(spec, components, graph, parent_ref, license_records):
     packages = lock["packages"]
     npm_root = "application:" + spec["id"]
     namespace = "npm-location:" if spec["legacy"] else "npm-location:" + spec["id"] + ":"
-    deployment = "PC Mobius host" if spec["legacy"] else spec["id"] + " host/browser build"
+    deployment = "PC Mobius host" if spec["legacy"] else "Mobius4 CSE host runtime" if spec["id"] == "cse-runtime" else spec["id"] + " host/browser build"
     components.append({"bom-ref": npm_root, "type": "application", "name": packages[""]["name"], "version": packages[""]["version"],
                        "hashes": [{"alg": "SHA-256", "content": sha256(pathlib.Path(spec["path"]).read_bytes())}],
                        "properties": properties(inventory_source=spec["source"], deployment_scope=deployment + "; not embedded in Android APK", hash_scope="package-lock.json", dependency_coverage="complete lock tree including development, peer and optional packages; not a bundle reachability analysis")})
+    if isinstance(packages[""].get("license"), str):
+        components[-1]["licenses"] = [license_choice(packages[""]["license"])]
     graph[parent_ref].add(npm_root)
     npm_refs = {location: namespace + location for location in packages if location}
     counts = {"runtime": 0, "development": 0, "runtime-optional": 0}
@@ -193,6 +253,17 @@ def add_npm_application(spec, components, graph, parent_ref, license_records):
         if hashes:
             component["hashes"] = hashes
         components.append(component)
+    if spec.get("source_manifest"):
+        evidence = verify_npm_source_manifest(spec)
+        application = next(item for item in components if item["bom-ref"] == npm_root)
+        if application["version"] != evidence["version"]:
+            raise ValueError("CSE manifest version differs from locked application")
+        application["properties"] += properties(source_manifest_sha256=evidence["manifest_sha256"], upstream_repository=evidence["repository"],
+                                                upstream_revision=evidence["revision"], source_patch_verification="archive and listed patched-file SHA256 match reviewed manifest")
+        reference = "source-archive:" + spec["id"]
+        components.append({"bom-ref": reference, "type": "file", "name": evidence["archive"], "hashes": [{"alg": "SHA-256", "content": evidence["archive_sha256"]}],
+                           "properties": properties(application_id=spec["id"], artifact_stage="reviewed patched source archive; not a built/deployed container image", patched_source_files=";".join(evidence["verified_patch_files"]))})
+        graph[npm_root].add(reference); graph[reference] = set()
     return {"application": spec["id"], "lock_source": spec["source"], "lock_sha256": sha256(pathlib.Path(spec["path"]).read_bytes()), "packages": sum(counts.values()), "kinds": counts}
 
 
@@ -535,6 +606,7 @@ def main():
     generate_parser.add_argument("--inventory", required=True)
     generate_parser.add_argument("--npm-lock", default="pc-mobius/package-lock.json")
     generate_parser.add_argument("--npm-application", action="append", default=[], metavar="ID=LOCKFILE")
+    generate_parser.add_argument("--npm-source-manifest", action="append", default=[], metavar="ID=MANIFEST")
     generate_parser.add_argument("--npm-licenses")
     generate_parser.add_argument("--python-environment", action="append", default=[], metavar="ID=SNAPSHOT")
     generate_parser.add_argument("--android-notices", default="app/app/src/main/assets/licenses/manifest.json")
@@ -550,6 +622,7 @@ def main():
     npm_parser = commands.add_parser("npm-bom")
     npm_parser.add_argument("--npm-lock", default="pc-mobius/package-lock.json")
     npm_parser.add_argument("--npm-application", action="append", default=[], metavar="ID=LOCKFILE")
+    npm_parser.add_argument("--npm-source-manifest", action="append", default=[], metavar="ID=MANIFEST")
     npm_parser.add_argument("--npm-licenses")
     npm_parser.add_argument("--python-environment", action="append", default=[], metavar="ID=SNAPSHOT")
     npm_parser.add_argument("--output", required=True)

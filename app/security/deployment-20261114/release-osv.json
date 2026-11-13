@@ -1,9 +1,13 @@
 {
   "advisories": {},
   "affected_package_versions": 0,
-  "checked_at": "2026-11-13T15:54:21Z",
-  "exact_package_versions": 222,
+  "checked_at": "2026-11-13T16:27:57Z",
+  "exact_package_versions": 417,
   "excluded_components": [
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "application:cse-runtime"
+    },
     {
       "reason": "first-party application, archive, or native file without verified package/version decomposition",
       "ref": "application:pc-mobius"
@@ -123,6 +127,10 @@
     {
       "reason": "first-party application, archive, or native file without verified package/version decomposition",
       "ref": "python-environment:gateway-validation:privacy-bubble-gateway"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "source-archive:cse-runtime"
     }
   ],
   "format": "privacy-bubble.osv-sca.v1",
@@ -2117,6 +2125,150 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/address",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/address"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/address",
+      "version": "5.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/formula",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/formula"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/formula",
+      "version": "3.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/hoek",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/hoek"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/hoek",
+      "version": "11.0.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/pinpoint",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/pinpoint"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/pinpoint",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/tlds",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/tlds"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/tlds",
+      "version": "1.1.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@hapi/topo",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@hapi/topo"
+      ],
+      "ecosystem": "npm",
+      "name": "@hapi/topo",
+      "version": "6.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@jsep-plugin/assignment",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@jsep-plugin/assignment"
+      ],
+      "ecosystem": "npm",
+      "name": "@jsep-plugin/assignment",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@jsep-plugin/regex",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@jsep-plugin/regex"
+      ],
+      "ecosystem": "npm",
+      "name": "@jsep-plugin/regex",
+      "version": "1.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -2130,6 +2282,60 @@
       "ecosystem": "npm",
       "name": "@napi-rs/lzma-linux-x64-gnu",
       "version": "1.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@nodable/entities",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@nodable/entities"
+      ],
+      "ecosystem": "npm",
+      "name": "@nodable/entities",
+      "version": "3.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@opentelemetry/api",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@opentelemetry/api"
+      ],
+      "ecosystem": "npm",
+      "name": "@opentelemetry/api",
+      "version": "1.9.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@pinojs/redact",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@pinojs/redact"
+      ],
+      "ecosystem": "npm",
+      "name": "@pinojs/redact",
+      "version": "0.4.0",
       "vulnerability_ids": []
     },
     {
@@ -2585,6 +2791,42 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@standard-schema/spec",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@standard-schema/spec"
+      ],
+      "ecosystem": "npm",
+      "name": "@standard-schema/spec",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@types/debug",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@types/debug"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/debug",
+      "version": "4.1.12",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -2634,6 +2876,42 @@
       "ecosystem": "npm",
       "name": "@types/leaflet",
       "version": "1.9.21",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@types/ms",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@types/ms"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/ms",
+      "version": "2.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@types/node",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@types/node"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/node",
+      "version": "24.1.0",
       "vulnerability_ids": []
     },
     {
@@ -2729,6 +3007,24 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/@types/validator",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/@types/validator"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/validator",
+      "version": "13.15.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2760,6 +3056,42 @@
       "ecosystem": "npm",
       "name": "abort-controller",
       "version": "3.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/accepts",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/accepts"
+      ],
+      "ecosystem": "npm",
+      "name": "accepts",
+      "version": "1.3.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/agent-base",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/agent-base"
+      ],
+      "ecosystem": "npm",
+      "name": "agent-base",
+      "version": "6.0.2",
       "vulnerability_ids": []
     },
     {
@@ -2817,6 +3149,139 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/anynum",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/anynum"
+      ],
+      "ecosystem": "npm",
+      "name": "anynum",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/array-flatten",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/array-flatten"
+      ],
+      "ecosystem": "npm",
+      "name": "array-flatten",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/async-mqtt",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/async-mqtt"
+      ],
+      "ecosystem": "npm",
+      "name": "async-mqtt",
+      "version": "2.6.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/asynckit",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/asynckit"
+      ],
+      "ecosystem": "npm",
+      "name": "asynckit",
+      "version": "0.4.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/atomic-sleep",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/atomic-sleep"
+      ],
+      "ecosystem": "npm",
+      "name": "atomic-sleep",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/axios",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/axios"
+      ],
+      "ecosystem": "npm",
+      "name": "axios",
+      "version": "1.21.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/balanced-match",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/balanced-match"
+      ],
+      "ecosystem": "npm",
+      "name": "balanced-match",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/base64-js",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2825,11 +3290,48 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/base64-js",
         "npm-location:node_modules/base64-js"
       ],
       "ecosystem": "npm",
       "name": "base64-js",
       "version": "1.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/bintrees",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/bintrees"
+      ],
+      "ecosystem": "npm",
+      "name": "bintrees",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mqtt-packet/node_modules/bl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mqtt-packet/node_modules/bl"
+      ],
+      "ecosystem": "npm",
+      "name": "bl",
+      "version": "4.1.0",
       "vulnerability_ids": []
     },
     {
@@ -2853,6 +3355,42 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/body-parser",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/body-parser"
+      ],
+      "ecosystem": "npm",
+      "name": "body-parser",
+      "version": "1.20.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/brace-expansion",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/brace-expansion"
+      ],
+      "ecosystem": "npm",
+      "name": "brace-expansion",
+      "version": "1.1.21",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2866,6 +3404,24 @@
       "ecosystem": "npm",
       "name": "broker-factory",
       "version": "3.1.15",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "buffer",
+      "version": "5.7.1",
       "vulnerability_ids": []
     },
     {
@@ -2889,6 +3445,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/buffer-from",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2897,11 +3460,120 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/buffer-from",
         "npm-location:node_modules/buffer-from"
       ],
       "ecosystem": "npm",
       "name": "buffer-from",
       "version": "1.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/bytes",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/bytes"
+      ],
+      "ecosystem": "npm",
+      "name": "bytes",
+      "version": "3.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/call-bind-apply-helpers",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/call-bind-apply-helpers"
+      ],
+      "ecosystem": "npm",
+      "name": "call-bind-apply-helpers",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/call-bound",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/call-bound"
+      ],
+      "ecosystem": "npm",
+      "name": "call-bound",
+      "version": "1.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/colorette",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/colorette"
+      ],
+      "ecosystem": "npm",
+      "name": "colorette",
+      "version": "2.0.20",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/combined-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/combined-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "combined-stream",
+      "version": "1.0.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/commist",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/commist"
+      ],
+      "ecosystem": "npm",
+      "name": "commist",
+      "version": "1.1.0",
       "vulnerability_ids": []
     },
     {
@@ -2925,6 +3597,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/concat-map",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/concat-map"
+      ],
+      "ecosystem": "npm",
+      "name": "concat-map",
+      "version": "0.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/concat-stream",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2933,11 +3630,120 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/concat-stream",
         "npm-location:node_modules/concat-stream"
       ],
       "ecosystem": "npm",
       "name": "concat-stream",
       "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/config",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/config"
+      ],
+      "ecosystem": "npm",
+      "name": "config",
+      "version": "3.3.12",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/content-disposition",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/content-disposition"
+      ],
+      "ecosystem": "npm",
+      "name": "content-disposition",
+      "version": "0.5.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/content-type",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/content-type"
+      ],
+      "ecosystem": "npm",
+      "name": "content-type",
+      "version": "1.0.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/cookie",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/cookie"
+      ],
+      "ecosystem": "npm",
+      "name": "cookie",
+      "version": "0.7.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/cookie-signature",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/cookie-signature"
+      ],
+      "ecosystem": "npm",
+      "name": "cookie-signature",
+      "version": "1.0.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/cors",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/cors"
+      ],
+      "ecosystem": "npm",
+      "name": "cors",
+      "version": "2.8.5",
       "vulnerability_ids": []
     },
     {
@@ -2961,6 +3767,91 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/date-fns",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/date-fns"
+      ],
+      "ecosystem": "npm",
+      "name": "date-fns",
+      "version": "4.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/dateformat",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/dateformat"
+      ],
+      "ecosystem": "npm",
+      "name": "dateformat",
+      "version": "4.6.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/body-parser/node_modules/debug",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/express/node_modules/debug",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/finalhandler/node_modules/debug",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/send/node_modules/debug",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/body-parser/node_modules/debug",
+        "npm-location:cse-runtime:node_modules/express/node_modules/debug",
+        "npm-location:cse-runtime:node_modules/finalhandler/node_modules/debug",
+        "npm-location:cse-runtime:node_modules/send/node_modules/debug"
+      ],
+      "ecosystem": "npm",
+      "name": "debug",
+      "version": "2.6.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/debug",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -2969,11 +3860,282 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/debug",
         "npm-location:node_modules/debug"
       ],
       "ecosystem": "npm",
       "name": "debug",
       "version": "4.4.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/delayed-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/delayed-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "delayed-stream",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/depd",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/depd"
+      ],
+      "ecosystem": "npm",
+      "name": "depd",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/destroy",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/destroy"
+      ],
+      "ecosystem": "npm",
+      "name": "destroy",
+      "version": "1.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/dotenv",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/dotenv"
+      ],
+      "ecosystem": "npm",
+      "name": "dotenv",
+      "version": "16.6.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/dottie",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/dottie"
+      ],
+      "ecosystem": "npm",
+      "name": "dottie",
+      "version": "2.0.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/dunder-proto",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/dunder-proto"
+      ],
+      "ecosystem": "npm",
+      "name": "dunder-proto",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/duplexify",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/duplexify"
+      ],
+      "ecosystem": "npm",
+      "name": "duplexify",
+      "version": "4.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ee-first",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/ee-first"
+      ],
+      "ecosystem": "npm",
+      "name": "ee-first",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/send/node_modules/encodeurl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/send/node_modules/encodeurl"
+      ],
+      "ecosystem": "npm",
+      "name": "encodeurl",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/encodeurl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/encodeurl"
+      ],
+      "ecosystem": "npm",
+      "name": "encodeurl",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/end-of-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/end-of-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "end-of-stream",
+      "version": "1.4.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/es-define-property",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/es-define-property"
+      ],
+      "ecosystem": "npm",
+      "name": "es-define-property",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/es-errors",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/es-errors"
+      ],
+      "ecosystem": "npm",
+      "name": "es-errors",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/es-object-atoms",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/es-object-atoms"
+      ],
+      "ecosystem": "npm",
+      "name": "es-object-atoms",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/es-set-tostringtag",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/es-set-tostringtag"
+      ],
+      "ecosystem": "npm",
+      "name": "es-set-tostringtag",
+      "version": "2.1.0",
       "vulnerability_ids": []
     },
     {
@@ -2992,6 +4154,42 @@
       "ecosystem": "npm",
       "name": "esbuild",
       "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/escape-html",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/escape-html"
+      ],
+      "ecosystem": "npm",
+      "name": "escape-html",
+      "version": "1.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/etag",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/etag"
+      ],
+      "ecosystem": "npm",
+      "name": "etag",
+      "version": "1.8.1",
       "vulnerability_ids": []
     },
     {
@@ -3033,6 +4231,60 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/express",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/express"
+      ],
+      "ecosystem": "npm",
+      "name": "express",
+      "version": "4.22.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/express-rate-limit",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/express-rate-limit"
+      ],
+      "ecosystem": "npm",
+      "name": "express-rate-limit",
+      "version": "8.7.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fast-copy",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fast-copy"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-copy",
+      "version": "4.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3054,6 +4306,24 @@
       "ecosystem": "npm",
       "name": "fast-deep-equal",
       "version": "3.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fast-safe-stringify",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fast-safe-stringify"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-safe-stringify",
+      "version": "2.1.1",
       "vulnerability_ids": []
     },
     {
@@ -3103,6 +4373,42 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fast-xml-builder",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fast-xml-builder"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-xml-builder",
+      "version": "1.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fast-xml-parser",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fast-xml-parser"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-xml-parser",
+      "version": "5.12.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -3116,6 +4422,114 @@
       "ecosystem": "npm",
       "name": "fdir",
       "version": "6.5.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/finalhandler",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/finalhandler"
+      ],
+      "ecosystem": "npm",
+      "name": "finalhandler",
+      "version": "1.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/follow-redirects",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/follow-redirects"
+      ],
+      "ecosystem": "npm",
+      "name": "follow-redirects",
+      "version": "1.16.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/form-data",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/form-data"
+      ],
+      "ecosystem": "npm",
+      "name": "form-data",
+      "version": "4.0.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/forwarded",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/forwarded"
+      ],
+      "ecosystem": "npm",
+      "name": "forwarded",
+      "version": "0.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fresh",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fresh"
+      ],
+      "ecosystem": "npm",
+      "name": "fresh",
+      "version": "0.5.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/fs.realpath",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/fs.realpath"
+      ],
+      "ecosystem": "npm",
+      "name": "fs.realpath",
+      "version": "1.0.0",
       "vulnerability_ids": []
     },
     {
@@ -3139,6 +4553,211 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/function-bind",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/function-bind"
+      ],
+      "ecosystem": "npm",
+      "name": "function-bind",
+      "version": "1.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/get-caller-file",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/get-caller-file"
+      ],
+      "ecosystem": "npm",
+      "name": "get-caller-file",
+      "version": "2.0.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/get-intrinsic",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/get-intrinsic"
+      ],
+      "ecosystem": "npm",
+      "name": "get-intrinsic",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/get-proto",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/get-proto"
+      ],
+      "ecosystem": "npm",
+      "name": "get-proto",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/glob",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/glob"
+      ],
+      "ecosystem": "npm",
+      "name": "glob",
+      "version": "7.2.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/gopd",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/gopd"
+      ],
+      "ecosystem": "npm",
+      "name": "gopd",
+      "version": "1.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/has-symbols",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/has-symbols"
+      ],
+      "ecosystem": "npm",
+      "name": "has-symbols",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/has-tostringtag",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/has-tostringtag"
+      ],
+      "ecosystem": "npm",
+      "name": "has-tostringtag",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/hasown",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/hasown"
+      ],
+      "ecosystem": "npm",
+      "name": "hasown",
+      "version": "2.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/helmet",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/helmet"
+      ],
+      "ecosystem": "npm",
+      "name": "helmet",
+      "version": "8.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/help-me",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/help-me"
+      ],
+      "ecosystem": "npm",
+      "name": "help-me",
+      "version": "3.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-pretty/node_modules/help-me",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3147,6 +4766,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-pretty/node_modules/help-me",
         "npm-location:node_modules/help-me"
       ],
       "ecosystem": "npm",
@@ -3157,6 +4777,93 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/http-errors",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/http-errors"
+      ],
+      "ecosystem": "npm",
+      "name": "http-errors",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/body-parser/node_modules/http-errors",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/raw-body/node_modules/http-errors",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/body-parser/node_modules/http-errors",
+        "npm-location:cse-runtime:node_modules/raw-body/node_modules/http-errors"
+      ],
+      "ecosystem": "npm",
+      "name": "http-errors",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/https-proxy-agent",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/https-proxy-agent"
+      ],
+      "ecosystem": "npm",
+      "name": "https-proxy-agent",
+      "version": "5.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/iconv-lite",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/iconv-lite"
+      ],
+      "ecosystem": "npm",
+      "name": "iconv-lite",
+      "version": "0.4.24",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ieee754",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3165,6 +4872,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/ieee754",
         "npm-location:node_modules/ieee754"
       ],
       "ecosystem": "npm",
@@ -3175,6 +4883,49 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/inflection",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/inflection"
+      ],
+      "ecosystem": "npm",
+      "name": "inflection",
+      "version": "1.13.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/inflight",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/inflight"
+      ],
+      "ecosystem": "npm",
+      "name": "inflight",
+      "version": "1.0.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/inherits",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3183,6 +4934,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/inherits",
         "npm-location:node_modules/inherits"
       ],
       "ecosystem": "npm",
@@ -3206,6 +4958,132 @@
       "ecosystem": "npm",
       "name": "ip-address",
       "version": "10.7.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ip-address",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/ip-address"
+      ],
+      "ecosystem": "npm",
+      "name": "ip-address",
+      "version": "10.7.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ipaddr.js",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/ipaddr.js"
+      ],
+      "ecosystem": "npm",
+      "name": "ipaddr.js",
+      "version": "1.9.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/is-unsafe",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/is-unsafe"
+      ],
+      "ecosystem": "npm",
+      "name": "is-unsafe",
+      "version": "2.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/joi",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/joi"
+      ],
+      "ecosystem": "npm",
+      "name": "joi",
+      "version": "18.3.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/joycon",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/joycon"
+      ],
+      "ecosystem": "npm",
+      "name": "joycon",
+      "version": "3.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/js-sdsl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/js-sdsl"
+      ],
+      "ecosystem": "npm",
+      "name": "js-sdsl",
+      "version": "4.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/jsep",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/jsep"
+      ],
+      "ecosystem": "npm",
+      "name": "jsep",
+      "version": "1.4.0",
       "vulnerability_ids": []
     },
     {
@@ -3237,6 +5115,42 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/json5",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/json5"
+      ],
+      "ecosystem": "npm",
+      "name": "json5",
+      "version": "2.2.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/jsonpath-plus",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/jsonpath-plus"
+      ],
+      "ecosystem": "npm",
+      "name": "jsonpath-plus",
+      "version": "10.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "runtime",
           "deployment_scope": "web-dashboard host/browser build",
@@ -3250,6 +5164,42 @@
       "ecosystem": "npm",
       "name": "leaflet",
       "version": "1.9.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/leven",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/leven"
+      ],
+      "ecosystem": "npm",
+      "name": "leven",
+      "version": "2.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/lodash",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/lodash"
+      ],
+      "ecosystem": "npm",
+      "name": "lodash",
+      "version": "4.18.1",
       "vulnerability_ids": []
     },
     {
@@ -3273,6 +5223,175 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/lru-cache",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/lru-cache"
+      ],
+      "ecosystem": "npm",
+      "name": "lru-cache",
+      "version": "6.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/math-intrinsics",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/math-intrinsics"
+      ],
+      "ecosystem": "npm",
+      "name": "math-intrinsics",
+      "version": "1.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/media-typer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/media-typer"
+      ],
+      "ecosystem": "npm",
+      "name": "media-typer",
+      "version": "0.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/merge-descriptors",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/merge-descriptors"
+      ],
+      "ecosystem": "npm",
+      "name": "merge-descriptors",
+      "version": "1.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/methods",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/methods"
+      ],
+      "ecosystem": "npm",
+      "name": "methods",
+      "version": "1.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mime",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mime"
+      ],
+      "ecosystem": "npm",
+      "name": "mime",
+      "version": "1.6.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mime-db",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mime-db"
+      ],
+      "ecosystem": "npm",
+      "name": "mime-db",
+      "version": "1.52.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mime-types",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mime-types"
+      ],
+      "ecosystem": "npm",
+      "name": "mime-types",
+      "version": "2.1.35",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/minimatch",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/minimatch"
+      ],
+      "ecosystem": "npm",
+      "name": "minimatch",
+      "version": "3.1.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/minimist",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3281,11 +5400,66 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/minimist",
         "npm-location:node_modules/minimist"
       ],
       "ecosystem": "npm",
       "name": "minimist",
       "version": "1.2.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/moment",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/moment"
+      ],
+      "ecosystem": "npm",
+      "name": "moment",
+      "version": "2.31.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/moment-timezone",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/moment-timezone"
+      ],
+      "ecosystem": "npm",
+      "name": "moment-timezone",
+      "version": "0.5.48",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mqtt",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mqtt"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt",
+      "version": "4.3.8",
       "vulnerability_ids": []
     },
     {
@@ -3309,6 +5483,24 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mqtt-packet",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/mqtt-packet"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt-packet",
+      "version": "6.10.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3327,6 +5519,55 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/body-parser/node_modules/ms",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/express/node_modules/ms",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/finalhandler/node_modules/ms",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/send/node_modules/debug/node_modules/ms",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/body-parser/node_modules/ms",
+        "npm-location:cse-runtime:node_modules/express/node_modules/ms",
+        "npm-location:cse-runtime:node_modules/finalhandler/node_modules/ms",
+        "npm-location:cse-runtime:node_modules/send/node_modules/debug/node_modules/ms"
+      ],
+      "ecosystem": "npm",
+      "name": "ms",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ms",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3335,6 +5576,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/ms",
         "npm-location:node_modules/ms"
       ],
       "ecosystem": "npm",
@@ -3363,6 +5605,240 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/nanoid",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/nanoid"
+      ],
+      "ecosystem": "npm",
+      "name": "nanoid",
+      "version": "5.1.16",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/negotiator",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/negotiator"
+      ],
+      "ecosystem": "npm",
+      "name": "negotiator",
+      "version": "0.6.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/number-allocator",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/number-allocator"
+      ],
+      "ecosystem": "npm",
+      "name": "number-allocator",
+      "version": "1.0.14",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/object-assign",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/object-assign"
+      ],
+      "ecosystem": "npm",
+      "name": "object-assign",
+      "version": "4.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/object-inspect",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/object-inspect"
+      ],
+      "ecosystem": "npm",
+      "name": "object-inspect",
+      "version": "1.13.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/on-exit-leak-free",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/on-exit-leak-free"
+      ],
+      "ecosystem": "npm",
+      "name": "on-exit-leak-free",
+      "version": "2.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/on-finished",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/on-finished"
+      ],
+      "ecosystem": "npm",
+      "name": "on-finished",
+      "version": "2.4.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/once",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/once"
+      ],
+      "ecosystem": "npm",
+      "name": "once",
+      "version": "1.4.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/parseurl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/parseurl"
+      ],
+      "ecosystem": "npm",
+      "name": "parseurl",
+      "version": "1.3.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/path-expression-matcher",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/path-expression-matcher"
+      ],
+      "ecosystem": "npm",
+      "name": "path-expression-matcher",
+      "version": "1.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/path-is-absolute",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/path-is-absolute"
+      ],
+      "ecosystem": "npm",
+      "name": "path-is-absolute",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/path-to-regexp",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/path-to-regexp"
+      ],
+      "ecosystem": "npm",
+      "name": "path-to-regexp",
+      "version": "0.1.13",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg"
+      ],
+      "ecosystem": "npm",
+      "name": "pg",
+      "version": "8.16.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3376,6 +5852,24 @@
       "ecosystem": "npm",
       "name": "pg",
       "version": "8.23.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime-optional",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-cloudflare",
+          "scope": "optional"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-cloudflare"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-cloudflare",
+      "version": "1.2.7",
       "vulnerability_ids": []
     },
     {
@@ -3417,6 +5911,49 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-connection-string",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-connection-string"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-connection-string",
+      "version": "2.9.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-hstore",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-hstore"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-hstore",
+      "version": "2.3.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-int8",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3425,11 +5962,30 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-int8",
         "npm-location:node_modules/pg-int8"
       ],
       "ecosystem": "npm",
       "name": "pg-int8",
       "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-pool",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-pool"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-pool",
+      "version": "3.10.1",
       "vulnerability_ids": []
     },
     {
@@ -3453,6 +6009,24 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-protocol",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-protocol"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-protocol",
+      "version": "1.10.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3471,6 +6045,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pg-types",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3479,6 +6060,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/pg-types",
         "npm-location:node_modules/pg-types"
       ],
       "ecosystem": "npm",
@@ -3489,6 +6071,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pgpass",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3497,6 +6086,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/pgpass",
         "npm-location:node_modules/pgpass"
       ],
       "ecosystem": "npm",
@@ -3543,6 +6133,114 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino"
+      ],
+      "ecosystem": "npm",
+      "name": "pino",
+      "version": "10.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-abstract-transport",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-abstract-transport"
+      ],
+      "ecosystem": "npm",
+      "name": "pino-abstract-transport",
+      "version": "3.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-http",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-http"
+      ],
+      "ecosystem": "npm",
+      "name": "pino-http",
+      "version": "11.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-pretty",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-pretty"
+      ],
+      "ecosystem": "npm",
+      "name": "pino-pretty",
+      "version": "13.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-roll",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-roll"
+      ],
+      "ecosystem": "npm",
+      "name": "pino-roll",
+      "version": "4.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-std-serializers",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pino-std-serializers"
+      ],
+      "ecosystem": "npm",
+      "name": "pino-std-serializers",
+      "version": "7.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -3561,6 +6259,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/postgres-array",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3569,11 +6274,30 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/postgres-array",
         "npm-location:node_modules/postgres-array"
       ],
       "ecosystem": "npm",
       "name": "postgres-array",
       "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/postgres-bytea",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/postgres-bytea"
+      ],
+      "ecosystem": "npm",
+      "name": "postgres-bytea",
+      "version": "1.0.0",
       "vulnerability_ids": []
     },
     {
@@ -3597,6 +6321,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/postgres-date",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3605,6 +6336,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/postgres-date",
         "npm-location:node_modules/postgres-date"
       ],
       "ecosystem": "npm",
@@ -3615,6 +6347,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/postgres-interval",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3623,6 +6362,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/postgres-interval",
         "npm-location:node_modules/postgres-interval"
       ],
       "ecosystem": "npm",
@@ -3651,6 +6391,13 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/process-nextick-args",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3659,11 +6406,210 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/process-nextick-args",
         "npm-location:node_modules/process-nextick-args"
       ],
       "ecosystem": "npm",
       "name": "process-nextick-args",
       "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/process-warning",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/process-warning"
+      ],
+      "ecosystem": "npm",
+      "name": "process-warning",
+      "version": "5.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/prom-client",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/prom-client"
+      ],
+      "ecosystem": "npm",
+      "name": "prom-client",
+      "version": "15.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/proxy-addr",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/proxy-addr"
+      ],
+      "ecosystem": "npm",
+      "name": "proxy-addr",
+      "version": "2.0.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/proxy-from-env",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/proxy-from-env"
+      ],
+      "ecosystem": "npm",
+      "name": "proxy-from-env",
+      "version": "2.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pump",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/pump"
+      ],
+      "ecosystem": "npm",
+      "name": "pump",
+      "version": "3.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/qs",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/qs"
+      ],
+      "ecosystem": "npm",
+      "name": "qs",
+      "version": "6.16.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/quick-format-unescaped",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/quick-format-unescaped"
+      ],
+      "ecosystem": "npm",
+      "name": "quick-format-unescaped",
+      "version": "4.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/randombytes",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/randombytes"
+      ],
+      "ecosystem": "npm",
+      "name": "randombytes",
+      "version": "2.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/randomstring",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/randomstring"
+      ],
+      "ecosystem": "npm",
+      "name": "randomstring",
+      "version": "1.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/range-parser",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/range-parser"
+      ],
+      "ecosystem": "npm",
+      "name": "range-parser",
+      "version": "1.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/raw-body",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/raw-body"
+      ],
+      "ecosystem": "npm",
+      "name": "raw-body",
+      "version": "2.5.3",
       "vulnerability_ids": []
     },
     {
@@ -3705,6 +6651,48 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/concat-stream/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/duplexify/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/help-me/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mqtt-packet/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/mqtt/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/split2/node_modules/readable-stream",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3713,6 +6701,12 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/concat-stream/node_modules/readable-stream",
+        "npm-location:cse-runtime:node_modules/duplexify/node_modules/readable-stream",
+        "npm-location:cse-runtime:node_modules/help-me/node_modules/readable-stream",
+        "npm-location:cse-runtime:node_modules/mqtt-packet/node_modules/readable-stream",
+        "npm-location:cse-runtime:node_modules/mqtt/node_modules/readable-stream",
+        "npm-location:cse-runtime:node_modules/split2/node_modules/readable-stream",
         "npm-location:node_modules/concat-stream/node_modules/readable-stream"
       ],
       "ecosystem": "npm",
@@ -3736,6 +6730,42 @@
       "ecosystem": "npm",
       "name": "readable-stream",
       "version": "4.8.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/real-require",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/real-require"
+      ],
+      "ecosystem": "npm",
+      "name": "real-require",
+      "version": "0.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/reinterval",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/reinterval"
+      ],
+      "ecosystem": "npm",
+      "name": "reinterval",
+      "version": "1.1.0",
       "vulnerability_ids": []
     },
     {
@@ -3767,6 +6797,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/retry-as-promised",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/retry-as-promised"
+      ],
+      "ecosystem": "npm",
+      "name": "retry-as-promised",
+      "version": "7.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/rfdc",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3775,6 +6830,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/rfdc",
         "npm-location:node_modules/rfdc"
       ],
       "ecosystem": "npm",
@@ -3803,6 +6859,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/string_decoder/node_modules/safe-buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/string_decoder/node_modules/safe-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "safe-buffer",
+      "version": "5.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/safe-buffer",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3811,11 +6892,48 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/safe-buffer",
         "npm-location:node_modules/safe-buffer"
       ],
       "ecosystem": "npm",
       "name": "safe-buffer",
       "version": "5.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/safe-stable-stringify",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/safe-stable-stringify"
+      ],
+      "ecosystem": "npm",
+      "name": "safe-stable-stringify",
+      "version": "2.5.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/safer-buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/safer-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "safer-buffer",
+      "version": "2.1.2",
       "vulnerability_ids": []
     },
     {
@@ -3834,6 +6952,204 @@
       "ecosystem": "npm",
       "name": "scheduler",
       "version": "0.28.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/secure-json-parse",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/secure-json-parse"
+      ],
+      "ecosystem": "npm",
+      "name": "secure-json-parse",
+      "version": "4.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/semver",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/semver"
+      ],
+      "ecosystem": "npm",
+      "name": "semver",
+      "version": "7.7.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/send",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/send"
+      ],
+      "ecosystem": "npm",
+      "name": "send",
+      "version": "0.19.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/sequelize",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/sequelize"
+      ],
+      "ecosystem": "npm",
+      "name": "sequelize",
+      "version": "6.37.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/sequelize-pool",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/sequelize-pool"
+      ],
+      "ecosystem": "npm",
+      "name": "sequelize-pool",
+      "version": "7.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/serve-static",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/serve-static"
+      ],
+      "ecosystem": "npm",
+      "name": "serve-static",
+      "version": "1.16.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/setprototypeof",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/setprototypeof"
+      ],
+      "ecosystem": "npm",
+      "name": "setprototypeof",
+      "version": "1.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/side-channel",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/side-channel"
+      ],
+      "ecosystem": "npm",
+      "name": "side-channel",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/side-channel-list",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/side-channel-list"
+      ],
+      "ecosystem": "npm",
+      "name": "side-channel-list",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/side-channel-map",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/side-channel-map"
+      ],
+      "ecosystem": "npm",
+      "name": "side-channel-map",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/side-channel-weakmap",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/side-channel-weakmap"
+      ],
+      "ecosystem": "npm",
+      "name": "side-channel-weakmap",
+      "version": "1.0.2",
       "vulnerability_ids": []
     },
     {
@@ -3875,6 +7191,24 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/sonic-boom",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/sonic-boom"
+      ],
+      "ecosystem": "npm",
+      "name": "sonic-boom",
+      "version": "4.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -3893,6 +7227,38 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/split2",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/split2"
+      ],
+      "ecosystem": "npm",
+      "name": "split2",
+      "version": "3.2.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pgpass/node_modules/split2",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/pino-abstract-transport/node_modules/split2",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3901,11 +7267,93 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/pgpass/node_modules/split2",
+        "npm-location:cse-runtime:node_modules/pino-abstract-transport/node_modules/split2",
         "npm-location:node_modules/split2"
       ],
       "ecosystem": "npm",
       "name": "split2",
       "version": "4.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/statuses",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/statuses"
+      ],
+      "ecosystem": "npm",
+      "name": "statuses",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/body-parser/node_modules/statuses",
+          "scope": "required"
+        },
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/raw-body/node_modules/statuses",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/body-parser/node_modules/statuses",
+        "npm-location:cse-runtime:node_modules/raw-body/node_modules/statuses"
+      ],
+      "ecosystem": "npm",
+      "name": "statuses",
+      "version": "2.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/stream-shift",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/stream-shift"
+      ],
+      "ecosystem": "npm",
+      "name": "stream-shift",
+      "version": "1.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/string_decoder",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/string_decoder"
+      ],
+      "ecosystem": "npm",
+      "name": "string_decoder",
+      "version": "1.1.1",
       "vulnerability_ids": []
     },
     {
@@ -3929,6 +7377,78 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/strip-json-comments",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/strip-json-comments"
+      ],
+      "ecosystem": "npm",
+      "name": "strip-json-comments",
+      "version": "5.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/strnum",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/strnum"
+      ],
+      "ecosystem": "npm",
+      "name": "strnum",
+      "version": "2.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/tdigest",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/tdigest"
+      ],
+      "ecosystem": "npm",
+      "name": "tdigest",
+      "version": "0.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/thread-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/thread-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "thread-stream",
+      "version": "4.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -3942,6 +7462,42 @@
       "ecosystem": "npm",
       "name": "tinyglobby",
       "version": "0.2.17",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/toidentifier",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/toidentifier"
+      ],
+      "ecosystem": "npm",
+      "name": "toidentifier",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/toposort-class",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/toposort-class"
+      ],
+      "ecosystem": "npm",
+      "name": "toposort-class",
+      "version": "1.0.1",
       "vulnerability_ids": []
     },
     {
@@ -3965,6 +7521,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/type-is",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/type-is"
+      ],
+      "ecosystem": "npm",
+      "name": "type-is",
+      "version": "1.6.18",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/typedarray",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -3973,6 +7554,7 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/typedarray",
         "npm-location:node_modules/typedarray"
       ],
       "ecosystem": "npm",
@@ -4001,6 +7583,24 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/underscore",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/underscore"
+      ],
+      "ecosystem": "npm",
+      "name": "underscore",
+      "version": "1.13.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "web-dashboard",
           "dependency_kind": "development",
           "deployment_scope": "web-dashboard host/browser build",
@@ -4014,6 +7614,24 @@
       "ecosystem": "npm",
       "name": "undici-types",
       "version": "7.24.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/undici-types",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/undici-types"
+      ],
+      "ecosystem": "npm",
+      "name": "undici-types",
+      "version": "7.8.0",
       "vulnerability_ids": []
     },
     {
@@ -4037,6 +7655,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/unpipe",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/unpipe"
+      ],
+      "ecosystem": "npm",
+      "name": "unpipe",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/util-deprecate",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -4045,11 +7688,84 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/util-deprecate",
         "npm-location:node_modules/util-deprecate"
       ],
       "ecosystem": "npm",
       "name": "util-deprecate",
       "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/utils-merge",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/utils-merge"
+      ],
+      "ecosystem": "npm",
+      "name": "utils-merge",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/uuid",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/uuid"
+      ],
+      "ecosystem": "npm",
+      "name": "uuid",
+      "version": "11.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/validator",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/validator"
+      ],
+      "ecosystem": "npm",
+      "name": "validator",
+      "version": "13.15.35",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/vary",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/vary"
+      ],
+      "ecosystem": "npm",
+      "name": "vary",
+      "version": "1.1.2",
       "vulnerability_ids": []
     },
     {
@@ -4068,6 +7784,24 @@
       "ecosystem": "npm",
       "name": "vite",
       "version": "7.3.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/wkx",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/wkx"
+      ],
+      "ecosystem": "npm",
+      "name": "wkx",
+      "version": "0.5.0",
       "vulnerability_ids": []
     },
     {
@@ -4145,6 +7879,42 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/wrappy",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/wrappy"
+      ],
+      "ecosystem": "npm",
+      "name": "wrappy",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/ws",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/ws"
+      ],
+      "ecosystem": "npm",
+      "name": "ws",
+      "version": "7.5.13",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -4163,6 +7933,31 @@
     {
       "component_contexts": [
         {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/xml-naming",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/xml-naming"
+      ],
+      "ecosystem": "npm",
+      "name": "xml-naming",
+      "version": "0.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/xtend",
+          "scope": "required"
+        },
+        {
           "application": "pc-mobius",
           "dependency_kind": "runtime",
           "deployment_scope": "PC Mobius host",
@@ -4171,15 +7966,34 @@
         }
       ],
       "component_refs": [
+        "npm-location:cse-runtime:node_modules/xtend",
         "npm-location:node_modules/xtend"
       ],
       "ecosystem": "npm",
       "name": "xtend",
       "version": "4.0.2",
       "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "cse-runtime",
+          "dependency_kind": "runtime",
+          "deployment_scope": "Mobius4 CSE host runtime",
+          "ref": "npm-location:cse-runtime:node_modules/yallist",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:cse-runtime:node_modules/yallist"
+      ],
+      "ecosystem": "npm",
+      "name": "yallist",
+      "version": "4.0.0",
+      "vulnerability_ids": []
     }
   ],
-  "querybatch_requests": 3,
+  "querybatch_requests": 5,
   "request_response_evidence": [
     {
       "request": {
@@ -5067,9 +8881,86 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "@hapi/address"
+            },
+            "version": "5.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@hapi/formula"
+            },
+            "version": "3.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@hapi/hoek"
+            },
+            "version": "11.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@hapi/pinpoint"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@hapi/tlds"
+            },
+            "version": "1.1.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@hapi/topo"
+            },
+            "version": "6.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@jsep-plugin/assignment"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@jsep-plugin/regex"
+            },
+            "version": "1.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "@napi-rs/lzma-linux-x64-gnu"
             },
             "version": "1.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@nodable/entities"
+            },
+            "version": "3.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@opentelemetry/api"
+            },
+            "version": "1.9.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@pinojs/redact"
+            },
+            "version": "0.4.0"
           },
           {
             "package": {
@@ -5249,6 +9140,20 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "@standard-schema/spec"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/debug"
+            },
+            "version": "4.1.12"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "@types/estree"
             },
             "version": "1.0.9"
@@ -5266,6 +9171,20 @@
               "name": "@types/leaflet"
             },
             "version": "1.9.21"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/ms"
+            },
+            "version": "2.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/node"
+            },
+            "version": "24.1.0"
           },
           {
             "package": {
@@ -5305,6 +9224,13 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "@types/validator"
+            },
+            "version": "13.15.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "@types/ws"
             },
             "version": "8.18.2"
@@ -5315,6 +9241,20 @@
               "name": "abort-controller"
             },
             "version": "3.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "accepts"
+            },
+            "version": "1.3.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "agent-base"
+            },
+            "version": "6.0.2"
           },
           {
             "package": {
@@ -5333,9 +9273,72 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "anynum"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "array-flatten"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "async-mqtt"
+            },
+            "version": "2.6.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "asynckit"
+            },
+            "version": "0.4.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "atomic-sleep"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "axios"
+            },
+            "version": "1.21.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "balanced-match"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "base64-js"
             },
             "version": "1.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "bintrees"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "bl"
+            },
+            "version": "4.1.0"
           },
           {
             "package": {
@@ -5347,9 +9350,30 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "body-parser"
+            },
+            "version": "1.20.9"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "brace-expansion"
+            },
+            "version": "1.1.21"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "broker-factory"
             },
             "version": "3.1.15"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "buffer"
+            },
+            "version": "5.7.1"
           },
           {
             "package": {
@@ -5368,9 +9392,58 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "bytes"
+            },
+            "version": "3.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "call-bind-apply-helpers"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "call-bound"
+            },
+            "version": "1.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "colorette"
+            },
+            "version": "2.0.20"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "combined-stream"
+            },
+            "version": "1.0.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "commist"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "commist"
             },
             "version": "3.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "concat-map"
+            },
+            "version": "0.0.1"
           },
           {
             "package": {
@@ -5382,6 +9455,48 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "config"
+            },
+            "version": "3.3.12"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "content-disposition"
+            },
+            "version": "0.5.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "content-type"
+            },
+            "version": "1.0.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "cookie"
+            },
+            "version": "0.7.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "cookie-signature"
+            },
+            "version": "1.0.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "cors"
+            },
+            "version": "2.8.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "csstype"
             },
             "version": "3.2.3"
@@ -5389,310 +9504,9 @@
           {
             "package": {
               "ecosystem": "npm",
-              "name": "debug"
+              "name": "date-fns"
             },
-            "version": "4.4.3"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "esbuild"
-            },
-            "version": "0.28.2"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "event-target-shim"
-            },
-            "version": "5.0.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "events"
-            },
-            "version": "3.3.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "fast-deep-equal"
-            },
-            "version": "3.1.3"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "fast-unique-numbers"
-            },
-            "version": "9.0.27"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "fast-uri"
-            },
-            "version": "3.1.9"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "fdir"
-            },
-            "version": "6.5.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "fsevents"
-            },
-            "version": "2.3.3"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "help-me"
-            },
-            "version": "5.0.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "ieee754"
-            },
-            "version": "1.2.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "inherits"
-            },
-            "version": "2.0.4"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "ip-address"
-            },
-            "version": "10.7.5"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "json-schema-traverse"
-            },
-            "version": "1.0.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "leaflet"
-            },
-            "version": "1.9.4"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "lru-cache"
-            },
-            "version": "10.4.3"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "minimist"
-            },
-            "version": "1.2.8"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "mqtt"
-            },
-            "version": "5.16.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "mqtt-packet"
-            },
-            "version": "9.0.2"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "ms"
-            },
-            "version": "2.1.3"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "nanoid"
-            },
-            "version": "3.3.20"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg"
-            },
-            "version": "8.23.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-cloudflare"
-            },
-            "version": "1.4.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-connection-string"
-            },
-            "version": "2.14.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-int8"
-            },
-            "version": "1.0.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-pool"
-            },
-            "version": "3.14.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-protocol"
-            },
-            "version": "1.16.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pg-types"
-            },
-            "version": "2.2.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "pgpass"
-            },
-            "version": "1.0.5"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "picocolors"
-            },
-            "version": "1.1.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "picomatch"
-            },
-            "version": "4.0.7"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "postcss"
-            },
-            "version": "8.5.32"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "postgres-array"
-            },
-            "version": "2.0.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "postgres-bytea"
-            },
-            "version": "1.0.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "postgres-date"
-            },
-            "version": "1.0.7"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "postgres-interval"
-            },
-            "version": "1.2.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "process"
-            },
-            "version": "0.11.10"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "process-nextick-args"
-            },
-            "version": "2.0.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "react"
-            },
-            "version": "19.3.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "react-dom"
-            },
-            "version": "19.3.1"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "readable-stream"
-            },
-            "version": "3.6.2"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "readable-stream"
-            },
-            "version": "4.8.0"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "require-from-string"
-            },
-            "version": "2.0.2"
-          },
-          {
-            "package": {
-              "ecosystem": "npm",
-              "name": "rfdc"
-            },
-            "version": "1.4.1"
+            "version": "4.1.0"
           }
         ]
       },
@@ -5807,9 +9621,1218 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "dateformat"
+            },
+            "version": "4.6.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "debug"
+            },
+            "version": "2.6.9"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "debug"
+            },
+            "version": "4.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "delayed-stream"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "depd"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "destroy"
+            },
+            "version": "1.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "dotenv"
+            },
+            "version": "16.6.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "dottie"
+            },
+            "version": "2.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "dunder-proto"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "duplexify"
+            },
+            "version": "4.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ee-first"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "encodeurl"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "encodeurl"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "end-of-stream"
+            },
+            "version": "1.4.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "es-define-property"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "es-errors"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "es-object-atoms"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "es-set-tostringtag"
+            },
+            "version": "2.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "esbuild"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "escape-html"
+            },
+            "version": "1.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "etag"
+            },
+            "version": "1.8.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "event-target-shim"
+            },
+            "version": "5.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "events"
+            },
+            "version": "3.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "express"
+            },
+            "version": "4.22.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "express-rate-limit"
+            },
+            "version": "8.7.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-copy"
+            },
+            "version": "4.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-deep-equal"
+            },
+            "version": "3.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-safe-stringify"
+            },
+            "version": "2.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-unique-numbers"
+            },
+            "version": "9.0.27"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-uri"
+            },
+            "version": "3.1.9"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-xml-builder"
+            },
+            "version": "1.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-xml-parser"
+            },
+            "version": "5.12.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fdir"
+            },
+            "version": "6.5.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "finalhandler"
+            },
+            "version": "1.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "follow-redirects"
+            },
+            "version": "1.16.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "form-data"
+            },
+            "version": "4.0.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "forwarded"
+            },
+            "version": "0.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fresh"
+            },
+            "version": "0.5.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fs.realpath"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fsevents"
+            },
+            "version": "2.3.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "function-bind"
+            },
+            "version": "1.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "get-caller-file"
+            },
+            "version": "2.0.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "get-intrinsic"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "get-proto"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "glob"
+            },
+            "version": "7.2.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "gopd"
+            },
+            "version": "1.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "has-symbols"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "has-tostringtag"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "hasown"
+            },
+            "version": "2.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "helmet"
+            },
+            "version": "8.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "help-me"
+            },
+            "version": "3.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "help-me"
+            },
+            "version": "5.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "http-errors"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "http-errors"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "https-proxy-agent"
+            },
+            "version": "5.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "iconv-lite"
+            },
+            "version": "0.4.24"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ieee754"
+            },
+            "version": "1.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "inflection"
+            },
+            "version": "1.13.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "inflight"
+            },
+            "version": "1.0.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "inherits"
+            },
+            "version": "2.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ip-address"
+            },
+            "version": "10.7.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ip-address"
+            },
+            "version": "10.7.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ipaddr.js"
+            },
+            "version": "1.9.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "is-unsafe"
+            },
+            "version": "2.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "joi"
+            },
+            "version": "18.3.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "joycon"
+            },
+            "version": "3.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "js-sdsl"
+            },
+            "version": "4.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "jsep"
+            },
+            "version": "1.4.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "json-schema-traverse"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "json5"
+            },
+            "version": "2.2.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "jsonpath-plus"
+            },
+            "version": "10.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "leaflet"
+            },
+            "version": "1.9.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "leven"
+            },
+            "version": "2.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "lodash"
+            },
+            "version": "4.18.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "lru-cache"
+            },
+            "version": "10.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "lru-cache"
+            },
+            "version": "6.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "math-intrinsics"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "media-typer"
+            },
+            "version": "0.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "merge-descriptors"
+            },
+            "version": "1.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "methods"
+            },
+            "version": "1.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mime"
+            },
+            "version": "1.6.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mime-db"
+            },
+            "version": "1.52.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mime-types"
+            },
+            "version": "2.1.35"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "minimatch"
+            },
+            "version": "3.1.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "minimist"
+            },
+            "version": "1.2.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "moment"
+            },
+            "version": "2.31.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "moment-timezone"
+            },
+            "version": "0.5.48"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt"
+            },
+            "version": "4.3.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt"
+            },
+            "version": "5.16.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt-packet"
+            },
+            "version": "6.10.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt-packet"
+            },
+            "version": "9.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ms"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ms"
+            },
+            "version": "2.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "nanoid"
+            },
+            "version": "3.3.20"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "nanoid"
+            },
+            "version": "5.1.16"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "negotiator"
+            },
+            "version": "0.6.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "number-allocator"
+            },
+            "version": "1.0.14"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "object-assign"
+            },
+            "version": "4.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "object-inspect"
+            },
+            "version": "1.13.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "on-exit-leak-free"
+            },
+            "version": "2.1.2"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    },
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "on-finished"
+            },
+            "version": "2.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "once"
+            },
+            "version": "1.4.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "parseurl"
+            },
+            "version": "1.3.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "path-expression-matcher"
+            },
+            "version": "1.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "path-is-absolute"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "path-to-regexp"
+            },
+            "version": "0.1.13"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg"
+            },
+            "version": "8.16.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg"
+            },
+            "version": "8.23.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-cloudflare"
+            },
+            "version": "1.2.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-cloudflare"
+            },
+            "version": "1.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-connection-string"
+            },
+            "version": "2.14.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-connection-string"
+            },
+            "version": "2.9.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-hstore"
+            },
+            "version": "2.3.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-int8"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-pool"
+            },
+            "version": "3.10.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-pool"
+            },
+            "version": "3.14.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-protocol"
+            },
+            "version": "1.10.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-protocol"
+            },
+            "version": "1.16.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-types"
+            },
+            "version": "2.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pgpass"
+            },
+            "version": "1.0.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "picocolors"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "picomatch"
+            },
+            "version": "4.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino"
+            },
+            "version": "10.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino-abstract-transport"
+            },
+            "version": "3.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino-http"
+            },
+            "version": "11.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino-pretty"
+            },
+            "version": "13.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino-roll"
+            },
+            "version": "4.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pino-std-serializers"
+            },
+            "version": "7.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postcss"
+            },
+            "version": "8.5.32"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-array"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-bytea"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-bytea"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-date"
+            },
+            "version": "1.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-interval"
+            },
+            "version": "1.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process"
+            },
+            "version": "0.11.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process-nextick-args"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process-warning"
+            },
+            "version": "5.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "prom-client"
+            },
+            "version": "15.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "proxy-addr"
+            },
+            "version": "2.0.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "proxy-from-env"
+            },
+            "version": "2.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pump"
+            },
+            "version": "3.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "qs"
+            },
+            "version": "6.16.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "quick-format-unescaped"
+            },
+            "version": "4.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "randombytes"
+            },
+            "version": "2.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "randomstring"
+            },
+            "version": "1.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "range-parser"
+            },
+            "version": "1.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "raw-body"
+            },
+            "version": "2.5.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "react"
+            },
+            "version": "19.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "react-dom"
+            },
+            "version": "19.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "3.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "4.8.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "real-require"
+            },
+            "version": "0.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "reinterval"
+            },
+            "version": "1.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "require-from-string"
+            },
+            "version": "2.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "retry-as-promised"
+            },
+            "version": "7.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "rfdc"
+            },
+            "version": "1.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "rollup"
             },
             "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "safe-buffer"
+            },
+            "version": "5.1.2"
           },
           {
             "package": {
@@ -5821,9 +10844,100 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "safe-stable-stringify"
+            },
+            "version": "2.5.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "safer-buffer"
+            },
+            "version": "2.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "scheduler"
             },
             "version": "0.28.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "secure-json-parse"
+            },
+            "version": "4.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "semver"
+            },
+            "version": "7.7.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "send"
+            },
+            "version": "0.19.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "sequelize"
+            },
+            "version": "6.37.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "sequelize-pool"
+            },
+            "version": "7.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "serve-static"
+            },
+            "version": "1.16.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "setprototypeof"
+            },
+            "version": "1.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "side-channel"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "side-channel-list"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "side-channel-map"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "side-channel-weakmap"
+            },
+            "version": "1.0.2"
           },
           {
             "package": {
@@ -5842,9 +10956,23 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "sonic-boom"
+            },
+            "version": "4.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "source-map-js"
             },
             "version": "1.2.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "split2"
+            },
+            "version": "3.2.2"
           },
           {
             "package": {
@@ -5856,9 +10984,65 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "statuses"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "statuses"
+            },
+            "version": "2.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "stream-shift"
+            },
+            "version": "1.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "string_decoder"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "string_decoder"
             },
             "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "strip-json-comments"
+            },
+            "version": "5.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "strnum"
+            },
+            "version": "2.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "tdigest"
+            },
+            "version": "0.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "thread-stream"
+            },
+            "version": "4.0.0"
           },
           {
             "package": {
@@ -5870,9 +11054,30 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "toidentifier"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "toposort-class"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "tslib"
             },
             "version": "2.8.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "type-is"
+            },
+            "version": "1.6.18"
           },
           {
             "package": {
@@ -5891,9 +11096,23 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "underscore"
+            },
+            "version": "1.13.8"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "undici-types"
             },
             "version": "7.24.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "undici-types"
+            },
+            "version": "7.8.0"
           },
           {
             "package": {
@@ -5905,6 +11124,123 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "unpipe"
+            },
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    },
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "util-deprecate"
             },
             "version": "1.0.2"
@@ -5912,9 +11248,44 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "utils-merge"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "uuid"
+            },
+            "version": "11.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "validator"
+            },
+            "version": "13.15.35"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "vary"
+            },
+            "version": "1.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "vite"
             },
             "version": "7.3.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "wkx"
+            },
+            "version": "0.5.0"
           },
           {
             "package": {
@@ -5947,6 +11318,20 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "wrappy"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ws"
+            },
+            "version": "7.5.13"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "ws"
             },
             "version": "8.22.0"
@@ -5954,9 +11339,23 @@
           {
             "package": {
               "ecosystem": "npm",
+              "name": "xml-naming"
+            },
+            "version": "0.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
               "name": "xtend"
             },
             "version": "4.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "yallist"
+            },
+            "version": "4.0.0"
           }
         ]
       },
@@ -5978,17 +11377,12 @@
           {},
           {},
           {},
-          {},
-          {},
-          {},
-          {},
-          {},
           {}
         ]
       }
     }
   ],
-  "sbom_sha256": "0ee9b80d5bb34dec30f79742306481386c192806f85f773ef39426c2c8d184e6",
+  "sbom_sha256": "d04baad920ee8a50d6411ffbc8ce725e50b55c642eea8a5e1f17cafadfe51c53",
   "status": "no-known-findings",
   "unique_advisories": 0
 }

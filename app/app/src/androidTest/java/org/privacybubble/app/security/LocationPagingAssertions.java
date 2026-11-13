@@ -113,10 +113,12 @@ public final class LocationPagingAssertions {
             instrumentation.waitForIdleSync();
             onMain(instrumentation, () -> {
                 Activity screen = activity.get();
+                List<?> previousCards = new ArrayList<>(cards(screen).values());
                 long started = SystemClock.elapsedRealtime();
                 assertions.check(view(screen, "keyringNext").performClick(), "actual-next-button-handler");
                 renderTimingsMillis[1] = SystemClock.elapsedRealtime() - started;
                 checkPage(screen, 1, assertions);
+                assertions.check(previousCards.size() == 25 && previousCards.containsAll(cards(screen).values()), "page-change-reuses-bounded-cards");
                 assertions.check(text(screen, "keyringPageStatus").equals("2 / 40 페이지") && view(screen, "keyringPrevious").isEnabled(), "next-page-status-and-controls");
                 assertNoRequests(screen, networkGeneration[0], assertions);
             });

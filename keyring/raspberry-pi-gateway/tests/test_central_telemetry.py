@@ -6,7 +6,8 @@ from unittest.mock import AsyncMock
 
 from bubble_gateway.store import Store
 from bubble_gateway.transport import TransportHub, RemoteResponseError
-from helpers import BINDING, observation
+from bubble_gateway.model import central_observation_id
+from helpers import BINDING, config, observation
 
 
 class CentralTelemetryTests(unittest.IsolatedAsyncioTestCase):
@@ -24,13 +25,18 @@ class CentralTelemetryTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(len(rows), 2)
                 self.assertEqual({row["container"] for row in rows}, {BINDING["observationContainer"], "@central/telemetry"})
                 self.assertEqual([json.loads(row["payload"]) for row in rows], [value, value])
+                identity = central_observation_id(value)
+                rqi = Store.request_id("central-telemetry", identity)
+                self.assertEqual(next(row["rqi"] for row in rows if row["container"] == "@central/telemetry"), rqi)
                 hub = object.__new__(TransportHub)
-                hub._api = AsyncMock(return_value={"status": "ACCEPTED", "deviceId": value["deviceId"], "observationId": "test"})
-                await hub.publish("central-rqi", "@central/telemetry", value)
-                hub._api.assert_awaited_once_with("POST", "/telemetry", value, "central-rqi")
+                hub.config = config()
+                hub.config.central_telemetry_enabled = True
+                hub._api = AsyncMock(return_value={"status": "ACCEPTED", "deviceId": value["deviceId"], "observationId": identity})
+                await hub.publish(rqi, "@central/telemetry", value)
+                hub._api.assert_awaited_once_with("POST", "/telemetry", value, rqi, idempotency_key=rqi)
                 hub._api.return_value = {"status": "ACCEPTED", "deviceId": "another-device"}
                 with self.assertRaises(RemoteResponseError):
-                    await hub.publish("central-rqi", "@central/telemetry", value)
+                    await hub.publish(rqi, "@central/telemetry", value)
             finally:
                 restored.close()
 

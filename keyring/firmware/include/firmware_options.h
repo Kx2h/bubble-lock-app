@@ -53,6 +53,12 @@
 #ifndef KEYRING_AUDIO_AMPLITUDE
 #define KEYRING_AUDIO_AMPLITUDE 512
 #endif
+#ifndef KEYRING_AUDIO_OUTPUT
+#define KEYRING_AUDIO_OUTPUT 1
+#endif
+#ifndef KEYRING_HEADPHONE_VOLUME
+#define KEYRING_HEADPHONE_VOLUME 0x20
+#endif
 #ifndef KEYRING_DISPLAY_PROFILE
 #define KEYRING_DISPLAY_PROFILE 0 // 0 disabled, 1 ST7789 240x240, 2 JD9853 240x296 candidate
 #endif
@@ -117,6 +123,8 @@ static_assert(KEYRING_WAKE_DURATION >= 0 && KEYRING_WAKE_DURATION <= 3, "LIS2DW1
 static_assert(KEYRING_ENABLE_AUDIO == 0 || KEYRING_ENABLE_AUDIO == 1, "Audio option must be 0 or 1");
 static_assert(KEYRING_AUDIO_FREQUENCY >= 100 && KEYRING_AUDIO_FREQUENCY <= 4000, "Cue frequency range is 100..4000Hz");
 static_assert(KEYRING_AUDIO_AMPLITUDE >= 0 && KEYRING_AUDIO_AMPLITUDE <= 2048, "Cue amplitude range is 0..2048 PCM counts");
+static_assert(KEYRING_AUDIO_OUTPUT == 1 || KEYRING_AUDIO_OUTPUT == 2, "Choose speaker or MAX9850 headphone PCM");
+static_assert(KEYRING_HEADPHONE_VOLUME >= 0 && KEYRING_HEADPHONE_VOLUME <= 0x3f, "MAX9850 volume must contain only VOL(5:0)");
 static_assert(KEYRING_DISPLAY_PROFILE >= 0 && KEYRING_DISPLAY_PROFILE <= 2, "Choose a fitted display profile");
 static_assert(KEYRING_LCD_ROTATION >= 0 && KEYRING_LCD_ROTATION <= 3, "LCD rotation range is 0..3");
 static_assert(KEYRING_LCD_X_OFFSET >= 0 && KEYRING_LCD_X_OFFSET <= 255 && KEYRING_LCD_Y_OFFSET >= 0 && KEYRING_LCD_Y_OFFSET <= 255, "LCD offsets are unsigned bytes");

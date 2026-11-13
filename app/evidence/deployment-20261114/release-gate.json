@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "mode": "Actual full gate, not preflight/dry-run",
+  "stages": [
+    "android",
+    "inventory",
+    "apk-inspection",
+    "build-isolation",
+    "node-core",
+    "node-mobile-api",
+    "security-tool-tests",
+    "sbom",
+    "sbom-schema",
+    "sbom-osv"
+  ],
+  "rootWorkspaceVerificationIsSeparate": true,
+  "outputArtifacts": {
+    "apkSha256": "5cbdadd2543bc5581ffe9c8cbe1bd8aa757aa21f2de68a3d13c3db7677613ed9",
+    "aabSha256": "a64e7c3bbc8c2954c7b5fb585c0d0199ffc1182e41e5f151e828f7c1937a3f01",
+    "bomSha256": "d04baad920ee8a50d6411ffbc8ce725e50b55c642eea8a5e1f17cafadfe51c53"
+  },
+  "bomIdenticalToPublishedEvidence": true,
+  "components": 492,
+  "exactPackageVersionQueries": 417,
+  "osvBatches": 5,
+  "knownMatches": 0,
+  "firmwareAndDeviceExecutionNotIncludedInGate": true
+}

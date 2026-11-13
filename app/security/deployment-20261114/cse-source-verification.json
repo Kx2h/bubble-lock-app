@@ -1,0 +1,19 @@
+{
+  "archive": "mobius4-e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8-bubble-subscription-v2.tar.gz",
+  "archive_sha256": "7b57d9a314a544cfb4a244b26e62ccf1e598e5a8ef2bf7545053a11f03e8721f",
+  "manifest_sha256": "061b356caa5c6978ba0291411d902c97d59c54660b0809cf450d67b0a50a790b",
+  "passed": true,
+  "repository": "https://github.com/IoTKETI/mobius4",
+  "revision": "e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8",
+  "scope": "Tracked patched Mobius4 source archive and npm lock; no deployed image or container base/OS inventory asserted",
+  "verified_patch_files": [
+    "cse/hostingCSE.js",
+    "cse/noti.js",
+    "cse/reqPrim.js",
+    "cse/resources/sub.js",
+    "docker/node-config.js",
+    "package-lock.json",
+    "package.json"
+  ],
+  "version": "4.25.0"
+}

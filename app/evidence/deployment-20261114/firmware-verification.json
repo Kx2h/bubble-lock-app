@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "LOCAL_COMPILE_AND_MOCK_IO",
+  "capturedAt": "2026-11-13T16:29:56.385529+00:00",
+  "historicalEvidenceReused": false,
+  "sourceManifest": "firmware-source-sha256.json",
+  "sourcesChangedDuringFinalCompile": [],
+  "compile": {
+    "exit": 0,
+    "startedAt": "2026-11-13T16:29:15.424582+00:00",
+    "completedAt": "2026-11-13T16:29:21.444953+00:00",
+    "command": [
+      "$WORKSPACE/.local/deployment-20261114/firmware/venv/bin/python",
+      "-m",
+      "platformio",
+      "run",
+      "-e",
+      "keyring_compile_minimal",
+      "-e",
+      "keyring_compile_st7789",
+      "-e",
+      "keyring_compile_jd9853",
+      "-e",
+      "keyring_compile_headphone"
+    ]
+  },
+  "profiles": {
+    "keyring_compile_minimal": {
+      "status": "PASS",
+      "ramBytes": 61824,
+      "flashBytes": 802453,
+      "artifacts": {
+        "firmware.bin": {
+          "bytes": 802816,
+          "sha256": "91a1e22ee492b96dcb44a5275dd5aea0ce7d950f6775be30a7e387eeb11e8e89"
+        },
+        "firmware.elf": {
+          "bytes": 19724568,
+          "sha256": "af23d4b31243a2ae13417e7d7bc09e686e97aac267a2396566ce5f445448ee0c"
+        },
+        "firmware.map": {
+          "bytes": 19387870,
+          "sha256": "2e28d64b79cc745e0b4e007d6c3edb824eba1e6056e0653ec248446cb53b1aa1"
+        },
+        "bootloader.bin": {
+          "bytes": 15104,
+          "sha256": "2a71d69b471e20c2bac7fb469f3c6a807b3ebee780e348e5889db0da849ca363"
+        },
+        "partitions.bin": {
+          "bytes": 3072,
+          "sha256": "b16b1b27ccfeecedd026631c54e77065d3913bca810cad5cfe77525fc9938f75"
+        }
+      }
+    },
+    "keyring_compile_st7789": {
+      "status": "PASS",
+      "ramBytes": 63148,
+      "flashBytes": 885617,
+      "artifacts": {
+        "firmware.bin": {
+          "bytes": 886032,
+          "sha256": "b47fa67e2fafae4a17171b978b2fde01e756eb0e436b4f6d2d1b9b5e68b18780"
+        },
+        "firmware.elf": {
+          "bytes": 21588200,
+          "sha256": "a22d430246689e1025b534ac0d6a41b02a115dc1594c7d2bda92d802939977f3"
+        },
+        "firmware.map": {
+          "bytes": 19996356,
+          "sha256": "f682d639cd93b93670ad557ef234d1f7c3de02531c6648333a8e61a7c732a186"
+        },
+        "bootloader.bin": {
+          "bytes": 15104,
+          "sha256": "2a71d69b471e20c2bac7fb469f3c6a807b3ebee780e348e5889db0da849ca363"
+        },
+        "partitions.bin": {
+          "bytes": 3072,
+          "sha256": "b16b1b27ccfeecedd026631c54e77065d3913bca810cad5cfe77525fc9938f75"
+        }
+      }
+    },
+    "keyring_compile_jd9853": {
+      "status": "PASS",
+      "ramBytes": 63148,
+      "flashBytes": 885233,
+      "artifacts": {
+        "firmware.bin": {
+          "bytes": 885648,
+          "sha256": "cd70bbb5b1c55f39e310cb7905cdcf95429b504e21b6c8db97114437ceb438db"
+        },
+        "firmware.elf": {
+          "bytes": 21584860,
+          "sha256": "ae938bd5313a8f3b7f67c6fac72a539b8806dc5d65070a8a2b06598ddaabefc1"
+        },
+        "firmware.map": {
+          "bytes": 19987164,
+          "sha256": "e85ecda86649dc5a0b31f6708fb3519e74448adae8e7928fbf4cdc58059f994d"
+        },
+        "bootloader.bin": {
+          "bytes": 15104,
+          "sha256": "2a71d69b471e20c2bac7fb469f3c6a807b3ebee780e348e5889db0da849ca363"
+        },
+        "partitions.bin": {
+          "bytes": 3072,
+          "sha256": "b16b1b27ccfeecedd026631c54e77065d3913bca810cad5cfe77525fc9938f75"
+        }
+      }
+    },
+    "keyring_compile_headphone": {
+      "status": "PASS",
+      "ramBytes": 62828,
+      "flashBytes": 842389,
+      "artifacts": {
+        "firmware.bin": {
+          "bytes": 842800,
+          "sha256": "4cedd49d1a0354794247587af2caf42d86b6922fe9ab092f98f1779166ee7bee"
+        },
+        "firmware.elf": {
+          "bytes": 20323660,
+          "sha256": "33bb40645360c4a4cdde689b6a3e0484dac51eb3ae99092c6370068943c43046"
+        },
+        "firmware.map": {
+          "bytes": 19449506,
+          "sha256": "68a5cfb4b43ac2640e4779131306381fbaec18deb774bc72f4f0810d98e7f46e"
+        },
+        "bootloader.bin": {
+          "bytes": 15104,
+          "sha256": "2a71d69b471e20c2bac7fb469f3c6a807b3ebee780e348e5889db0da849ca363"
+        },
+        "partitions.bin": {
+          "bytes": 3072,
+          "sha256": "b16b1b27ccfeecedd026631c54e77065d3913bca810cad5cfe77525fc9938f75"
+        }
+      }
+    }
+  },
+  "hostTests": [
+    {
+      "name": "motor_gate",
+      "status": "PASS",
+      "binarySha256": "279c329e96b9df4646a69f1a15ddbb5796af1ba108de7a3d333ceff04f802b6b",
+      "log": "host-motor_gate.log"
+    },
+    {
+      "name": "aux_rail",
+      "status": "PASS",
+      "binarySha256": "d5a72c8039a463b0884e18983b7ea8750e009592acaa7b1236c7d609f9a501a0",
+      "log": "host-motor_gate.log"
+    },
+    {
+      "name": "power_sleep",
+      "status": "PASS",
+      "binarySha256": "3c4e4d5a93372f897dbbb97add27faeac229d52e6b6b4d7cccabf108e23aaa35",
+      "log": "host-motor_gate.log"
+    },
+    {
+      "name": "journal_nvs",
+      "status": "PASS",
+      "binarySha256": "3ffe4851ea5307ae1d00bd93589485058afebabbbdf9b8d8e7fe8a8718c00bec",
+      "log": "host-journal_nvs.log"
+    },
+    {
+      "name": "sensor_recovery",
+      "status": "PASS",
+      "binarySha256": "b30c44d2b5ea85e55d0ca7eb81c6df9a5e69f2cdbc93f5ec9b6cf3fef9065d29",
+      "log": "host-sensor_recovery.log"
+    },
+    {
+      "name": "button_observation",
+      "status": "PASS",
+      "binarySha256": "7c3fcb996ebacb75baf0bc619c1c2bff5c9aee797f6d9e2e83ce0ab39d7a3b4c",
+      "log": "host-button_observation-final.log"
+    },
+    {
+      "name": "command_wire",
+      "status": "PASS",
+      "binarySha256": "27fa022eadcb0bb49772d595452ec74833a11644cc7fcc008ceb0ce3fd40b555",
+      "log": "host-command_wire.log"
+    },
+    {
+      "name": "feather_commands",
+      "status": "PASS",
+      "binarySha256": "1b860daa9a6246dc0e096c7c40ed39ad4821e2d3a5bb82aacbc36ab16e12b4af",
+      "log": "host-feather_commands.log"
+    },
+    {
+      "name": "headphone",
+      "status": "PASS",
+      "binarySha256": "1e64e09ff48d57684252cce71e83bbf62cbea79940d583d4dede6d6d42afd26a",
+      "log": "host-headphone-final.log"
+    }
+  ],
+  "configurationBoundaryChecks": [
+    {
+      "case": "defaults",
+      "defines": [],
+      "expectedCompile": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "case": "speaker",
+      "defines": [
+        "KEYRING_AUDIO_OUTPUT=1"
+      ],
+      "expectedCompile": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "case": "headphone",
+      "defines": [
+        "KEYRING_AUDIO_OUTPUT=2"
+      ],
+      "expectedCompile": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "case": "volume-zero",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=0"
+      ],
+      "expectedCompile": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "case": "volume-upper",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=0x3f"
+      ],
+      "expectedCompile": true,
+      "exit": 0,
+      "pass": true
+    },
+    {
+      "case": "invalid-output-zero",
+      "defines": [
+        "KEYRING_AUDIO_OUTPUT=0"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    },
+    {
+      "case": "invalid-output-three",
+      "defines": [
+        "KEYRING_AUDIO_OUTPUT=3"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    },
+    {
+      "case": "invalid-volume-negative",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=-1"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    },
+    {
+      "case": "invalid-volume-slew",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=0x40"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    },
+    {
+      "case": "invalid-volume-mute",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=0x80"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    },
+    {
+      "case": "invalid-volume-byte",
+      "defines": [
+        "KEYRING_HEADPHONE_VOLUME=0xff"
+      ],
+      "expectedCompile": false,
+      "exit": 1,
+      "pass": true
+    }
+  ],
+  "tools": {
+    "platformio": "6.1.18",
+    "platform": "espressif32@6.9.0",
+    "framework": "Arduino 2.0.17 / 3.20017.241212+sha.dcc1105b",
+    "xtensa": "8.4.0+2021r2-patch5",
+    "gxx": "13.3.0",
+    "ArduinoJson": "6.21.5",
+    "Arduino_GFX": "1.4.9 / 3cc08c4e9ab6d85807e49b657d73fae10871616e"
+  },
+  "runnerNotes": [
+    "Windows MSVC cl runners executed with local wrapper translating to g++ equivalent includes/defines/C++14 flags. No runner sources were changed.",
+    "Headphone runner used explicit --compiler g++ with its production source and C++17 flags.",
+    "Button fixture now covers bounded maximum-identity fallback separately from full-energy observations."
+  ],
+  "issuesResolved": [
+    "Missing KEYRING_AUDIO_OUTPUT and KEYRING_HEADPHONE_VOLUME defaults prevented compilation. Defaults restored and hardware field boundaries checked.",
+    "Button host fixture expected optional INA219/journal details even after maximum-size identity selected bounded fallback. Fixtures now exercise both paths."
+  ],
+  "physicalExecution": {
+    "flashed": false,
+    "usbSerial": false,
+    "gpio": false,
+    "bleRadio": false,
+    "pi": false
+  },
+  "deploymentSuitable": false,
+  "limitation": "Compile-only profiles deliberately ignore provisioning; invalid default passkey0. Physical device, analog audio, RF/pairing, power and real-server behavior are unmeasured."
+}

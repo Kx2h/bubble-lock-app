@@ -2,6 +2,8 @@ package org.privacybubble.app.auth;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
+import java.util.Collections;
 
 public final class MobileApiAuthorization {
     public final String contract;
@@ -19,14 +21,19 @@ public final class MobileApiAuthorization {
         throw new IllegalArgumentException("Unsupported mobile API contract");
     }
 
-    public String requestScope() { return "openid offline_access " + apiScope; }
+    public String requestScope() { return "openid " + (contract.equals("keyrings-v1") ? "offline_access " : "") + apiScope; }
+
+    public Set<String> allowedScopes() {
+        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(requestScope().split(" "))));
+    }
 
     public void requireResponseScope(String value) {
         if (value == null || value.isEmpty() || value.length() > 128 || value.charAt(0) == ' ' || value.charAt(value.length() - 1) == ' ')
             throw new IllegalArgumentException("Invalid mobile authorization scope");
         Set<String> received = new HashSet<>();
+        Set<String> allowed = allowedScopes();
         for (String scope : value.split(" ", -1)) {
-            if (!(scope.equals("openid") || scope.equals("offline_access") || scope.equals(apiScope)) || !received.add(scope))
+            if (!allowed.contains(scope) || !received.add(scope))
                 throw new IllegalArgumentException("Invalid mobile authorization scope");
         }
         if (!received.contains(apiScope)) throw new IllegalArgumentException("Required mobile authorization scope missing");
