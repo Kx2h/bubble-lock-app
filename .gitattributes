@@ -1,0 +1,19 @@
+# Stable source bytes across Windows/Linux checkouts and release hashes.
+*.sh text eol=lf
+*.mjs text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.template text eol=lf
+Dockerfile text eol=lf
+*.Dockerfile text eol=lf
+# Preserve source hardware and historical evidence byte-for-byte.
+keyring/pcb/r18/** -text
+keyring/evidence/** -text
+web-dashboard/evidence/** -text
+docs/integration-evidence/** -text
+docs/integration-evidence/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
