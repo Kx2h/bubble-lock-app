@@ -27,14 +27,22 @@ Paths and profile:
   WORKSPACE_ROOT    Workspace containing this checkout (default: checkout root).
   GATE_OUTPUT_DIR   Generated reports (default: app/app/build/reports/release-gate).
   NPM_LICENSES_JSON Reviewed exact-version license snapshot
-                    (default: app/security/evidence/npm-licenses.json).
+                    (default: app/security/deployment-20261114/pc-npm-licenses.json).
+  INCLUDE_WEB_INVENTORY=1 (default) adds the web lock and requires the reviewed
+  NPM_ALL_LICENSES_JSON (default: deployment-20261114/npm-all-licenses.json).
+  INCLUDE_GATEWAY_PYTHON=1 (default) adds the reviewed local Gateway runtime
+  GATEWAY_PYTHON_SNAPSHOT (default: deployment-20261114/gateway-python-environment.json).
+  Set either INCLUDE_* value to 0 only for an explicitly narrower inventory.
   EXPECT_PRODUCTION_AUTH=1 requires MOBILE_API_BASE_URL, OIDC_ISSUER and
   OIDC_CLIENT_ID. Default 0 explicitly builds an unprovisioned profile.
+  MOBILE_API_CONTRACT keyrings-v1 (default), portal-central-v1 or portal-web-v1.
 
 Dependency lockfiles, verification metadata, source legal notices and signing
 keys are never updated. Gradle uses strict dependency verification. OSV and
 missing pinned schema snapshots require network access; scan failures or known
 findings fail the gate. Logs may contain local build paths; review before sharing.
+Run the root npm run verify separately; this gate does not replace its integrated
+web/Gateway/real-local-TLS verification stages.
 USAGE
 }
 
@@ -87,14 +95,24 @@ node_major=$("$NODE_BIN" -p 'process.versions.node.split(".")[0]')
 
 cd -- "$repo_root"
 output_dir=${GATE_OUTPUT_DIR:-"$app_root/app/build/reports/release-gate"}
-npm_licenses=${NPM_LICENSES_JSON:-"$app_root/security/evidence/npm-licenses.json"}
-output_dir=$("$PYTHON_BIN" - "$workspace_root" "$output_dir" "$npm_licenses" <<'PY'
+npm_licenses=${NPM_LICENSES_JSON:-"$app_root/security/deployment-20261114/pc-npm-licenses.json"}
+all_npm_licenses=${NPM_ALL_LICENSES_JSON:-"$app_root/security/deployment-20261114/npm-all-licenses.json"}
+gateway_snapshot=${GATEWAY_PYTHON_SNAPSHOT:-"$app_root/security/deployment-20261114/gateway-python-environment.json"}
+include_web=${INCLUDE_WEB_INVENTORY:-1}
+include_gateway=${INCLUDE_GATEWAY_PYTHON:-1}
+for value in "$include_web" "$include_gateway"; do
+  [[ $value == 0 || $value == 1 ]] || fail 'INCLUDE_WEB_INVENTORY and INCLUDE_GATEWAY_PYTHON must be 0 or 1.'
+done
+output_dir=$("$PYTHON_BIN" - "$workspace_root" "$output_dir" "$npm_licenses" "$all_npm_licenses" "$include_web" "$gateway_snapshot" "$include_gateway" <<'PY'
+import hashlib
 import importlib.metadata
 import json
 from pathlib import Path
+import re
 import sys
 
-workspace, output, licenses = map(Path, sys.argv[1:])
+workspace, output, licenses, combined = map(Path, sys.argv[1:5])
+include_web, gateway, include_gateway = sys.argv[5:8]
 output = output.resolve()
 output.relative_to(workspace)
 if output == workspace:
@@ -105,33 +123,73 @@ for line in Path('scripts/security/requirements.txt').read_text().splitlines():
     package, version = line.strip().split('==')
     if importlib.metadata.version(package) != version:
         raise SystemExit('Install the reviewed Python requirements before running the gate: ' + package)
-lock = json.loads(Path('pc-mobius/package-lock.json').read_text())
-expected = {(path.rsplit('node_modules/', 1)[-1], value['version']) for path, value in lock['packages'].items() if path}
-snapshot = json.loads(licenses.read_text())
-actual = {(item['name'], item['version']) for item in snapshot['packages']}
-if expected != actual:
-    raise SystemExit('Reviewed npm license snapshot does not match package-lock.json; update it explicitly after review')
+def verify_licenses(path, applications):
+    expected, lock_hashes = set(), {}
+    for identifier, lock_path in applications:
+        raw = Path(lock_path).read_bytes()
+        lock = json.loads(raw)
+        if lock.get('lockfileVersion') != 3:
+            raise SystemExit('Release gate requires npm lockfile version 3')
+        expected.update((location.rsplit('node_modules/', 1)[-1], item['version']) for location, item in lock['packages'].items() if location)
+        lock_hashes[identifier] = hashlib.sha256(raw).hexdigest()
+    snapshot = json.loads(path.read_text())
+    actual = {(item['name'], item['version']) for item in snapshot['packages']}
+    if expected != actual or len(actual) != len(snapshot['packages']):
+        raise SystemExit('Reviewed npm license snapshot coverage differs from the selected lockfiles; update explicitly after review')
+    recorded = {item['id']: item['lock_sha256'] for item in snapshot.get('applications', [])}
+    if recorded != lock_hashes or len(recorded) != len(snapshot.get('applications', [])):
+        raise SystemExit('Reviewed npm license snapshot lock hashes differ from the selected inputs')
+    if any(not item.get('licenses') for item in snapshot['packages']):
+        raise SystemExit('Selected npm license snapshot has unresolved declarations requiring review')
+pc = [('pc-mobius', 'pc-mobius/package-lock.json')]
+verify_licenses(licenses, pc)
+if include_web == '1':
+    verify_licenses(combined, pc + [('web-dashboard', 'web-dashboard/package-lock.json')])
+if include_gateway == '1':
+    sys.path.insert(0, str(Path('scripts/security').resolve()))
+    import release_inventory
+    snapshot = json.loads(Path(gateway).read_text())
+    if snapshot.get('root_distribution') != 'privacy-bubble-gateway':
+        raise SystemExit('Expected the reviewed Gateway distribution snapshot')
+    release_inventory.add_python_environment('gateway-validation', gateway, [], {'root': set()}, 'root')
+    source = Path('keyring/raspberry-pi-gateway/src/bubble_gateway/__init__.py').read_text()
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]+)[\'"]', source, re.M)
+    package = next(item for item in snapshot['packages'] if item['name'] == 'privacy-bubble-gateway')
+    if version is None or version.group(1) != package['version']:
+        raise SystemExit('Reviewed Gateway snapshot version differs from the current first-party source')
 print(output)
 PY
 )
 for file in app/gradle/verification-metadata.xml app/app/gradle.lockfile app/vendor/appauth/gradle.lockfile \
     app/app/src/main/assets/licenses/manifest.json app/scripts/check-release-security.py app/scripts/check-build-isolation.sh \
     scripts/security/release_inventory.py scripts/security/test_release_inventory.py \
-    app/security/schema-lock.json app/security/legal-source-lock.json; do
+    scripts/security/requirements.lock app/security/schema-lock.json app/security/legal-source-lock.json; do
   [[ -f $file ]] || fail "Required reviewed input is missing: $file"
 done
 [[ -f "$ANDROID_HOME/platforms/android-36/android.jar" ]] || fail 'Install Android SDK platform 36 before running the gate.'
 profile=${EXPECT_PRODUCTION_AUTH:-0}
+api_contract=${MOBILE_API_CONTRACT:-keyrings-v1}
+case $api_contract in
+  keyrings-v1|portal-central-v1|portal-web-v1) ;;
+  *) fail 'Unsupported MOBILE_API_CONTRACT.' ;;
+esac
 case $profile in
   0) [[ -z ${MOBILE_API_BASE_URL:-}${OIDC_ISSUER:-}${OIDC_CLIENT_ID:-} ]] || fail 'Set EXPECT_PRODUCTION_AUTH=1 to use a provisioned profile.' ;;
   1) [[ -n ${MOBILE_API_BASE_URL:-} && -n ${OIDC_ISSUER:-} && -n ${OIDC_CLIENT_ID:-} ]] || fail 'Provisioned profile requires all three public profile variables.' ;;
   *) fail 'EXPECT_PRODUCTION_AUTH must be 0 or 1.' ;;
 esac
 gradle=("$GRADLE_BIN" --no-daemon --max-workers=2 --dependency-verification=strict \
-    "-PmobileApiBaseUrl=${MOBILE_API_BASE_URL:-}" "-PoidcIssuer=${OIDC_ISSUER:-}" "-PoidcClientId=${OIDC_CLIENT_ID:-}")
+    "-PmobileApiBaseUrl=${MOBILE_API_BASE_URL:-}" "-PoidcIssuer=${OIDC_ISSUER:-}" "-PoidcClientId=${OIDC_CLIENT_ID:-}" "-PmobileApiContract=$api_contract")
 inspection=()
 [[ $profile == 0 ]] || inspection+=(--configured-auth)
-printf 'PASS: release-gate prerequisites; callback profile=%s\n' "$profile"
+bom_inputs=(--npm-licenses "$npm_licenses")
+if [[ $include_web == 1 ]]; then
+  bom_inputs=(--npm-application web-dashboard=web-dashboard/package-lock.json --npm-licenses "$all_npm_licenses")
+fi
+if [[ $include_gateway == 1 ]]; then
+  bom_inputs+=(--python-environment "gateway-validation=$gateway_snapshot")
+fi
+printf 'PASS: release-gate prerequisites; callback profile=%s; API contract=%s; web inventory=%s; Gateway snapshot=%s\n' "$profile" "$api_contract" "$include_web" "$include_gateway"
 [[ $mode != check ]] || exit 0
 [[ $mode == dry ]] || mkdir -p -- "$output_dir"
 
@@ -161,7 +219,7 @@ run build-isolation env "EXPECT_PRODUCTION_AUTH=$profile" "AAPT=$ANDROID_HOME/bu
 )
 run security-tool-tests "$PYTHON_BIN" -m unittest discover -s scripts/security -p 'test_*.py' -v
 run sbom "$PYTHON_BIN" scripts/security/release_inventory.py generate --inventory "$output_dir/release-inventory.json" \
-    --npm-lock pc-mobius/package-lock.json --npm-licenses "$npm_licenses" \
+    --npm-lock pc-mobius/package-lock.json "${bom_inputs[@]}" \
     --apk app/app/build/outputs/apk/release/app-release-unsigned.apk --aab app/app/build/outputs/bundle/release/app-release.aab \
     --output "$output_dir/release.cdx.json"
 run sbom-schema "$PYTHON_BIN" scripts/security/release_inventory.py validate --sbom "$output_dir/release.cdx.json" \

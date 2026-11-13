@@ -1,7 +1,7 @@
 import { recordEnvelope } from './integration-utils.mjs';
 
 function jsonResponse(status, body) {
-  return { status, headers: { 'content-type': 'application/json', 'x-privacy-bubble-contract': 'privacy-bubble.integration.v1' }, body };
+  return { status, headers: { 'content-type': 'application/json', 'x-privacy-bubble-contract': 'privacy-bubble.integration.v1', 'cache-control': 'no-store, private', 'vary': 'Authorization', 'x-content-type-options': 'nosniff' }, body };
 }
 
 export class IntegrationApiGateway {

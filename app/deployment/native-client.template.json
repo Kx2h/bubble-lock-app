@@ -1,0 +1,28 @@
+{
+  "clientId": "{{NATIVE_CLIENT_ID}}",
+  "name": "Bubble Android",
+  "description": "Native Authorization Code client; no browser BFF secret or Gateway identity",
+  "protocol": "openid-connect",
+  "enabled": true,
+  "publicClient": true,
+  "bearerOnly": false,
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "serviceAccountsEnabled": false,
+  "authorizationServicesEnabled": false,
+  "fullScopeAllowed": false,
+  "consentRequired": true,
+  "redirectUris": ["org.privacybubble.app:/oauth2redirect"],
+  "webOrigins": [],
+  "defaultClientScopes": ["basic"],
+  "optionalClientScopes": ["offline_access", "portal:read"],
+  "attributes": {
+    "pkce.code.challenge.method": "S256",
+    "id.token.signed.response.alg": "RS256",
+    "access.token.signed.response.alg": "RS256",
+    "exclude.issuer.from.auth.response": "false",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "oidc.ciba.grant.enabled": "false"
+  }
+}

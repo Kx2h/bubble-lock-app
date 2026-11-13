@@ -8,7 +8,10 @@ def profileString = { name, fallback = '' ->
 def configuredIssuer = providers.gradleProperty('oidcIssuer').orElse('').get()
 def configuredClient = providers.gradleProperty('oidcClientId').orElse('').get()
 def configuredApi = providers.gradleProperty('mobileApiBaseUrl').orElse('').get()
-def configuredAuth = !configuredIssuer.isEmpty() || !configuredClient.isEmpty()
+def configuredContract = providers.gradleProperty('mobileApiContract').orElse('keyrings-v1').get()
+if (!(configuredContract in ['keyrings-v1', 'portal-central-v1', 'portal-web-v1']))
+    throw new GradleException('Unknown mobile API contract')
+def configuredAuth = !configuredIssuer.isEmpty() || !configuredClient.isEmpty() || !configuredApi.isEmpty()
 if (configuredAuth) {
     if (configuredIssuer.isEmpty() || configuredClient.isEmpty() || configuredApi.isEmpty())
         throw new GradleException('A production sign-in profile requires mobileApiBaseUrl, oidcIssuer and oidcClientId together')
@@ -39,10 +42,11 @@ android {
         applicationId 'org.privacybubble.app'
         minSdk 29
         targetSdk 36
-        versionCode 3
-        versionName '0.3.0'
+        versionCode 4
+        versionName '0.4.0'
         testInstrumentationRunner 'org.privacybubble.app.security.SessionSecurityInstrumentation'
         buildConfigField 'String', 'MOBILE_API_BASE_URL', profileString('mobileApiBaseUrl')
+        buildConfigField 'String', 'MOBILE_API_CONTRACT', profileString('mobileApiContract', 'keyrings-v1')
         buildConfigField 'String', 'OIDC_ISSUER', profileString('oidcIssuer')
         buildConfigField 'String', 'OIDC_CLIENT_ID', profileString('oidcClientId')
         buildConfigField 'String', 'MAP_STYLE_URL', profileString('mapStyleUrl', 'https://tiles.openfreemap.org/styles/liberty')

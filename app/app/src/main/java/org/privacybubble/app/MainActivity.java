@@ -5,11 +5,14 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -31,9 +34,11 @@ import org.privacybubble.app.auth.MobileTokenManager;
 import org.privacybubble.app.location.KeyringLocation;
 import org.privacybubble.app.location.LocationRepository;
 import org.privacybubble.app.location.LocationSnapshot;
+import org.privacybubble.app.location.PortalLocationRepository;
 import org.privacybubble.app.session.MobileSessionStore;
 import org.privacybubble.app.ui.AppTheme;
 import org.privacybubble.app.ui.KeyringMapView;
+import org.privacybubble.app.ui.LocationReadLease;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -53,21 +58,22 @@ import java.util.concurrent.Future;
 public final class MainActivity extends AppCompatActivity {
     private static final int SIGN_IN = 7701;
     private static final long REFRESH_MILLIS = 30_000;
+    private static final int PAGE_SIZE = 25;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Runnable refresh = () -> { if (this.foreground) fetchLocations(); };
     private AppTheme theme;
     private MobileSessionStore session;
     private ScreenState state;
     private KeyringMapView map;
-    private LinearLayout root, mapDetails, keyringRows;
+    private LinearLayout root, mapDetails, keyringRows, keyringPager, keyringPageContainer;
     private LocationCard selectedCard;
     private final Map<String, LocationCard> keyringCards = new LinkedHashMap<>();
     private String mapEmptySignature, listEmptySignature;
     private ScrollView mapScroll, keyringScroll, settingsScroll;
     private FrameLayout pages;
-    private TextView connectionPill, banner, mapCaption, listCaption, settingsStatus;
+    private TextView connectionPill, banner, mapCaption, listCaption, settingsStatus, keyringPageStatus;
     private LinearProgressIndicator progress;
-    private MaterialButton refreshButton, accountButton;
+    private MaterialButton refreshButton, accountButton, keyringPrevious, keyringNext;
     private final List<MaterialButton> navButtons = new ArrayList<>();
     private TextInputLayout addressField;
     private TextInputEditText addressInput;
@@ -78,12 +84,17 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
+        if (usesPortal()) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            if (Build.VERSION.SDK_INT >= 33) setRecentsScreenshotEnabled(false);
+        }
         theme = new AppTheme(this); session = new MobileSessionStore(this);
         Object retained = getLastCustomNonConfigurationInstance();
         state = retained instanceof ScreenState ? (ScreenState)retained : new ScreenState();
         if (saved != null) {
             tab = Math.max(0, Math.min(2, saved.getInt("tab", 0)));
             state.selectedId = saved.getString("selectedKeyring", state.selectedId);
+            state.listPage = Math.max(0,saved.getInt("keyringPage",state.listPage));
             addressDraft = saved.getString("addressDraft");
             addressError = saved.getString("addressError"); addressHelper = saved.getString("addressHelper");
             addressSelectionStart = saved.getInt("addressSelectionStart", 0);
@@ -109,7 +120,7 @@ public final class MainActivity extends AppCompatActivity {
     }
     @Override public Object onRetainCustomNonConfigurationInstance() { return state; }
     @Override protected void onStart() {
-        super.onStart(); foreground = true; state.listener = this::renderState;
+        super.onStart(); foreground = true; state.expireReadLease(); state.listener = this::renderState;
         syncMapLifecycle(); renderState(); fetchLocations();
     }
     @Override protected void onResume() { super.onResume(); resumed = true; syncMapLifecycle(); }
@@ -123,6 +134,7 @@ public final class MainActivity extends AppCompatActivity {
     @Override public void onLowMemory() { super.onLowMemory(); if (map != null) map.onLowMemory(); }
     @Override protected void onSaveInstanceState(Bundle out) {
         captureAddress(); out.putInt("tab", tab); out.putString("selectedKeyring", state.selectedId);
+        out.putInt("keyringPage",state.listPage);
         out.putString("addressDraft", addressDraft); out.putInt("addressSelectionStart", addressSelectionStart);
         out.putString("addressError", addressError); out.putString("addressHelper", addressHelper);
         out.putInt("addressSelectionEnd", addressSelectionEnd); map.onSaveInstanceState(out);
@@ -191,6 +203,10 @@ public final class MainActivity extends AppCompatActivity {
         LinearLayout body = theme.column(); body.addView(theme.heading("내 키링", 26));
         listCaption = theme.text("위치가 공유된 키링을 확인할 수 있어요.", 15, theme.muted); add(body, listCaption, 8, 20);
         keyringRows = theme.column(); body.addView(keyringRows); keyringScroll = page(body); keyringScroll.setId(R.id.keyring_page);
+        pages.removeView(keyringScroll);
+        keyringPageContainer=theme.column();
+        keyringPageContainer.addView(keyringScroll,new LinearLayout.LayoutParams(-1,0,1));
+        pages.addView(keyringPageContainer,new FrameLayout.LayoutParams(-1,-1));
     }
     private void buildSettingsPage() {
         LinearLayout body = theme.column(); body.addView(theme.heading("설정", 26));
@@ -221,6 +237,7 @@ public final class MainActivity extends AppCompatActivity {
     private void selectTab(int selected, boolean user) {
         if (tab == 2) captureAddress(); tab = selected;
         mapScroll.setVisibility(tab == 0 ? View.VISIBLE : View.GONE); keyringScroll.setVisibility(tab == 1 ? View.VISIBLE : View.GONE); settingsScroll.setVisibility(tab == 2 ? View.VISIBLE : View.GONE);
+        keyringPageContainer.setVisibility(tab == 1 ? View.VISIBLE : View.GONE);
         for (int i=0;i<navButtons.size();i++) {
             MaterialButton item = navButtons.get(i); boolean active = i == tab; item.setSelected(active);
             item.setBackgroundTintList(ColorStateList.valueOf(active ? theme.subtle : theme.surface)); item.setContentDescription(item.getText() + (active ? ", 선택됨" : ""));
@@ -242,6 +259,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private void renderState() {
         if (root == null) return;
+        state.expireReadLease();
         boolean signedIn = hasSession();
         if (!signedIn && !state.locations.isEmpty()) state.clear();
         if (state.errorCode == 401 && signedIn) {
@@ -254,6 +272,7 @@ public final class MainActivity extends AppCompatActivity {
         String notice = vaultProblem ? "연결 정보를 안전하게 불러오지 못했어요. 앱을 다시 열어 주세요."
                 : state.errorCode == 401 ? "로그인이 만료됐어요. 다시 로그인해 주세요."
                 : state.errorCode == 403 ? "위치를 확인할 권한이 없어요. 계정의 공유 설정을 확인해 주세요."
+                : state.readLeaseExpired ? "위치 열람 시간이 끝나 위치를 지웠어요. 다시 확인해 주세요."
                 : state.error != null ? (state.locations.isEmpty() ? "위치를 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요." : "연결이 끊겨 마지막 위치를 표시하고 있어요. 현재 위치와 다를 수 있어요.") : "";
         if (!notice.contentEquals(banner.getText())) banner.setText(notice); banner.setVisibility(notice.isEmpty() ? View.GONE : View.VISIBLE);
         refreshButton.setEnabled(signedIn && !safeBase().isEmpty() && !state.loading);
@@ -273,8 +292,7 @@ public final class MainActivity extends AppCompatActivity {
         List<KeyringLocation> result = new ArrayList<>(); long now = System.currentTimeMillis();
         for (KeyringLocation item : state.locations) {
             if (item.hasCoordinates() && (state.error != null || !item.isFresh(now)))
-                result.add(new KeyringLocation(item.id, item.name, "stale", item.latitude, item.longitude, item.accuracyMeters,
-                        item.observedAt, item.receivedAt, item.expiresAt, item.source, item.connectivity, item.batteryPercent));
+                result.add(item.asStale());
             else result.add(item);
         }
         return result;
@@ -298,7 +316,14 @@ public final class MainActivity extends AppCompatActivity {
         selectedCard.bind(selected, true);
     }
     private void renderKeyrings(List<KeyringLocation> locations, boolean signedIn) {
-        setText(listCaption, locations.isEmpty() ? "위치가 공유된 키링을 확인할 수 있어요." : "총 " + locations.size() + "개 · 위치와 최근 상태");
+        int pages=Math.max(1,(locations.size()+PAGE_SIZE-1)/PAGE_SIZE);
+        state.listPage=Math.min(state.listPage,pages-1);
+        int start=state.listPage*PAGE_SIZE, end=Math.min(locations.size(),start+PAGE_SIZE);
+        setText(listCaption, locations.isEmpty() ? "위치가 공유된 키링을 확인할 수 있어요." : "총 " + locations.size() + "개 · " + (start+1) + "–" + end + "번째");
+        ensureKeyringPager();
+        keyringPager.setVisibility(locations.size()>PAGE_SIZE ? View.VISIBLE : View.GONE);
+        keyringPageStatus.setText((state.listPage+1)+" / "+pages+" 페이지");
+        keyringPrevious.setEnabled(state.listPage>0); keyringNext.setEnabled(end<locations.size());
         if (locations.isEmpty()) {
             String signature = emptySignature(signedIn);
             if (!keyringCards.isEmpty() || !signature.equals(listEmptySignature)) {
@@ -308,14 +333,15 @@ public final class MainActivity extends AppCompatActivity {
         }
         if (keyringCards.isEmpty()) keyringRows.removeAllViews();
         listEmptySignature = null;
-        Set<String> ids = new HashSet<>(); for (KeyringLocation item : locations) ids.add(item.id);
+        List<KeyringLocation> visiblePage=locations.subList(start,end);
+        Set<String> ids = new HashSet<>(); for (KeyringLocation item : visiblePage) ids.add(item.id);
         Iterator<Map.Entry<String, LocationCard>> obsolete = keyringCards.entrySet().iterator();
         while (obsolete.hasNext()) {
             Map.Entry<String, LocationCard> row = obsolete.next();
             if (!ids.contains(row.getKey())) { keyringRows.removeView(row.getValue().view); obsolete.remove(); }
         }
-        for (int index = 0; index < locations.size(); index++) {
-            KeyringLocation item = locations.get(index); LocationCard card = keyringCards.get(item.id);
+        for (int index = 0; index < visiblePage.size(); index++) {
+            KeyringLocation item = visiblePage.get(index); LocationCard card = keyringCards.get(item.id);
             if (card == null) { card = new LocationCard(false); keyringCards.put(item.id, card); }
             if (keyringRows.getChildAt(index) != card.view) {
                 keyringRows.removeView(card.view);
@@ -325,8 +351,28 @@ public final class MainActivity extends AppCompatActivity {
             card.bind(item, item.id.equals(state.selectedId));
         }
     }
+    private void ensureKeyringPager() {
+        if (keyringPager != null) return;
+        keyringPager=theme.panel(); keyringPageStatus=theme.text("",15,theme.muted); keyringPageStatus.setGravity(Gravity.CENTER);
+        keyringPager.addView(keyringPageStatus);
+        LinearLayout row=new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL);
+        keyringPrevious=theme.button("이전 목록",false,v -> changeKeyringPage(-1));
+        keyringNext=theme.button("다음 목록",false,v -> changeKeyringPage(1));
+        LinearLayout.LayoutParams previous=new LinearLayout.LayoutParams(0,-2,1); previous.setMarginEnd(theme.dp(8));
+        row.addView(keyringPrevious,previous); row.addView(keyringNext,new LinearLayout.LayoutParams(0,-2,1));
+        add(keyringPager,row,12,0);
+        LinearLayout.LayoutParams pagerParams=new LinearLayout.LayoutParams(-1,-2);
+        pagerParams.setMargins(theme.dp(20),theme.dp(8),theme.dp(20),theme.dp(8));
+        keyringPageContainer.addView(keyringPager,0,pagerParams);
+    }
+    private void changeKeyringPage(int delta) {
+        int pages=Math.max(1,(state.locations.size()+PAGE_SIZE-1)/PAGE_SIZE);
+        state.listPage=Math.max(0,Math.min(pages-1,state.listPage+delta)); renderState();
+        keyringScroll.post(() -> keyringScroll.fullScroll(View.FOCUS_UP));
+        keyringPageStatus.announceForAccessibility(keyringPageStatus.getText());
+    }
     private String emptySignature(boolean signedIn) {
-        return safeBase().isEmpty() + ":" + signedIn + ":" + state.loading + ":" + state.errorCode + ":" + (state.error != null);
+        return safeBase().isEmpty() + ":" + signedIn + ":" + state.loading + ":" + state.errorCode + ":" + (state.error != null) + ":" + state.readLeaseExpired;
     }
     private static void setText(TextView view, String value) {
         if (!value.contentEquals(view.getText())) view.setText(value);
@@ -338,7 +384,7 @@ public final class MainActivity extends AppCompatActivity {
         final TextView selection = theme.text("선택한 키링", 13, theme.accent);
         final TextView summary = theme.text("", 16, theme.text);
         final TextView stale = theme.text("이전 위치 정보예요. 현재 위치와 다를 수 있어요.", 15, theme.warning);
-        final InfoField time, accuracy, provider, coordinate, battery, connection;
+        final InfoField time, accuracy, provider, coordinate, battery, connection, gateway, signal;
         final MaterialButton action;
         final boolean detail;
         String currentId;
@@ -347,6 +393,7 @@ public final class MainActivity extends AppCompatActivity {
             time = new InfoField(view, "정보 시각"); accuracy = new InfoField(view, "위치 정확도");
             provider = new InfoField(view, "위치 출처"); coordinate = new InfoField(view, "좌표");
             battery = new InfoField(view, "배터리"); connection = new InfoField(view, "키링 연결");
+            gateway = new InfoField(view, "수신 게이트웨이"); signal = new InfoField(view, "근접 신호 기록");
             action = theme.button(detail ? "키링 목록 보기" : "지도에서 보기", false, v -> {
                 if (this.detail) selectTab(1, true); else selectKeyring(currentId, true);
             });
@@ -355,7 +402,7 @@ public final class MainActivity extends AppCompatActivity {
         void bind(KeyringLocation item, boolean selected) {
             currentId = item.id; boolean coordinates = item.hasCoordinates(), fresh = item.isFresh(System.currentTimeMillis());
             boolean denied = "denied".equals(item.status);
-            setText(name, item.name); setText(status, status(item)); status.setTextColor(fresh ? theme.success : theme.warning);
+            setText(name, (item.simulation ? "모의 · " : "") + item.name); setText(status, status(item)); status.setTextColor(fresh && !item.simulation ? theme.success : theme.warning);
             selection.setVisibility(!detail && selected ? View.VISIBLE : View.GONE);
             setText(summary, coordinates ? "마지막 위치 정보 " + relative(item.observedAt) : noLocation(item));
             stale.setVisibility(coordinates && !fresh ? View.VISIBLE : View.GONE);
@@ -364,7 +411,9 @@ public final class MainActivity extends AppCompatActivity {
             provider.bind(coordinates, source(item.source));
             coordinate.bind(coordinates, coordinates ? String.format(Locale.US, "%.5f, %.5f", item.latitude, item.longitude) : "");
             battery.bind(!denied && item.batteryPercent != null, item.batteryPercent == null ? "" : item.batteryPercent + "%");
-            connection.bind(!denied, connectivity(item.connectivity));
+            connection.bind(!denied && item.connectivity != null, connectivity(item.connectivity));
+            gateway.bind(!denied && item.gatewayId != null, item.gatewayId == null ? "" : item.gatewayId);
+            signal.bind(!denied && item.rssiDbm != null, item.rssiDbm == null ? "" : (item.bleSimulation ? "모의 · " : "") + item.rssiDbm + " dBm · " + relative(item.bleObservedAt));
             action.setVisibility(detail || coordinates ? View.VISIBLE : View.GONE);
             action.setContentDescription(detail ? "키링 목록 보기" : item.name + ", 지도에서 보기");
             view.setBackground(theme.shape(!detail && selected ? theme.subtle : theme.surface, !detail && selected ? theme.accent : theme.border, 22));
@@ -385,6 +434,7 @@ public final class MainActivity extends AppCompatActivity {
         else if (!signedIn) { title = "내 키링을 만나보세요"; message = "계정으로 로그인하면 공유가 허용된 위치만 안전하게 표시해요."; action = "로그인"; }
         else if (state.loading) { title = "키링을 확인하고 있어요"; message = "잠시만 기다려 주세요. 공유된 위치와 최근 상태를 불러오고 있어요."; action = null; }
         else if (state.errorCode == 403) { title = "위치 공유 권한이 필요해요"; message = "현재 계정으로 확인할 수 있는 위치가 없어요. 서비스의 공유 설정을 확인해 주세요."; action = "다시 확인"; }
+        else if (state.readLeaseExpired) { title = "위치를 다시 확인해 주세요"; message = "열람 시간이 끝난 위치는 지도와 목록에서 지워져요."; action = "다시 확인"; }
         else if (state.error != null) { title = "지금은 연결할 수 없어요"; message = "인터넷 연결과 서비스 주소를 확인한 뒤 다시 시도해 주세요."; action = "다시 시도"; }
         else { title = "공유된 키링이 아직 없어요"; message = "위치 공유가 허용된 키링이 연결되면 여기에 나타나요."; action = "다시 확인"; }
         TextView symbol = theme.text("", 32, theme.accent); symbol.setCompoundDrawablesWithIntrinsicBounds(theme.icon("keyring", theme.accent), null, null, null);
@@ -396,15 +446,22 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void selectKeyring(String id, boolean switchToMap) {
+        for (int index=0;index<state.locations.size();index++) if (state.locations.get(index).id.equals(id)) { state.listPage=index/PAGE_SIZE; break; }
         state.selectedId = id; renderState(); if (switchToMap) { selectTab(0, true); map.focusSelected(); }
     }
     private void fetchLocations() {
         main.removeCallbacks(refresh); if (!foreground) return;
         if (safeBase().isEmpty()) { state.clear(); renderState(); return; }
         if (!hasSession()) {
-            state.clear(); renderState(); main.postDelayed(refresh, REFRESH_MILLIS); return;
+            state.clear(); renderState(); main.postDelayed(refresh, refreshInterval()); return;
         }
-        if (!state.loading) state.load(safeBase(), session); main.postDelayed(refresh, REFRESH_MILLIS);
+        if (!state.loading) state.load(safeBase(), session); main.postDelayed(refresh, refreshInterval());
+    }
+    private static boolean usesPortal() { return "portal-central-v1".equals(BuildConfig.MOBILE_API_CONTRACT) || "portal-web-v1".equals(BuildConfig.MOBILE_API_CONTRACT); }
+    private long refreshInterval() {
+        if (!usesPortal()) return REFRESH_MILLIS;
+        long remaining=state.readLease.remaining(System.currentTimeMillis(),SystemClock.elapsedRealtime());
+        return remaining>0 ? Math.max(500,Math.min(2000,remaining/2)) : 2000;
     }
     private boolean hasSession() {
 
@@ -478,15 +535,15 @@ public final class MainActivity extends AppCompatActivity {
     private static int clamp(int value, int length) { return Math.max(0, Math.min(value, length)); }
     private static String status(KeyringLocation item) {
         if ("denied".equals(item.status)) return "접근 제한"; if (!item.hasCoordinates()) return "위치 확인 전";
-        return item.isFresh(System.currentTimeMillis()) ? "최근 위치 정보" : "이전 위치 정보";
+        return (item.simulation ? "모의 · " : "") + (item.isFresh(System.currentTimeMillis()) ? "최근 위치 정보" : "이전 위치 정보");
     }
-    private static String noLocation(KeyringLocation item) { return "denied".equals(item.status) ? "이 키링의 위치를 볼 권한이 없어요." : "아직 공유된 위치가 없어요."; }
+    private static String noLocation(KeyringLocation item) { return "denied".equals(item.status) ? "이 키링의 위치를 볼 권한이 없어요." : item.rssiDbm != null ? "게이트웨이의 근접 신호 기록이에요. 키링 좌표는 제공되지 않았어요." : "아직 공유된 위치가 없어요."; }
     private static String distance(double meters) { return meters < 1 ? "1 m 미만" : meters >= 1000 ? String.format(Locale.KOREAN, "%.1f km", meters / 1000) : String.format(Locale.KOREAN, "%.0f m", meters); }
     private static String source(String value) {
         if (value == null || value.isEmpty()) return "제공 정보 없음"; String source=value.toLowerCase(Locale.ROOT);
         if (source.contains("gps") || source.contains("gnss")) return "위성 위치";
         if (source.contains("mec") || source.contains("network")) return "MEC 위치 서비스";
-        if (source.contains("ble")) return "근접 신호"; if (source.contains("gateway")) return "연결된 기기"; return "위치 제공 서비스";
+        if (source.contains("ble")) return "근접 신호"; if (source.contains("relay")) return "릴레이 기준 위치"; if (source.contains("gateway")) return "연결된 기기"; return "위치 제공 서비스";
     }
     private static String connectivity(String value) {
         if (value == null) return "확인 필요";
@@ -513,31 +570,63 @@ public final class MainActivity extends AppCompatActivity {
         private final ExecutorService worker = Executors.newSingleThreadExecutor();
         private final Handler main = new Handler(Looper.getMainLooper());
         private Future<?> request; private long generation; private List<KeyringLocation> locations = Collections.emptyList();
-        private String selectedId, error; private int errorCode; private boolean loading, loaded, closed; private long lastSuccess;
+        private String selectedId, error; private int errorCode, listPage; private boolean loading, loaded, closed; private long lastSuccess;
         private Runnable listener;
+        private final LocationReadLease readLease=new LocationReadLease();
+        private boolean readLeaseExpired;
+        private final Runnable leaseExpiry=() -> {
+            if (expireReadLease()) notifyListener();
+            else if (readLease.active()) scheduleReadLease();
+        };
         private void load(String base, MobileSessionStore store) {
             if (closed || loading) return; final long ticket = ++generation; loading = true; notifyListener();
             request = worker.submit(() -> {
                 LocationSnapshot response = null; String failure = null; int code = 0;
-                try { response = new LocationRepository(BuildConfig.DEBUG).load(base, MobileTokenManager.accessToken(store)); }
+                try {
+                    String access=MobileTokenManager.accessToken(store);
+                    if (usesPortal()) {
+                        PortalLocationRepository.Endpoint endpoint="portal-central-v1".equals(BuildConfig.MOBILE_API_CONTRACT)
+                                ? PortalLocationRepository.Endpoint.CENTRAL : PortalLocationRepository.Endpoint.WEB;
+                        response=new PortalLocationRepository(endpoint).load(base,access);
+                    } else response=new LocationRepository(BuildConfig.DEBUG).load(base,access);
+                }
                 catch (LocationRepository.ApiException problem) { failure = problem.getMessage(); code = problem.statusCode; }
                 catch (Exception problem) { failure = "연결을 확인해 주세요."; }
                 final LocationSnapshot result = response; final String message = failure; final int status = code;
                 main.post(() -> {
                     if (closed || ticket != generation) return; loading = false; request = null; error = message; errorCode = status;
                     if (result != null) {
+                        boolean permitted=!usesPortal() || readLease.install(result.readAuthorizedUntilMillis,System.currentTimeMillis(),SystemClock.elapsedRealtime());
+                        if (!usesPortal()) readLease.clear();
+                        main.removeCallbacks(leaseExpiry);
+                        if (!permitted) {
+                            locations=Collections.emptyList(); selectedId=null; lastSuccess=0; loaded=false; readLeaseExpired=true;
+                            notifyListener(); return;
+                        }
+                        readLeaseExpired=false; scheduleReadLease();
                         locations = result.keyrings; loaded = true; lastSuccess = System.currentTimeMillis(); boolean selectionPresent = false;
                         for (KeyringLocation item : locations) if (item.id.equals(selectedId)) selectionPresent = true;
                         if (!selectionPresent) selectedId = locations.isEmpty() ? null : locations.get(0).id;
-                    } else if (status == 401 || status == 403) { locations = Collections.emptyList(); selectedId = null; lastSuccess = 0; }
+                    } else if (status == 401 || status == 403) { locations = Collections.emptyList(); selectedId = null; lastSuccess = 0; readLease.clear(); main.removeCallbacks(leaseExpiry); readLeaseExpired=false; }
+                    expireReadLease();
                     notifyListener();
                 });
             });
         }
         private void notifyListener() { if (listener != null) listener.run(); }
+        private void scheduleReadLease() {
+            main.removeCallbacks(leaseExpiry);
+            if (readLease.active()) main.postDelayed(leaseExpiry,Math.max(1,readLease.remaining(System.currentTimeMillis(),SystemClock.elapsedRealtime())));
+        }
+        private boolean expireReadLease() {
+            if (!readLease.active() || readLease.isValid(System.currentTimeMillis(),SystemClock.elapsedRealtime())) return false;
+            readLease.clear(); main.removeCallbacks(leaseExpiry);
+            locations=Collections.emptyList(); selectedId=null; lastSuccess=0; loaded=false; readLeaseExpired=true;
+            return true;
+        }
         private void cancel() { ++generation; if (request != null) request.cancel(true); request = null; loading = false; }
         private void detach() { listener = null; cancel(); }
-        private void clear() { cancel(); locations = Collections.emptyList(); selectedId = null; error = null; errorCode = 0; loaded = false; lastSuccess = 0; }
-        private void close() { closed = true; detach(); worker.shutdownNow(); }
+        private void clear() { cancel(); readLease.clear(); main.removeCallbacks(leaseExpiry); readLeaseExpired=false; locations = Collections.emptyList(); selectedId = null; listPage=0; error = null; errorCode = 0; loaded = false; lastSuccess = 0; }
+        private void close() { closed = true; clear(); listener=null; worker.shutdownNow(); }
     }
 }

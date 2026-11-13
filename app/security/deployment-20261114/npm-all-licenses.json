@@ -1,0 +1,1823 @@
+{
+  "applications": [
+    {
+      "id": "pc-mobius",
+      "lock_sha256": "64a991f785ba48f72d25d0e98a515fee324d4166f0fca49e939b479c6ebedaef"
+    },
+    {
+      "id": "web-dashboard",
+      "lock_sha256": "64b8dec063c5f1cdad02bca714c98c08077f85cf6a4ce3d0f8519772c85dd5ff"
+    }
+  ],
+  "checked_at": "2026-11-13T15:29:46Z",
+  "packages": [
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "07cee4a3a13b16e0afc384cdb0f9de426dcf0d1ef1085dc38ce54a1fe5f02b96",
+      "name": "@babel/runtime",
+      "source": "https://registry.npmjs.org/%40babel%2Fruntime/7.29.10",
+      "version": "7.29.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6a87bdfc53a201251e235343d23af0960811c357e40064e7ec95db1df78baa39",
+      "name": "@esbuild/aix-ppc64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Faix-ppc64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4747ef1c8e9498d88ab8b875276957a1022390c5197b73d8afb77b6de9b45590",
+      "name": "@esbuild/android-arm",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fandroid-arm/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b3593be5f0c584c3ff5e0a94933f6e1f4d241b63605853d8189435c6eea445ae",
+      "name": "@esbuild/android-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fandroid-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "a9eb2d2daee660612b75b670fab0803f0c394ce630c46a3462d1d6d7a3e07cac",
+      "name": "@esbuild/android-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fandroid-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "00477430377a3c80c3b5ab40f269123d6d2ff31feeb1c97a618080d71ba4062c",
+      "name": "@esbuild/darwin-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fdarwin-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4ff9a1a2f707885b7681182348402c7100fd063c085244bbc2b90317f8833b83",
+      "name": "@esbuild/darwin-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fdarwin-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f816fa7e89aeb6f8dcf83047a0bd9476939b035b088bbc9bafd895a8ff371dc2",
+      "name": "@esbuild/freebsd-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Ffreebsd-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "082f153f9c6436d030ceb3d600c46c6f43642b5188d588ed3fa884d562ad1fca",
+      "name": "@esbuild/freebsd-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Ffreebsd-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "23519b55cbc3e14ebe386c66a3b77302988409323fd77713be037ae72495b0ed",
+      "name": "@esbuild/linux-arm",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-arm/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6a08a836938a0224f4e116d00a18af2e580d4eb407923ecb8fafa8f4dd1c539a",
+      "name": "@esbuild/linux-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "330db663dcfa8cb92ad4000553b24025b610f29500d89380a771b9092648f0ae",
+      "name": "@esbuild/linux-ia32",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-ia32/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "80b17aafab800272684e961e1d6fb23c09423f73d235a704fc2e66e6ff5f6091",
+      "name": "@esbuild/linux-loong64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-loong64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f884b55501134f073fe37848f39117d2c4f6bb406f2d052bc14017e44c122894",
+      "name": "@esbuild/linux-mips64el",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-mips64el/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b749bbd411cb0c98ee648f5d73a6b88bdc87535ebe72fea55c5e849a2c8a7293",
+      "name": "@esbuild/linux-ppc64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-ppc64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "2a4a4ce8e83cf5c83a7c201c3996804b24ce897d5ad8358887266a36d25bd3fd",
+      "name": "@esbuild/linux-riscv64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-riscv64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "dfcc3f23361f218c53ed5d23bad8d826fd6258f82ea433deefc0424c6b6af337",
+      "name": "@esbuild/linux-s390x",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-s390x/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "aac7bdf83762a5942487b1c052ba8dd810e159efc7831f9d2fa72f39a1860a6e",
+      "name": "@esbuild/linux-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Flinux-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "e5f689c45de406e190750e52a797d28dd1c543700605cdbce78afcdbc18d2f4a",
+      "name": "@esbuild/netbsd-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fnetbsd-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4a6af6b54e9a2addfc53b56a28842537a368386179e27277aa08f16a535eca6a",
+      "name": "@esbuild/netbsd-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fnetbsd-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1163f21d47689c6e6c0dda6e6ab90ab94be0605962c8ee39dcc0a0c424798933",
+      "name": "@esbuild/openbsd-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fopenbsd-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "33d93c1502911fd2935152226cbc775c83960766bb916c1dcc5f61947b5ce861",
+      "name": "@esbuild/openbsd-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fopenbsd-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "42f2b0b1b648befcdbb85a8370a94187e9b15f0a6beead74fd64973ad51a9349",
+      "name": "@esbuild/openharmony-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fopenharmony-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "05c873d2d35d079b058ff8a3e8aafd741440fa5d1158e61ae605b963ac76e6cb",
+      "name": "@esbuild/sunos-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fsunos-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "de8ec48137536b868c60fcbb2dc1b037d5781692b34e0f970eae4a32a46817db",
+      "name": "@esbuild/win32-arm64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fwin32-arm64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "726484724a14ea6f438d167935cde6f041c034d9f5aab47edf99b5ef756bab00",
+      "name": "@esbuild/win32-ia32",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fwin32-ia32/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "599f80d555c5e3c0c3fc8ad9d4daf3968e92e28b001ce1593d46f39f43a90867",
+      "name": "@esbuild/win32-x64",
+      "source": "https://registry.npmjs.org/%40esbuild%2Fwin32-x64/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "dd4baac0dae8f526e5c4d0198108eb17e7f621e7e35597d817d6d10093e7e6e2",
+      "name": "@napi-rs/lzma-linux-x64-gnu",
+      "source": "https://registry.npmjs.org/%40napi-rs%2Flzma-linux-x64-gnu/1.5.1",
+      "version": "1.5.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "fafc343c388f27ee228b7e71ca062b9ca5a4c0943d04d40f59702139003b6302",
+      "name": "@rollup/rollup-android-arm-eabi",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-android-arm-eabi/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "faf96550207ac1895d4b9cd646d97379996363ce4de0278ebd0a52e3ccb11d62",
+      "name": "@rollup/rollup-android-arm64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-android-arm64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1fc8fee6649de9557afb2998832bdb9c22a50295e28c0434b655de0dc45ceb3f",
+      "name": "@rollup/rollup-darwin-arm64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-darwin-arm64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "641f7296ed75b51397227db8fe2a96e02b6379dbc855f866f90f423ae5c44829",
+      "name": "@rollup/rollup-darwin-x64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-darwin-x64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b1c6a872ba2cd750a65e5f5c6e5bdbd3c4d478d3a88782f539d0f1f9c4961bc8",
+      "name": "@rollup/rollup-freebsd-arm64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-freebsd-arm64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "742fa80c92795dc4be9ea1387762f8f23c652e09d535232681988156e3d28206",
+      "name": "@rollup/rollup-freebsd-x64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-freebsd-x64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "55cc1840f8a098ac8c15dbee81cd79132a3d6916d20ffd9331cc7ddb0209df11",
+      "name": "@rollup/rollup-linux-arm-gnueabihf",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-arm-gnueabihf/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "c2630ff1b0e5f08535cfe6d2853a458bde9c9fbbaff7845586933bff3250bd5a",
+      "name": "@rollup/rollup-linux-arm-musleabihf",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-arm-musleabihf/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "da2a2cf8510868240273532862b989a5189e70f10175e354520274df88c16be9",
+      "name": "@rollup/rollup-linux-arm64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-arm64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3071da2e16b778ff8983533e5f06da669bc7ae7a49669609f461462f60b4053e",
+      "name": "@rollup/rollup-linux-arm64-musl",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-arm64-musl/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "9e6a07a8c8ef2b53496ebe0d9c61bf7dfb835797c506314d20fe68dc44bf7e3a",
+      "name": "@rollup/rollup-linux-loong64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-loong64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4240e828a5ea7949848c0b6900074ee7c8aea3d1b4ae63c7d01f0f1d0385749f",
+      "name": "@rollup/rollup-linux-loong64-musl",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-loong64-musl/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "e0ac8d4e1ac67711aebd6d2deae81927f0596458577621134924396103af7427",
+      "name": "@rollup/rollup-linux-ppc64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-ppc64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "2c84fc9e155d9ec4c36644f402f030d64eeff6e2f84202f5a5af032f0d5b8d46",
+      "name": "@rollup/rollup-linux-ppc64-musl",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-ppc64-musl/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "88b8e99c15c98c29c156eef118a0c450d8eb7609764c0e20acf9bb787bc63797",
+      "name": "@rollup/rollup-linux-riscv64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-riscv64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b2f1ca93a547e5e7f91aa63c17b9cb044e2980c5f967ced6ecb02cca9fdea769",
+      "name": "@rollup/rollup-linux-riscv64-musl",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-riscv64-musl/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "37f9ebc2dcb18266f919607330fef3e9c16ea3f649a69cab8a725cab84f7cd6d",
+      "name": "@rollup/rollup-linux-s390x-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-s390x-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "7ec6879213c6e6e8df0294ac51e688ea5291f8860a58b489d03e9cbedb127186",
+      "name": "@rollup/rollup-linux-x64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-x64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "edd993452452edf57d4a7f3d4a2446f3395c4d30ae2ee5c2a11137978c5e041f",
+      "name": "@rollup/rollup-linux-x64-musl",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-linux-x64-musl/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f0af89a66829817a45a685741ab9b69ba206539c2fc8aea7c53f12e54e143008",
+      "name": "@rollup/rollup-openbsd-x64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-openbsd-x64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "77a4e17ac72451d284bc600a347b1b3e5327927b24926761cd23039e7ac4a9c7",
+      "name": "@rollup/rollup-openharmony-arm64",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-openharmony-arm64/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ff6258fa805060f77f33b9ae1a5ed390b5b514b00705fb1b88ef2d23de320ab4",
+      "name": "@rollup/rollup-win32-arm64-msvc",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-win32-arm64-msvc/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ad627e49bb69a4f83f1b7e0ead64c55cb5310c0ce7dd207f1ca4901e090a5cdf",
+      "name": "@rollup/rollup-win32-ia32-msvc",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-win32-ia32-msvc/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "655e806be9b1c9c0aae12a9a6c5a331c25700bd44b369a024348deb7b887daa7",
+      "name": "@rollup/rollup-win32-x64-gnu",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-gnu/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4681764e48c48105e5c1bc4b2f28b082d0955790544e8b0f04651cc4ba451301",
+      "name": "@rollup/rollup-win32-x64-msvc",
+      "source": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-msvc/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "423d7b7664c5da1001f99e0e9c1c668639c65a850b06392c7839a4b0f3f1bd3c",
+      "name": "@types/estree",
+      "source": "https://registry.npmjs.org/%40types%2Festree/1.0.9",
+      "version": "1.0.9"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "100f5536281995692877bd4e85c89b9b6aeebff65b89b4287c6596948eba1a8c",
+      "name": "@types/geojson",
+      "source": "https://registry.npmjs.org/%40types%2Fgeojson/7946.0.16",
+      "version": "7946.0.16"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1964e40071b777c273571c30d37e5224ad920c171de03d7ae770fef8a8cb10a6",
+      "name": "@types/leaflet",
+      "source": "https://registry.npmjs.org/%40types%2Fleaflet/1.9.21",
+      "version": "1.9.21"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "0bae9161b0232cdb42406d82e00e9d04e007db40361b4c07ccc6c2b374ac20ba",
+      "name": "@types/node",
+      "source": "https://registry.npmjs.org/%40types%2Fnode/24.19.2",
+      "version": "24.19.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "7db5f21c56ef0d03dcab4237d1760d28f00ab19b9edd25dc7ba7d78ce9ac1207",
+      "name": "@types/node",
+      "source": "https://registry.npmjs.org/%40types%2Fnode/26.6.5",
+      "version": "26.6.5"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ccd0554ff295453569548e7f2c7241120a90f68c3fa92c8d55b39d1d61cfe0a5",
+      "name": "@types/react",
+      "source": "https://registry.npmjs.org/%40types%2Freact/19.3.0",
+      "version": "19.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "dfffb4b945d03a8335cc3fabf7afeb4d4fd52b1e5a000dc14d19a2ad98b1c9a6",
+      "name": "@types/react-dom",
+      "source": "https://registry.npmjs.org/%40types%2Freact-dom/19.3.0",
+      "version": "19.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "174a87643c8ba73ba4ed7576fab5bd6ce8af839894c7e8109bf25727b76277b1",
+      "name": "@types/readable-stream",
+      "source": "https://registry.npmjs.org/%40types%2Freadable-stream/4.0.25",
+      "version": "4.0.25"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ce84a24d90981a84c9ed14e7c331ee3276fa999f1fbd19a93bf13585e6f20c67",
+      "name": "@types/ws",
+      "source": "https://registry.npmjs.org/%40types%2Fws/8.18.2",
+      "version": "8.18.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "30707f3764743a8bd0e82f7fbeb60343d98ff3313cb9369e0ffc0ead17ebdbe1",
+      "name": "abort-controller",
+      "source": "https://registry.npmjs.org/abort-controller/3.0.0",
+      "version": "3.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "06e54d782c940fddeb8cb575cec727eefc62daabea8be93326e1e814ac0ae23a",
+      "name": "ajv",
+      "source": "https://registry.npmjs.org/ajv/8.20.0",
+      "version": "8.20.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3c5e2628f4af18d6dd6504b8d351ccca20b4ee0fa529a6f55814ca17a8474a6c",
+      "name": "ajv-formats",
+      "source": "https://registry.npmjs.org/ajv-formats/3.0.1",
+      "version": "3.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "9e1b9210ad2284f9c219860beaae1ed476e6591c77a5c9254a5d67c7b49160b1",
+      "name": "base64-js",
+      "source": "https://registry.npmjs.org/base64-js/1.5.1",
+      "version": "1.5.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b656daa252da5e053305440189a79134cf5a59095e29da053b464fdab83fd484",
+      "name": "bl",
+      "source": "https://registry.npmjs.org/bl/6.1.6",
+      "version": "6.1.6"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8d100a9eb476debb770819659ac0d73ff9197f28e97f9d60365e939bb64a6f3c",
+      "name": "broker-factory",
+      "source": "https://registry.npmjs.org/broker-factory/3.1.15",
+      "version": "3.1.15"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1e4c5d759986699c80290b6307aeb2678d5a7032ac72e7dd8250c0e9d97487ad",
+      "name": "buffer",
+      "source": "https://registry.npmjs.org/buffer/6.0.3",
+      "version": "6.0.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "88a0705c8a4f1ae5bd13a488cbe8210f3d7f6a6e92ec255d3aa880295a1b8a84",
+      "name": "buffer-from",
+      "source": "https://registry.npmjs.org/buffer-from/1.1.2",
+      "version": "1.1.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6d3c649b563ab948ff162b00e0558d546c8d0c42821d5f753201cbb1bd66b0b6",
+      "name": "commist",
+      "source": "https://registry.npmjs.org/commist/3.2.0",
+      "version": "3.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6f3b8ca3007546943f8969ef8068a8e1dbaf8b230b6647d407cbb12974d5796c",
+      "name": "concat-stream",
+      "source": "https://registry.npmjs.org/concat-stream/2.0.0",
+      "version": "2.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6bab447d66bbd752e8cec14bced6394bedde6c236923546be5de980c40143c51",
+      "name": "csstype",
+      "source": "https://registry.npmjs.org/csstype/3.2.3",
+      "version": "3.2.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b268afc41ce4b2772412cb09e15986a86f19fd5c408de1daad1b02895b760a3e",
+      "name": "debug",
+      "source": "https://registry.npmjs.org/debug/4.4.3",
+      "version": "4.4.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "bf28f28148c535e785693ef3a7873d8efd73f6b227f6eef2c7722daf272b930b",
+      "name": "esbuild",
+      "source": "https://registry.npmjs.org/esbuild/0.28.2",
+      "version": "0.28.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b98c3b07007ce1a74a016a0b06d123872585e7b6ac556e92636b80de997292cf",
+      "name": "event-target-shim",
+      "source": "https://registry.npmjs.org/event-target-shim/5.0.1",
+      "version": "5.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "093f035c32b4aab14fefbe70e526213b7b8397082093a090eed432b6a2696e8c",
+      "name": "events",
+      "source": "https://registry.npmjs.org/events/3.3.0",
+      "version": "3.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "a011c9dc607ea7a8c032162e86d0c909ddeb46e089dee9350247e4eff3f3db4b",
+      "name": "fast-deep-equal",
+      "source": "https://registry.npmjs.org/fast-deep-equal/3.1.3",
+      "version": "3.1.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "32bedfaba319460ac1b62ebcfe9bfc2e775cab7895e8bbaa39ccd73e4ef5aa2c",
+      "name": "fast-unique-numbers",
+      "source": "https://registry.npmjs.org/fast-unique-numbers/9.0.27",
+      "version": "9.0.27"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "metadata_sha256": "dda7eed241a2f47ead3ab9fd7f7ed10ccf14c9f3e8c743860935a8d134df1ca1",
+      "name": "fast-uri",
+      "source": "https://registry.npmjs.org/fast-uri/3.1.9",
+      "version": "3.1.9"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8a06d4d82bd68db72aa332842d835eccc70933779084f162aa7940399fbfbefe",
+      "name": "fdir",
+      "source": "https://registry.npmjs.org/fdir/6.5.0",
+      "version": "6.5.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8abf250ca29b20e9e8607147ea0432c16f326c7b7f495a8af67affb575efee8d",
+      "name": "fsevents",
+      "source": "https://registry.npmjs.org/fsevents/2.3.3",
+      "version": "2.3.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3ff1edda3cd94ff084abb93399a7ff95812908e9ae966de6120866ea1cebb5d4",
+      "name": "help-me",
+      "source": "https://registry.npmjs.org/help-me/5.0.0",
+      "version": "5.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "metadata_sha256": "0a3a6743198b377e785ff443a59d8df8ce474f09cafc498c00db2f66c0cf0651",
+      "name": "ieee754",
+      "source": "https://registry.npmjs.org/ieee754/1.2.1",
+      "version": "1.2.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "6233fbf9bf6e4e86273b53362522435f4772ea9a74a0fa3f82801625432c8f96",
+      "name": "inherits",
+      "source": "https://registry.npmjs.org/inherits/2.0.4",
+      "version": "2.0.4"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b2f791c525879e69183dfc09fb5c0fff3f5d2829b9dbb72d1b8239d4746bde76",
+      "name": "ip-address",
+      "source": "https://registry.npmjs.org/ip-address/10.7.5",
+      "version": "10.7.5"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3745b71bbba6365091a38c47919dded5ca08bfebd9005f49437dd43d3e1f8302",
+      "name": "json-schema-traverse",
+      "source": "https://registry.npmjs.org/json-schema-traverse/1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "metadata_sha256": "dfa97cdfc653ab92ed1c530e080d98b62537140cc493b8e5e878f62e2e1d2f00",
+      "name": "leaflet",
+      "source": "https://registry.npmjs.org/leaflet/1.9.4",
+      "version": "1.9.4"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "81312fd758caa7138bb0e18192cb97131ad69a8bc759208b1fe742ea714365e5",
+      "name": "lru-cache",
+      "source": "https://registry.npmjs.org/lru-cache/10.4.3",
+      "version": "10.4.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "53fa9d5c2818e5c69e8f765fb95152f4d4fff7c86a9da33453aa30a3c98ceac1",
+      "name": "minimist",
+      "source": "https://registry.npmjs.org/minimist/1.2.8",
+      "version": "1.2.8"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f00486cf51be61e768ff543f7ee6df417864820c55f7885a99c17f1f213f5f3a",
+      "name": "mqtt",
+      "source": "https://registry.npmjs.org/mqtt/5.16.1",
+      "version": "5.16.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "344be374a8e21b354e0ebe7aa7bb9c3e934570de63f5167465a57381651d3179",
+      "name": "mqtt-packet",
+      "source": "https://registry.npmjs.org/mqtt-packet/9.0.2",
+      "version": "9.0.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "c698094a3017fb8d801c34a94da18a98158a4cec1580d8829a6c631990ab892b",
+      "name": "ms",
+      "source": "https://registry.npmjs.org/ms/2.1.3",
+      "version": "2.1.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "f0051590d49f82f027d5d4c4e3903f612956f72c7b6fbd77ba3ebad049c67ff7",
+      "name": "nanoid",
+      "source": "https://registry.npmjs.org/nanoid/3.3.20",
+      "version": "3.3.20"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "d569f44509ac2d210f3967291e59d543a6cd0b4028bce694650805dc4a9e9a66",
+      "name": "pg",
+      "source": "https://registry.npmjs.org/pg/8.23.1",
+      "version": "8.23.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b076cfe13ebfdca842d11d1577e15adcad1995306c33b0d743fed51e27b33234",
+      "name": "pg-cloudflare",
+      "source": "https://registry.npmjs.org/pg-cloudflare/1.4.1",
+      "version": "1.4.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "87e49d1f897fab757c4f463978d9e9d1a1317a1b95242e082accf13afc1d5353",
+      "name": "pg-connection-string",
+      "source": "https://registry.npmjs.org/pg-connection-string/2.14.1",
+      "version": "2.14.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "454660e28c0e5706493a11bf837f9981212ddc80a12ce8c9e1c73278335da093",
+      "name": "pg-int8",
+      "source": "https://registry.npmjs.org/pg-int8/1.0.1",
+      "version": "1.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6c67bdd80716b7e7bc6a2021b6cf8ef345f5cf32324dd8802517f5f1d8545b96",
+      "name": "pg-pool",
+      "source": "https://registry.npmjs.org/pg-pool/3.14.0",
+      "version": "3.14.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b9ad1dfdae58a42b184f21326083bda8eaea9c8dc468fe9fd29d50d90cfd3006",
+      "name": "pg-protocol",
+      "source": "https://registry.npmjs.org/pg-protocol/1.16.1",
+      "version": "1.16.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "9f2b73fcb3d67394540b1d1421eadeed7aeffcb973655729cc8824db59d83ee8",
+      "name": "pg-types",
+      "source": "https://registry.npmjs.org/pg-types/2.2.0",
+      "version": "2.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "b25728ee49402805ce7e2ab3944f5b5b0b967d60f2b2092aed57f4a41c1892e8",
+      "name": "pgpass",
+      "source": "https://registry.npmjs.org/pgpass/1.0.5",
+      "version": "1.0.5"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "c100ecbbc02bf3c116c26307e922175066cfa3a28d5eeb24f7f2e84a869094ef",
+      "name": "picocolors",
+      "source": "https://registry.npmjs.org/picocolors/1.1.1",
+      "version": "1.1.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "6f5d91e96eca972636d1dad9538dc9c283c94c7c63bce541b0d68a4d625b130a",
+      "name": "picomatch",
+      "source": "https://registry.npmjs.org/picomatch/4.0.7",
+      "version": "4.0.7"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "3ecd8d82747290395f60842710f407c686625b3f2ff420786b92141e4a4c6983",
+      "name": "postcss",
+      "source": "https://registry.npmjs.org/postcss/8.5.32",
+      "version": "8.5.32"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "a20af4e2cf57eb1ef812ecdc977a9b8c69c582cede82996bb7b625278f5e58d9",
+      "name": "postgres-array",
+      "source": "https://registry.npmjs.org/postgres-array/2.0.0",
+      "version": "2.0.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "62c48c0ebb0f8a20ed0d45fe784f08b7a521c9004d6545f0364c8038e2c5ec91",
+      "name": "postgres-bytea",
+      "source": "https://registry.npmjs.org/postgres-bytea/1.0.1",
+      "version": "1.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "5ce4155ee43e0f7d40b841587163ae6a395c1e0990ce916ecd0c030462d6b943",
+      "name": "postgres-date",
+      "source": "https://registry.npmjs.org/postgres-date/1.0.7",
+      "version": "1.0.7"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4c08c97b184307639e0a0fc443ec9c946beb7e0ee6aa47310f31b49d6106b560",
+      "name": "postgres-interval",
+      "source": "https://registry.npmjs.org/postgres-interval/1.2.0",
+      "version": "1.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "250506a63afdc63af0b9f32534dcf36474e21ccaded7cb5209efc66bce0fc37f",
+      "name": "process",
+      "source": "https://registry.npmjs.org/process/0.11.10",
+      "version": "0.11.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ae4f8d22c3be3ac9f85d21c9d7ef2bedeca4ee7bb72e07af35bc061afc03a33a",
+      "name": "process-nextick-args",
+      "source": "https://registry.npmjs.org/process-nextick-args/2.0.1",
+      "version": "2.0.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "2149ff10bf77dc9f2dc7dd48cc5a2b466768cbe72002981bc0204e49634c9bc2",
+      "name": "react",
+      "source": "https://registry.npmjs.org/react/19.3.1",
+      "version": "19.3.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "492f0b540c460a45fd7299dc146f2904b8089bb21e044a421647ea90c51c04d6",
+      "name": "react-dom",
+      "source": "https://registry.npmjs.org/react-dom/19.3.1",
+      "version": "19.3.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1c81b9c385bf3e0de8a6c91f887acb9b39dccda84dccd9b10c4641186322aa1b",
+      "name": "readable-stream",
+      "source": "https://registry.npmjs.org/readable-stream/3.6.2",
+      "version": "3.6.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "036a7f22b9486371a09566c2751068beb7b8ca14fd80beb4093e765ce1c7e4e3",
+      "name": "readable-stream",
+      "source": "https://registry.npmjs.org/readable-stream/4.8.0",
+      "version": "4.8.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4f70a64c40f9147a92af6304542dff4239884dead07a7f3cd10c4112d79d276d",
+      "name": "require-from-string",
+      "source": "https://registry.npmjs.org/require-from-string/2.0.2",
+      "version": "2.0.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "fecbd7d31461f018c263e071d783000dd31c9449412446a5a81384bdf98e6720",
+      "name": "rfdc",
+      "source": "https://registry.npmjs.org/rfdc/1.4.1",
+      "version": "1.4.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "9145f0caaff76acd75a3dce1638ed6d47d635d80cba72499643bf29291eb7f0b",
+      "name": "rollup",
+      "source": "https://registry.npmjs.org/rollup/4.66.0",
+      "version": "4.66.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "7b3423533cb6b58bf259ad692aa9f87866f6dd2590dc192d977801488ed75917",
+      "name": "safe-buffer",
+      "source": "https://registry.npmjs.org/safe-buffer/5.2.1",
+      "version": "5.2.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4a9df2c7b223d20e596727a0a20990546ec747f30296731d077d33ce8fd07da2",
+      "name": "scheduler",
+      "source": "https://registry.npmjs.org/scheduler/0.28.0",
+      "version": "0.28.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1e2b1f4921fd6c372a37c8482dd1414c6d5065f9c908abac4cfca39f69f63ab9",
+      "name": "smart-buffer",
+      "source": "https://registry.npmjs.org/smart-buffer/4.2.0",
+      "version": "4.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "2c992b68febd8dae55765744ffce29f85614c3cec9b551fefb8c93dfc4fd162c",
+      "name": "socks",
+      "source": "https://registry.npmjs.org/socks/2.8.10",
+      "version": "2.8.10"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "metadata_sha256": "db3110345381a9fb87b7504deed4f8c6ad409f12f87d96957e323b45887f2319",
+      "name": "source-map-js",
+      "source": "https://registry.npmjs.org/source-map-js/1.2.2",
+      "version": "1.2.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "metadata_sha256": "5835f2f1b3a8d347f43cf4afb2db341e7bcd428617606af3aed30b61151f8ae6",
+      "name": "split2",
+      "source": "https://registry.npmjs.org/split2/4.2.0",
+      "version": "4.2.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "4823d456faeba235ce324984e3a5fcc80c2d5630878f62d7de23db7afa4a0dfe",
+      "name": "string_decoder",
+      "source": "https://registry.npmjs.org/string_decoder/1.3.0",
+      "version": "1.3.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ba4a2f5f3f4f18b2bec221a5d63f44d6ff56ffb273bab3045f052efa840447da",
+      "name": "tinyglobby",
+      "source": "https://registry.npmjs.org/tinyglobby/0.2.17",
+      "version": "0.2.17"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "0BSD"
+          }
+        }
+      ],
+      "metadata_sha256": "c0422c6174a7d64c318b42bda107700ba38e738233419091a06916625a0ee83a",
+      "name": "tslib",
+      "source": "https://registry.npmjs.org/tslib/2.8.1",
+      "version": "2.8.1"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "82a2b1c9af6fe9d3404eb51f4ca73807d0706028d616daa2a3f004e1cb99b92f",
+      "name": "typedarray",
+      "source": "https://registry.npmjs.org/typedarray/0.0.6",
+      "version": "0.0.6"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "metadata_sha256": "3e60e93529d2dfa584024b238765f7f8fd3524624bbce6967b49254262716d85",
+      "name": "typescript",
+      "source": "https://registry.npmjs.org/typescript/5.9.3",
+      "version": "5.9.3"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8021870b6ff105ac98ecc336b3e076b08320a8e27c3190a7eb087b4de63a1905",
+      "name": "undici-types",
+      "source": "https://registry.npmjs.org/undici-types/7.24.6",
+      "version": "7.24.6"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "46fed606b0deb71334108039e2ea5785fe587a7ee7a55596e0c5dc1c6aa5f6f7",
+      "name": "undici-types",
+      "source": "https://registry.npmjs.org/undici-types/8.9.0",
+      "version": "8.9.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "ed2a52f244a05a768ad951439b2cee969a0c4761f1fc2bf2b4f6070f875153d9",
+      "name": "util-deprecate",
+      "source": "https://registry.npmjs.org/util-deprecate/1.0.2",
+      "version": "1.0.2"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "c010204722a801cb89f8955cb3a0f88257282542f7eec83d4c99d0f04af3abcc",
+      "name": "vite",
+      "source": "https://registry.npmjs.org/vite/7.3.7",
+      "version": "7.3.7"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "025b025aca43677ca8d7384f8b2f8dd1cae99103d97b85646c80fe0c5a948936",
+      "name": "worker-factory",
+      "source": "https://registry.npmjs.org/worker-factory/7.0.50",
+      "version": "7.0.50"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "1bfd42204a738b5e80b20f9deef22baebccd729b7b27edf4961b4e83968904b8",
+      "name": "worker-timers",
+      "source": "https://registry.npmjs.org/worker-timers/8.0.34",
+      "version": "8.0.34"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "8b7eb5c22a8f684b230c4f179eaba666eb4288d7ed0043a60de293b3997390ae",
+      "name": "worker-timers-broker",
+      "source": "https://registry.npmjs.org/worker-timers-broker/8.0.18",
+      "version": "8.0.18"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "e8d526fc181a5d2204185b1f388422dee5781d81716920cff23e4457cca58855",
+      "name": "worker-timers-worker",
+      "source": "https://registry.npmjs.org/worker-timers-worker/9.0.15",
+      "version": "9.0.15"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "5215f393ed9acee525b3eab3579f34e33fbd9848a53680d3f5a24b49f647a1f3",
+      "name": "ws",
+      "source": "https://registry.npmjs.org/ws/8.22.0",
+      "version": "8.22.0"
+    },
+    {
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "metadata_sha256": "fea25ec1cb4e9d340f21d23292dfa5a89ea0ca465ea81536f9d000ad316a3d72",
+      "name": "xtend",
+      "source": "https://registry.npmjs.org/xtend/4.0.2",
+      "version": "4.0.2"
+    }
+  ],
+  "source": "npm exact-version registry metadata"
+}

@@ -1,0 +1,71 @@
+{
+  "format": "privacy-bubble.security-tool-bootstrap.v1",
+  "tool_role": "SBOM validation/inventory tooling; excluded from product runtime BOM",
+  "fresh_venv_bootstrap_passed": true,
+  "artifact_policy": "Only prebuilt wheels; official PyPI release metadata SHA256 pins; offline installation from verified wheelhouse with pip --require-hashes",
+  "requirements_sha256": "2dffeb21d3deb755987cf13b159e7e6e76e95cb022ee3a1b809ae796dbf3fa31",
+  "requirements_lock_sha256": "d6f2f42506648dd2c1e3939ba74decaaaa22070e2c8a42a635383f50a8db4127",
+  "verified_platform_artifacts": [
+    {
+      "file": "attrs-26.1.0-py3-none-any.whl",
+      "package": "attrs",
+      "version": "26.1.0",
+      "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+      "official_pypi_release": "https://pypi.org/pypi/attrs/26.1.0/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "jsonschema-4.26.0-py3-none-any.whl",
+      "package": "jsonschema",
+      "version": "4.26.0",
+      "sha256": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce",
+      "official_pypi_release": "https://pypi.org/pypi/jsonschema/4.26.0/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+      "package": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "sha256": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe",
+      "official_pypi_release": "https://pypi.org/pypi/jsonschema-specifications/2025.9.1/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "packaging-26.3-py3-none-any.whl",
+      "package": "packaging",
+      "version": "26.3",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "official_pypi_release": "https://pypi.org/pypi/packaging/26.3/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "referencing-0.37.0-py3-none-any.whl",
+      "package": "referencing",
+      "version": "0.37.0",
+      "sha256": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+      "official_pypi_release": "https://pypi.org/pypi/referencing/0.37.0/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "package": "rpds-py",
+      "version": "2026.9.1",
+      "sha256": "addeda51556dac7c1a2f14cda62db8b621cd12afba3091d03a96c72932387eab",
+      "official_pypi_release": "https://pypi.org/pypi/rpds-py/2026.9.1/json",
+      "matches_official_metadata": true
+    },
+    {
+      "file": "typing_extensions-4.16.0-py3-none-any.whl",
+      "package": "typing-extensions",
+      "version": "4.16.0",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "official_pypi_release": "https://pypi.org/pypi/typing-extensions/4.16.0/json",
+      "matches_official_metadata": true
+    }
+  ],
+  "limitations": [
+    "Checksums were bootstrapped from official PyPI HTTPS metadata; not an independent publisher signature/authenticity assertion.",
+    "Only seven selected-platform wheel bytes were downloaded and checked; other permitted wheel/sdist hashes in requirements.lock come from the same official metadata.",
+    "The installer bootstrap supplied by Python ensurepip is separate from these seven pinned validation-tool distributions."
+  ]
+}

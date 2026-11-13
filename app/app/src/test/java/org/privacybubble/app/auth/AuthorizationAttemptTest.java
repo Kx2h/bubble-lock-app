@@ -5,6 +5,15 @@ import java.util.Random;
 import org.junit.Test;
 
 public class AuthorizationAttemptTest {
+    @Test public void callbackAndCompletionMustKeepTheExactApiContract() {
+        AuthorizationAttempt attempt = new AuthorizationAttempt(100,3,"https://api.example.test","portal-central-v1");
+        assertFalse(attempt.isLive(101,3,"https://api.example.test","portal-web-v1"));
+        assertFalse(attempt.claim(101,3,"https://api.example.test","keyrings-v1"));
+        assertTrue(attempt.claim(101,3,"https://api.example.test","portal-central-v1"));
+        assertFalse(attempt.claim(102,3,"https://api.example.test","portal-central-v1"));
+        assertThrows(IllegalArgumentException.class, () -> new AuthorizationAttempt(100,3,"https://api.example.test","unknown"));
+    }
+
     @Test public void singleUseCallbackAndLateResponseCannotSurviveCancellation() {
         AuthorizationAttempt attempt = new AuthorizationAttempt(100, 3, "https://api.example.test");
         assertTrue(attempt.claim(100, 3, "https://api.example.test"));

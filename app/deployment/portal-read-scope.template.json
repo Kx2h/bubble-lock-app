@@ -1,0 +1,24 @@
+{
+  "name": "portal:read",
+  "description": "User-bound portal reads; the API still checks enrollment, household and current location leases",
+  "protocol": "openid-connect",
+  "attributes": {
+    "include.in.token.scope": "true",
+    "display.on.consent.screen": "true",
+    "consent.screen.text": "허용된 키링 위치 조회"
+  },
+  "protocolMappers": [
+    {
+      "name": "bubble-native-api-audience",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "consentRequired": false,
+      "config": {
+        "included.custom.audience": "{{API_AUDIENCE}}",
+        "id.token.claim": "false",
+        "access.token.claim": "true",
+        "introspection.token.claim": "true"
+      }
+    }
+  ]
+}

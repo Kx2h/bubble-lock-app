@@ -21,12 +21,14 @@ public final class AuthSecurityAssertions {
 
     public static int run(Instrumentation instrumentation) throws Exception {
         assertions = 0;
+        assertions += SessionContractAssertions.run(instrumentation);
+        String requestScope=MobileApiAuthorization.forContract(new MobileSessionStore(instrumentation.getTargetContext()).getApiContract()).requestScope();
         AuthorizationRequest original = new AuthorizationRequest.Builder(
                 new AuthorizationServiceConfiguration(Uri.parse("https://issuer.example.test/auth"), Uri.parse("https://issuer.example.test/token")),
-                "isolated-mobile-client", ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT)).setScope("openid offline_access location:read").build();
+                "isolated-mobile-client", ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT)).setScope(requestScope).build();
         AuthorizationRequest transport = MobileSignInActivity.publicBrowserRequest(original);
         check(original != transport && !original.codeVerifier.equals(transport.codeVerifier), "separate-transport-request");
-        check(original.state.equals(transport.state) && original.nonce.equals(transport.nonce), "public-transaction-binding");
+        check(original.state.equals(transport.state) && original.nonce.equals(transport.nonce) && requestScope.equals(transport.scope), "public-transaction-binding");
         check(original.codeVerifierChallenge.equals(transport.codeVerifierChallenge) && "S256".equals(transport.codeVerifierChallengeMethod), "original-s256-challenge");
         check(original.codeVerifierChallenge.equals(transport.toUri().getQueryParameter("code_challenge")), "browser-challenge");
         check(transport.toUri().getQueryParameter("code_verifier") == null, "no-verifier-in-browser-uri");

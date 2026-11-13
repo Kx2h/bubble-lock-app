@@ -8,6 +8,7 @@ import android.util.Base64;
 import org.json.JSONObject;
 import org.privacybubble.app.BuildConfig;
 import org.privacybubble.app.net.BearerToken;
+import org.privacybubble.app.auth.MobileApiAuthorization;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import javax.crypto.Cipher;
@@ -18,7 +19,6 @@ import javax.crypto.spec.GCMParameterSpec;
 public final class MobileSessionStore {
     private static final Object LOCK = new Object();
     private static final String ALIAS = "privacy-bubble.mobile.session.v1";
-    private static final byte[] AAD = "org.privacybubble.app/mobile-session/v1".getBytes(StandardCharsets.UTF_8);
     private final SharedPreferences preferences;
 
     public MobileSessionStore(Context context) {
@@ -28,8 +28,9 @@ public final class MobileSessionStore {
     public String getApiBaseUrl() { return ServiceOrigin.effective(BuildConfig.MOBILE_API_BASE_URL, preferences.getString("api_base", null), BuildConfig.DEBUG); }
     public String getIssuer() { return BuildConfig.OIDC_ISSUER; }
     public String getClientId() { return BuildConfig.OIDC_CLIENT_ID; }
+    public String getApiContract() { return MobileApiAuthorization.forContract(BuildConfig.MOBILE_API_CONTRACT).contract; }
     public boolean isSignInConfigured() {
-        return !getApiBaseUrl().isEmpty() && !getIssuer().isEmpty() && !getClientId().isEmpty();
+        return !getApiContract().isEmpty() && !getApiBaseUrl().isEmpty() && !getIssuer().isEmpty() && !getClientId().isEmpty();
     }
 
     public void saveConnection(String baseUrl, String issuer, String clientId) {
@@ -64,14 +65,14 @@ public final class MobileSessionStore {
             if (value == null || value.optString("refresh", "").isEmpty()) return null;
             clearSession();
             return new RefreshTicket(value.optString("refresh"), value.optString("subject"), value.optString("nonce"), value.optString("identity", ""),
-                    getApiBaseUrl(), getIssuer(), getClientId(), epoch());
+                    getApiBaseUrl(), getIssuer(), getClientId(), getApiContract(), epoch());
         }
     }
     public static final class RefreshTicket {
-        public final String refreshToken, subject, nonce, identityContext, baseUrl, issuer, clientId;
+        public final String refreshToken, subject, nonce, identityContext, baseUrl, issuer, clientId, apiContract;
         public final long epoch;
-        private RefreshTicket(String refresh, String subject, String nonce, String identity, String base, String issuer, String client, long epoch) {
-            this.refreshToken=refresh; this.subject=subject; this.nonce=nonce; this.identityContext=identity; this.baseUrl=base; this.issuer=issuer; this.clientId=client; this.epoch=epoch;
+        private RefreshTicket(String refresh, String subject, String nonce, String identity, String base, String issuer, String client, String apiContract, long epoch) {
+            this.refreshToken=refresh; this.subject=subject; this.nonce=nonce; this.identityContext=identity; this.baseUrl=base; this.issuer=issuer; this.clientId=client; this.apiContract=apiContract; this.epoch=epoch;
         }
         @Override public String toString() { return "RefreshTicket[redacted]"; }
     }
@@ -79,13 +80,19 @@ public final class MobileSessionStore {
         return saveTokensIfCurrent(access,refresh,subject,expires,nonce,expectedEpoch,expectedBase,"");
     }
     public boolean saveTokensIfCurrent(String access, String refresh, String subject, long expires, String nonce, long expectedEpoch, String expectedBase, String identityContext) {
+        return saveTokensIfCurrent(access,refresh,subject,expires,nonce,expectedEpoch,expectedBase,identityContext,getApiContract());
+    }
+    public boolean saveTokensIfCurrent(String access, String refresh, String subject, long expires, String nonce, long expectedEpoch, String expectedBase, String identityContext, String expectedContract) {
         synchronized (LOCK) {
-            if (epoch() != expectedEpoch || !getApiBaseUrl().equals(expectedBase)) return false;
+            if (epoch() != expectedEpoch || !getApiBaseUrl().equals(expectedBase) || !getApiContract().equals(expectedContract)) return false;
             saveTokens(access, refresh, subject, expires, nonce, identityContext); return true;
         }
     }
     public void clearSessionIfCurrent(long expectedEpoch,String expectedBase) {
-        synchronized (LOCK) { if (epoch()==expectedEpoch && getApiBaseUrl().equals(expectedBase)) clearSession(); }
+        clearSessionIfCurrent(expectedEpoch,expectedBase,getApiContract());
+    }
+    public void clearSessionIfCurrent(long expectedEpoch,String expectedBase,String expectedContract) {
+        synchronized (LOCK) { if (epoch()==expectedEpoch && getApiBaseUrl().equals(expectedBase) && getApiContract().equals(expectedContract)) clearSession(); }
     }
 
     public void saveTokens(String access, String refresh, String subject, long expiresAtEpochSeconds) {
@@ -104,9 +111,9 @@ public final class MobileSessionStore {
                 JSONObject value = new JSONObject().put("access", access).put("refresh", refresh == null ? "" : refresh)
                         .put("subject", subject).put("expires", expiresAtEpochSeconds).put("nonce", nonce == null ? "" : nonce)
                         .put("identity", identityContext == null ? "" : identityContext)
-                        .put("origin", getApiBaseUrl()).put("issuer", getIssuer()).put("client", getClientId());
+                        .put("origin", getApiBaseUrl()).put("issuer", getIssuer()).put("client", getClientId()).put("apiContract",getApiContract());
                 Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-                cipher.init(Cipher.ENCRYPT_MODE, key()); cipher.updateAAD(AAD);
+                cipher.init(Cipher.ENCRYPT_MODE, key()); cipher.updateAAD(SessionProfile.associatedData(getApiContract()));
                 byte[] encrypted = cipher.doFinal(value.toString().getBytes(StandardCharsets.UTF_8));
                 if (!preferences.edit().putString("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
                         .putString("credentials", Base64.encodeToString(encrypted, Base64.NO_WRAP)).commit()) throw new Exception();
@@ -132,9 +139,10 @@ public final class MobileSessionStore {
             if (encrypted.length() > 70000) throw new Exception();
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key(), new GCMParameterSpec(128, Base64.decode(preferences.getString("iv", ""), Base64.NO_WRAP)));
-            cipher.updateAAD(AAD);
+            cipher.updateAAD(SessionProfile.associatedData(getApiContract()));
             JSONObject value = new JSONObject(new String(cipher.doFinal(Base64.decode(encrypted, Base64.NO_WRAP)), StandardCharsets.UTF_8));
-            if (!getApiBaseUrl().equals(value.optString("origin")) || !getIssuer().equals(value.optString("issuer")) || !getClientId().equals(value.optString("client"))) throw new Exception();
+            if (!getApiBaseUrl().equals(value.optString("origin")) || !getIssuer().equals(value.optString("issuer")) || !getClientId().equals(value.optString("client"))
+                    || !SessionProfile.matchesContract(value.opt("apiContract"),getApiContract())) throw new Exception();
             return value;
         } catch (Exception invalid) { clearSession(); return null; }
     }

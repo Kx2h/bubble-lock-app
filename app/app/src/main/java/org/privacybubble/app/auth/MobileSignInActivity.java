@@ -117,14 +117,14 @@ public final class MobileSignInActivity extends AppCompatActivity {
             if (!store.isSignInConfigured()) { status.setValue(FAILED); return; }
             try {
                 store.clearSession();
-                attempt = new AuthorizationAttempt(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl());
+                attempt = new AuthorizationAttempt(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl(), store.getApiContract());
                 worker.execute(() -> {
                     try {
                         OidcProvider discovered = OidcProvider.discover(store.getIssuer());
                         AuthorizationServiceConfiguration configuration = new AuthorizationServiceConfiguration(
                                 Uri.parse(discovered.authorizationEndpoint.toString()), Uri.parse(discovered.tokenEndpoint.toString()));
                         AuthorizationRequest created = new AuthorizationRequest.Builder(configuration, store.getClientId(), ResponseTypeValues.CODE, Uri.parse(OidcRedirect.REDIRECT))
-                                .setScope("openid offline_access location:read").build();
+                                .setScope(MobileApiAuthorization.forContract(attempt.apiContract).requestScope()).build();
                         if (created.state == null || created.nonce == null || created.codeVerifier == null || !"S256".equals(created.codeVerifierChallengeMethod)) throw new Exception();
                         synchronized (this) {
                             if (!live()) return;
@@ -146,7 +146,7 @@ public final class MobileSignInActivity extends AppCompatActivity {
         synchronized void consumeResult(int result, String redirect) {
             if (closed) return;
             if (attempt == null) { fail(); return; }
-            if (!attempt.claim(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl())) {
+            if (!attempt.claim(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl(), store.getApiContract())) {
                 if (!live()) fail();
                 return;
             }
@@ -165,12 +165,12 @@ public final class MobileSignInActivity extends AppCompatActivity {
                             + "&client_id=" + MobileTokenManager.enc(transaction.clientId) + "&redirect_uri=" + MobileTokenManager.enc(OidcRedirect.REDIRECT)
                             + "&code_verifier=" + MobileTokenManager.enc(transaction.codeVerifier);
                     String responseText = OidcTokenTransport.postForm(trustedProvider.tokenEndpoint, form);
-                    MobileTokenManager.TokenValues tokens = MobileTokenManager.TokenValues.parse(responseText, "", true);
+                    MobileTokenManager.TokenValues tokens = MobileTokenManager.TokenValues.parse(responseText, "", true, attempt.apiContract);
                     JSONObject response = new JSONObject(responseText);
                     IdTokenVerifier.Identity identity = trustedProvider.verifyIdentityToken(response.getString("id_token"), transaction.clientId, transaction.nonce, tokens.access);
                     synchronized (this) {
                         if (!live() || !store.saveTokensIfCurrent(tokens.access, tokens.refresh, identity.subject(), exchangeStarted + tokens.seconds,
-                                transaction.nonce, attempt.epoch, attempt.base, identity.exportForEncryptedStorage())) throw new Exception();
+                                transaction.nonce, attempt.epoch, attempt.base, identity.exportForEncryptedStorage(), attempt.apiContract)) throw new Exception();
                         request = null;
                         status.postValue(SUCCESS);
                     }
@@ -179,7 +179,7 @@ public final class MobileSignInActivity extends AppCompatActivity {
         }
 
         private boolean live() {
-            return !closed && attempt != null && attempt.isLive(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl());
+            return !closed && attempt != null && attempt.isLive(SystemClock.elapsedRealtime(), store.epoch(), store.getApiBaseUrl(), store.getApiContract());
         }
 
         private synchronized void fail() {
@@ -197,7 +197,7 @@ public final class MobileSignInActivity extends AppCompatActivity {
             status.postValue(FAILED);
             if (attempt != null) {
                 attempt.cancel();
-                try { store.clearSessionIfCurrent(attempt.epoch, attempt.base); } catch (Exception ignored) { }
+                try { store.clearSessionIfCurrent(attempt.epoch, attempt.base, attempt.apiContract); } catch (Exception ignored) { }
             }
             worker.shutdownNow();
         }

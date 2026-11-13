@@ -92,7 +92,7 @@ public final class KeyringMapView extends FrameLayout {
     private static final String DOTS = "privacybubble-dots";
     private static final String SELECTED = "privacybubble-selected";
     private static final LatLng OVERVIEW = new LatLng(36.3, 127.8);
-    private static final int MAX_POINTS = 500;
+    private static final int MAX_POINTS = 1000;
 
     private final Handler main = new Handler(Looper.getMainLooper());
     private final FrameLayout mapHost;
@@ -178,12 +178,12 @@ public final class KeyringMapView extends FrameLayout {
         controlsParams.setMargins(0, dp(12), dp(12), 0);
         mapHost.addView(controls, controlsParams);
 
-        legend = label("● 최근 확인   ○ 이전 기록", 11, text);
+        legend = label("● 최근 확인   ○ 이전·모의 기록", 11, text);
         legend.setPadding(dp(10), dp(7), dp(10), dp(7));
         legend.setGravity(Gravity.CENTER);
         legend.setBackgroundColor(surface);
         legend.setVisibility(GONE);
-        legend.setContentDescription("채워진 초록 점은 최근 확인 위치, 빈 테두리와 황토색 점은 이전 위치 기록입니다.");
+        legend.setContentDescription("채워진 초록 점은 최근 확인 위치, 빈 테두리와 황토색 점은 이전 기록 또는 모의 위치입니다.");
 
         column.addView(legend, 1, new LinearLayout.LayoutParams(-1, -2));
 
@@ -399,12 +399,12 @@ public final class KeyringMapView extends FrameLayout {
             Feature point = Feature.fromGeometry(Point.fromLngLat(item.longitude, item.latitude));
             point.addStringProperty("keyringId", item.id);
             point.addBooleanProperty("selected", item.id != null && item.id.equals(selectedId));
-            point.addBooleanProperty("fresh", item.isFresh(now));
+            point.addBooleanProperty("fresh", item.isFresh(now) && !item.simulation);
             points.add(point);
             if (item.id != null && item.id.equals(selectedId) && item.accuracyMeters != null
                     && Double.isFinite(item.accuracyMeters) && item.accuracyMeters > 0 && item.accuracyMeters <= 100_000) {
                 Feature area = Feature.fromGeometry(accuracyArea(item));
-                area.addBooleanProperty("fresh", item.isFresh(now));
+                area.addBooleanProperty("fresh", item.isFresh(now) && !item.simulation);
                 accuracy.add(area);
             }
         }

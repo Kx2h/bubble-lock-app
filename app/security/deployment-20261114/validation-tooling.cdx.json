@@ -1,0 +1,297 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "tooling:pypi:attrs",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+        }
+      ],
+      "name": "attrs",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/attrs@26.1.0",
+      "scope": "excluded",
+      "type": "library",
+      "version": "26.1.0"
+    },
+    {
+      "bom-ref": "tooling:pypi:jsonschema",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"
+        }
+      ],
+      "name": "jsonschema",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/jsonschema@4.26.0",
+      "scope": "excluded",
+      "type": "library",
+      "version": "4.26.0"
+    },
+    {
+      "bom-ref": "tooling:pypi:jsonschema-specifications",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"
+        }
+      ],
+      "name": "jsonschema-specifications",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
+      "scope": "excluded",
+      "type": "library",
+      "version": "2025.9.1"
+    },
+    {
+      "bom-ref": "tooling:pypi:packaging",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+        }
+      ],
+      "name": "packaging",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/packaging@26.3",
+      "scope": "excluded",
+      "type": "library",
+      "version": "26.3"
+    },
+    {
+      "bom-ref": "tooling:pypi:referencing",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231"
+        }
+      ],
+      "name": "referencing",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/referencing@0.37.0",
+      "scope": "excluded",
+      "type": "library",
+      "version": "0.37.0"
+    },
+    {
+      "bom-ref": "tooling:pypi:rpds-py",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "addeda51556dac7c1a2f14cda62db8b621cd12afba3091d03a96c72932387eab"
+        }
+      ],
+      "name": "rpds-py",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/rpds-py@2026.9.1",
+      "scope": "excluded",
+      "type": "library",
+      "version": "2026.9.1"
+    },
+    {
+      "bom-ref": "tooling:pypi:typing-extensions",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+        }
+      ],
+      "name": "typing-extensions",
+      "properties": [
+        {
+          "name": "privacybubble:application-id",
+          "value": "sbom-validation-toolchain"
+        },
+        {
+          "name": "privacybubble:dependency-kind",
+          "value": "validation tooling only"
+        },
+        {
+          "name": "privacybubble:deployment-scope",
+          "value": "local validation environment; excluded from Android/PC/web/Gateway runtime"
+        },
+        {
+          "name": "privacybubble:artifact-hash-scope",
+          "value": "selected-platform wheel from official PyPI metadata"
+        }
+      ],
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "scope": "excluded",
+      "type": "library",
+      "version": "4.16.0"
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "tooling:sbom-validation"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:attrs"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:jsonschema"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:jsonschema-specifications"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:packaging"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:referencing"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:rpds-py"
+    },
+    {
+      "dependsOn": [],
+      "ref": "tooling:pypi:typing-extensions"
+    },
+    {
+      "dependsOn": [
+        "tooling:pypi:attrs",
+        "tooling:pypi:jsonschema",
+        "tooling:pypi:jsonschema-specifications",
+        "tooling:pypi:packaging",
+        "tooling:pypi:referencing",
+        "tooling:pypi:rpds-py",
+        "tooling:pypi:typing-extensions"
+      ],
+      "ref": "tooling:sbom-validation"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "tooling:sbom-validation",
+      "name": "bubble-lock-sbom-validation-toolchain",
+      "type": "application",
+      "version": "pinned-tools-snapshot"
+    },
+    "properties": [
+      {
+        "name": "privacybubble:coverage",
+        "value": "Seven explicitly pinned validation/inventory-tool wheels; excludes product runtime and installer/bootstrap Python/pip layers"
+      }
+    ]
+  },
+  "serialNumber": "urn:uuid:07397f1e-f43c-5f0d-9134-c84737a65630",
+  "specVersion": "1.6",
+  "version": 1
+}

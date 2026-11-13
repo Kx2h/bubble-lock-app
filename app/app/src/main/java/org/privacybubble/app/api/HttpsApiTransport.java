@@ -21,8 +21,14 @@ public final class HttpsApiTransport {
     private static final Set<String> METHODS = new HashSet<>(Arrays.asList("GET", "POST", "PUT", "DELETE"));
     private static final Set<String> RESERVED = new HashSet<>(Arrays.asList("host", "connection", "content-length", "transfer-encoding", "proxy-authorization"));
     private final URI origin;
+    private final int maximumResponseBytes;
 
     public HttpsApiTransport(URI origin) {
+        this(origin, MAX_BODY);
+    }
+
+    public HttpsApiTransport(URI origin, int maximumResponseBytes) {
+        if (maximumResponseBytes < 1 || maximumResponseBytes > 1_048_576) throw new IllegalArgumentException("Invalid response bound");
         if (origin == null || !"https".equalsIgnoreCase(origin.getScheme()) || origin.getHost() == null
                 || origin.getUserInfo() != null || origin.getRawQuery() != null || origin.getRawFragment() != null
                 || origin.getPort() > 65535 || origin.getPort() == 0
@@ -30,6 +36,7 @@ public final class HttpsApiTransport {
             throw new IllegalArgumentException("Invalid HTTPS origin");
         }
         this.origin = origin;
+        this.maximumResponseBytes = maximumResponseBytes;
     }
 
     public Response request(String method, String relative, Map<String, String> headers, byte[] body) throws IOException {
@@ -58,7 +65,7 @@ public final class HttpsApiTransport {
             remainingMillis(deadline);
             if (status < 100 || status > 599) throw new IOException("Invalid HTTP response");
             InputStream stream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-            byte[] response = readBody(connection, stream, deadline);
+            byte[] response = readBody(connection, stream, deadline, maximumResponseBytes);
             Map<String, String> responseHeaders = new HashMap<>();
             Set<String> repeated = new HashSet<>();
             for (Map.Entry<String, java.util.List<String>> header : connection.getHeaderFields().entrySet()) {
@@ -111,7 +118,7 @@ public final class HttpsApiTransport {
         return (int) Math.max(1, (nanos + 999_999) / 1_000_000);
     }
 
-    private static byte[] readBody(HttpsURLConnection connection, InputStream input, long deadline) throws IOException {
+    private static byte[] readBody(HttpsURLConnection connection, InputStream input, long deadline, int maximumResponseBytes) throws IOException {
         if (input == null) return new byte[0];
         try (InputStream in = input; ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[4096]; int count;
@@ -120,7 +127,7 @@ public final class HttpsApiTransport {
                 count = in.read(buffer);
                 remainingMillis(deadline);
                 if (count == -1) break;
-                if (count > MAX_BODY - output.size()) throw new IOException("Response too large");
+                if (count > maximumResponseBytes - output.size()) throw new IOException("Response too large");
                 output.write(buffer, 0, count);
             }
             return output.toByteArray();

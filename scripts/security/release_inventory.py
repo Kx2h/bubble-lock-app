@@ -8,12 +8,15 @@ import hashlib
 import importlib.metadata
 import json
 import pathlib
+import re
+import subprocess
 import sys
 import time
 import urllib.parse
 import urllib.request
 import uuid
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 
 
 OSV = "https://api.osv.dev/v1/"
@@ -79,12 +82,11 @@ def license_choice(name, url=None):
 
 
 def collect_licenses(args):
-    lock = read_json(args.npm_lock)
+    specs = npm_inputs(args)
     records = []
-    for location, item in sorted(lock["packages"].items()):
-        if not location:
-            continue
-        name, version = npm_name(location), item["version"]
+    selected = sorted({(npm_name(location), item["version"]) for spec in specs for location, item in read_json(spec["path"])["packages"].items() if location})
+    def collect(package):
+        name, version = package
         source = "https://registry.npmjs.org/" + urllib.parse.quote(name, safe="") + "/" + urllib.parse.quote(version, safe="")
         metadata = request_json(source)
         if metadata.get("name") != name or metadata.get("version") != version:
@@ -96,9 +98,12 @@ def collect_licenses(args):
             choices = [license_choice(value.get("type", "Unspecified"), value.get("url"))]
         else:
             choices = []
-        records.append({"name": name, "version": version, "source": source, "licenses": choices,
-                        "metadata_sha256": sha256(json.dumps(metadata, sort_keys=True).encode())})
-    write_json(args.output, {"source": "npm exact-version registry metadata", "checked_at": stamp(), "packages": records})
+        return {"name": name, "version": version, "source": source, "licenses": choices,
+                "metadata_sha256": sha256(json.dumps(metadata, sort_keys=True).encode())}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        records = list(pool.map(collect, selected))
+    write_json(args.output, {"source": "npm exact-version registry metadata", "checked_at": stamp(), "packages": records,
+                            "applications": [{"id": spec["id"], "lock_sha256": sha256(pathlib.Path(spec["path"]).read_bytes())} for spec in specs]})
     print(json.dumps({"result": "license-metadata-collected", "npm_packages": len(records), "without_declared_license": sum(not r["licenses"] for r in records)}))
 
 
@@ -115,6 +120,210 @@ def resolve_npm(location, name, packages):
         if candidate in packages:
             return candidate
     raise ValueError("Dependency missing from lockfile: " + name)
+
+
+def named_input(value):
+    identifier, separator, path = value.partition("=")
+    if not separator or not re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", identifier) or not path:
+        raise ValueError("Expected a unique application-id=path input")
+    return identifier, path
+
+
+def npm_inputs(args):
+    result = [{"id": "pc-mobius", "path": args.npm_lock, "source": "pc-mobius/package-lock.json", "legacy": True}]
+    names, paths = {"pc-mobius"}, {pathlib.Path(args.npm_lock).resolve()}
+    for identifier, path in sorted(named_input(value) for value in getattr(args, "npm_application", []) or []):
+        if identifier in names or pathlib.Path(path).resolve() in paths:
+            raise ValueError("Duplicate npm application identity or lockfile")
+        names.add(identifier); paths.add(pathlib.Path(path).resolve())
+        result.append({"id": identifier, "path": path, "source": identifier + "/package-lock.json", "legacy": False})
+    return result
+
+
+def add_npm_application(spec, components, graph, parent_ref, license_records):
+    lock = read_json(spec["path"])
+    if lock.get("lockfileVersion") != 3:
+        raise ValueError("Expected npm lockfile version 3")
+    packages = lock["packages"]
+    npm_root = "application:" + spec["id"]
+    namespace = "npm-location:" if spec["legacy"] else "npm-location:" + spec["id"] + ":"
+    deployment = "PC Mobius host" if spec["legacy"] else spec["id"] + " host/browser build"
+    components.append({"bom-ref": npm_root, "type": "application", "name": packages[""]["name"], "version": packages[""]["version"],
+                       "hashes": [{"alg": "SHA-256", "content": sha256(pathlib.Path(spec["path"]).read_bytes())}],
+                       "properties": properties(inventory_source=spec["source"], deployment_scope=deployment + "; not embedded in Android APK", hash_scope="package-lock.json", dependency_coverage="complete lock tree including development, peer and optional packages; not a bundle reachability analysis")})
+    graph[parent_ref].add(npm_root)
+    npm_refs = {location: namespace + location for location in packages if location}
+    counts = {"runtime": 0, "development": 0, "runtime-optional": 0}
+    for location, item in sorted(packages.items()):
+        reference = npm_root if not location else npm_refs[location]
+        graph[reference] = set()
+        dependencies = {**item.get("dependencies", {}), **item.get("optionalDependencies", {}), **item.get("peerDependencies", {})}
+        if not location:
+            dependencies.update(item.get("devDependencies", {}))
+        for name in sorted(dependencies):
+            try:
+                graph[reference].add(npm_refs[resolve_npm(location, name, packages)])
+            except ValueError:
+                optional = name in item.get("optionalDependencies", {}) or item.get("peerDependenciesMeta", {}).get(name, {}).get("optional", False)
+                if not optional:
+                    raise
+        if not location:
+            continue
+        if item.get("link") or not item.get("version"):
+            raise ValueError("Unsupported unversioned/link dependency in npm lockfile")
+        name = npm_name(location)
+        kind = "development" if item.get("dev") else "runtime-optional" if item.get("optional") else "runtime"
+        counts[kind] += 1
+        component = {"bom-ref": reference, "type": "library", "name": name, "version": item["version"],
+                     "purl": "pkg:npm/" + urllib.parse.quote(name, safe="/") + "@" + urllib.parse.quote(item["version"]),
+                     "scope": "excluded" if kind == "development" else "optional" if kind == "runtime-optional" else "required",
+                     "properties": properties(inventory_source=spec["source"], application_id=spec["id"], deployment_scope=deployment,
+                                               dependency_kind=kind, npm_dev_optional=bool(item.get("devOptional")),
+                                               integrity_scope="lockfile registry tarball integrity; tarball not re-downloaded")}
+        license_record = license_records.get((name, item["version"]))
+        if license_record:
+            if license_record["licenses"]:
+                component["licenses"] = license_record["licenses"]
+            component["properties"] += properties(license_metadata_source=license_record["source"], license_metadata_sha256=license_record["metadata_sha256"])
+        hashes = []
+        for value in item.get("integrity", "").split():
+            algorithm, encoded = value.split("-", 1)
+            if algorithm in ("sha256", "sha384", "sha512", "sha1"):
+                hashes.append({"alg": {"sha1": "SHA-1", "sha256": "SHA-256", "sha384": "SHA-384", "sha512": "SHA-512"}[algorithm], "content": base64.b64decode(encoded, validate=True).hex()})
+        if hashes:
+            component["hashes"] = hashes
+        components.append(component)
+    return {"application": spec["id"], "lock_source": spec["source"], "lock_sha256": sha256(pathlib.Path(spec["path"]).read_bytes()), "packages": sum(counts.values()), "kinds": counts}
+
+
+def assemble_bom(root_ref, name, version, components, graph, coverage):
+    metadata = {"bom-ref": root_ref, "type": "application", "name": name, "version": version}
+    bom = {"$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json", "bomFormat": "CycloneDX", "specVersion": "1.6", "version": 1,
+           "metadata": {"component": metadata, "properties": properties(coverage=coverage)},
+           "components": sorted(components, key=lambda c: c["bom-ref"]), "dependencies": [{"ref": ref, "dependsOn": sorted(deps)} for ref, deps in sorted(graph.items())],
+           "compositions": [{"aggregate": "incomplete", "assemblies": [root_ref]}]}
+    encoded = json.dumps(bom, sort_keys=True).encode()
+    bom["serialNumber"] = "urn:uuid:" + str(uuid.uuid5(uuid.NAMESPACE_URL, sha256(encoded)))
+    verify_graph(bom)
+    return bom
+
+
+def generate_npm(args):
+    components, root_ref = [], "release:bubble-lock-host-dependencies"
+    graph = {root_ref: set()}
+    licenses = read_json(args.npm_licenses) if args.npm_licenses else {"packages": []}
+    records = {(item["name"], item["version"]): item for item in licenses["packages"]}
+    scopes = [add_npm_application(spec, components, graph, root_ref, records) for spec in npm_inputs(args)]
+    python_snapshots = getattr(args, "python_environment", []) or []
+    for value in python_snapshots:
+        identifier, path = named_input(value)
+        add_python_environment(identifier, path, components, graph, root_ref)
+    bom = assemble_bom(root_ref, "bubble-lock-host-dependencies", "inventory-snapshot", components, graph,
+                       "Complete selected npm lock trees including development/peer/optional dependencies and optionally selected local Gateway Python runtime snapshots; excludes Android; not evidence of deployed server/Pi package versions or browser bundle reachability")
+    write_json(args.output, bom)
+    print(json.dumps({"result": "generated", "components": len(components), "applications": scopes}))
+
+
+def python_runtime_closure(packages, root_name, environment):
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
+    from packaging.version import Version
+    by_name = {canonicalize_name(item["name"]): item for item in packages}
+    if len(by_name) != len(packages) or root_name not in by_name:
+        raise ValueError("Ambiguous Python inventory or missing Gateway root distribution")
+    active = {root_name: set()}
+    pending, graph = [root_name], {}
+    while pending:
+        name = pending.pop(0)
+        graph[name] = set()
+        for expression in by_name[name]["requires"]:
+            requirement = Requirement(expression)
+            if requirement.url:
+                raise ValueError("Direct URL Python dependency needs separate provenance")
+            if requirement.marker and not any(requirement.marker.evaluate({**environment, "extra": extra}) for extra in {"", *active[name]}):
+                continue
+            selected = canonicalize_name(requirement.name)
+            if selected not in by_name:
+                raise ValueError("Installed Python runtime dependency is missing: " + selected)
+            if requirement.specifier and not requirement.specifier.contains(Version(by_name[selected]["version"]), prereleases=True):
+                raise ValueError("Installed Python version violates declared dependency: " + selected)
+            graph[name].add(selected)
+            previous = active.get(selected)
+            extras = set(requirement.extras)
+            if previous is None or extras - previous:
+                active.setdefault(selected, set()).update(extras)
+                pending.append(selected)
+    return sorted(active), {name: sorted(values) for name, values in graph.items()}
+
+
+def collect_python_environment(args):
+    from packaging.utils import canonicalize_name
+    collector = '''import hashlib,importlib.metadata as m,json,os,platform,sys
+rows=[]
+for d in m.distributions():
+ raw=d.read_text("METADATA") or d.read_text("PKG-INFO") or ""
+ rows.append({"name":d.metadata["Name"],"version":d.version,"requires":d.requires or [],"metadata_sha256":hashlib.sha256(raw.encode()).hexdigest(),"license_expression":d.metadata.get("License-Expression"),"license_name":(d.metadata.get("License") or "").splitlines()[0][:256] if d.metadata.get("License") else None})
+v=sys.implementation.version
+iv="%s.%s.%s"%(v.major,v.minor,v.micro)
+if v.releaselevel!="final":iv+={"alpha":"a","beta":"b","candidate":"rc"}[v.releaselevel]+str(v.serial)
+env={"implementation_name":sys.implementation.name,"implementation_version":iv,"os_name":os.name,"platform_machine":platform.machine(),"platform_python_implementation":platform.python_implementation(),"platform_release":platform.release(),"platform_system":platform.system(),"platform_version":platform.version(),"python_full_version":platform.python_version(),"python_version":"%s.%s"%sys.version_info[:2],"sys_platform":sys.platform}
+print(json.dumps({"environment":env,"packages":rows}))'''
+    result = subprocess.run([args.python, "-I", "-c", collector], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+    if len(result.stdout) > LIMIT:
+        raise ValueError("Python environment metadata exceeds limit")
+    document = json.loads(result.stdout)
+    selected = {}
+    for item in document["packages"]:
+        from packaging.requirements import Requirement
+        from packaging.version import Version
+        name = canonicalize_name(item["name"], validate=True)
+        Version(item["version"])
+        if len(item["requires"]) > 512:
+            raise ValueError("Python dependency metadata exceeds bound")
+        for value in item["requires"]:
+            if len(value) > 2048 or Requirement(value).url:
+                raise ValueError("Unsupported Python requirement URL or oversized metadata")
+        if name in selected and selected[name] != item:
+            raise ValueError("Multiple conflicting Python distributions: " + name)
+        selected[name] = item
+    packages = [selected[name] for name in sorted(selected)]
+    root_name = canonicalize_name(args.root_distribution)
+    runtime, graph = python_runtime_closure(packages, root_name, document["environment"])
+    snapshot = {"format": "privacy-bubble.python-environment.v1", "checked_at": stamp(), "root_distribution": root_name,
+                "environment": document["environment"], "packages": packages, "runtime_packages": runtime, "runtime_graph": graph,
+                "excluded_installed_packages": sorted(set(selected) - set(runtime)),
+                "scope": "Local Gateway validation interpreter snapshot; not a lockfile, physical Pi environment, or deployed server inventory. Only the declared runtime closure enters the product BOM."}
+    write_json(args.output, snapshot)
+    print(json.dumps({"result": "python-environment-collected", "installed_packages": len(packages), "runtime_packages": len(runtime), "excluded_installed_packages": len(snapshot["excluded_installed_packages"])}))
+
+
+def add_python_environment(identifier, path, components, graph, parent_ref):
+    from packaging.utils import canonicalize_name
+    snapshot = read_json(path)
+    if snapshot.get("format") != "privacy-bubble.python-environment.v1":
+        raise ValueError("Expected a recorded Gateway Python environment")
+    runtime, runtime_graph = python_runtime_closure(snapshot["packages"], snapshot["root_distribution"], snapshot["environment"])
+    if runtime != snapshot["runtime_packages"] or runtime_graph != snapshot["runtime_graph"]:
+        raise ValueError("Recorded Python runtime closure differs from metadata")
+    packages = {canonicalize_name(item["name"]): item for item in snapshot["packages"]}
+    refs = {name: "python-environment:" + identifier + ":" + name for name in runtime}
+    root = snapshot["root_distribution"]
+    graph[parent_ref].add(refs[root])
+    for name in runtime:
+        item = packages[name]
+        component = {"bom-ref": refs[name], "type": "application" if name == root else "library", "name": name, "version": item["version"], "scope": "required",
+                     "properties": properties(inventory_source="installed Python distribution METADATA", environment_id=identifier,
+                                               deployment_scope="local Gateway validation environment; not physical Pi or deployed server",
+                                               dependency_kind="first-party application" if name == root else "runtime",
+                                               metadata_sha256=item["metadata_sha256"], environment_snapshot_sha256=sha256(pathlib.Path(path).read_bytes()),
+                                               artifact_hash_scope="metadata only; installed wheel/archive bytes not independently reconstructed")}
+        if name != root:
+            component["purl"] = "pkg:pypi/" + urllib.parse.quote(name) + "@" + urllib.parse.quote(item["version"])
+        license_name = item.get("license_expression") or item.get("license_name")
+        if license_name:
+            component["licenses"] = [license_choice(license_name)]
+        components.append(component)
+        graph[refs[name]] = {refs[dependency] for dependency in runtime_graph[name]}
 
 
 def generate(args):
@@ -166,48 +375,11 @@ def generate(args):
             graph[reference] = set()
     root_ref = "release:bubble-lock"
     graph[root_ref] = {inventory["root"]}
-    lock = read_json(args.npm_lock)
-    if lock.get("lockfileVersion") != 3:
-        raise ValueError("Expected npm lockfile version 3")
-    packages = lock["packages"]
-    npm_root = "application:pc-mobius"
-    components.append({"bom-ref": npm_root, "type": "application", "name": packages[""]["name"], "version": packages[""]["version"],
-                       "hashes": [{"alg": "SHA-256", "content": sha256(pathlib.Path(args.npm_lock).read_bytes())}],
-                       "properties": properties(inventory_source="pc-mobius/package-lock.json", deployment_scope="PC Mobius host; not embedded in Android APK", hash_scope="package-lock.json")})
-    graph[root_ref].add(npm_root)
-    npm_refs = {location: "npm-location:" + location for location in packages if location}
-    for location, item in sorted(packages.items()):
-        reference = npm_root if not location else npm_refs[location]
-        graph[reference] = set()
-        for name in sorted({**item.get("dependencies", {}), **item.get("optionalDependencies", {})}):
-            try:
-                graph[reference].add(npm_refs[resolve_npm(location, name, packages)])
-            except ValueError:
-                if name not in item.get("optionalDependencies", {}):
-                    raise
-        if not location:
-            continue
-        if item.get("link") or not item.get("version"):
-            raise ValueError("Unsupported unversioned/link dependency in npm lockfile")
-        name = npm_name(location)
-        component = {"bom-ref": reference, "type": "library", "name": name, "version": item["version"],
-                     "purl": "pkg:npm/" + urllib.parse.quote(name, safe="/") + "@" + urllib.parse.quote(item["version"]),
-                     "scope": "excluded" if item.get("dev") else "optional" if item.get("optional") else "required",
-                     "properties": properties(inventory_source="pc-mobius/package-lock.json", deployment_scope="PC Mobius host", integrity_scope="lockfile registry tarball integrity; tarball not re-downloaded")}
-        license_record = license_records.get((name, item["version"]))
-        if license_record:
-            if license_record["licenses"]:
-                component["licenses"] = license_record["licenses"]
-            component["properties"] += properties(license_metadata_source=license_record["source"], license_metadata_sha256=license_record["metadata_sha256"])
-        integrity = item.get("integrity", "").split()
-        hashes = []
-        for value in integrity:
-            algorithm, encoded = value.split("-", 1)
-            if algorithm in ("sha256", "sha384", "sha512", "sha1"):
-                hashes.append({"alg": {"sha1": "SHA-1", "sha256": "SHA-256", "sha384": "SHA-384", "sha512": "SHA-512"}[algorithm], "content": base64.b64decode(encoded, validate=True).hex()})
-        if hashes:
-            component["hashes"] = hashes
-        components.append(component)
+    for spec in npm_inputs(args):
+        add_npm_application(spec, components, graph, root_ref, license_records)
+    for value in getattr(args, "python_environment", []) or []:
+        identifier, path = named_input(value)
+        add_python_environment(identifier, path, components, graph, root_ref)
     for supplied, kind in ((args.apk, "apk"), (args.aab, "aab")):
         if not supplied:
             continue
@@ -232,14 +404,8 @@ def generate(args):
                                        "properties": properties(native_stage="packaged " + kind.upper() + " after Android processing", native_internal_dependencies="not decomposed; no native-version SCA claim")})
                     graph[artifact_ref].add(reference)
                     graph[reference] = set()
-    metadata = {"bom-ref": root_ref, "type": "application", "name": "bubble-lock-release", "version": inventory["version"]}
-    bom = {"$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json", "bomFormat": "CycloneDX", "specVersion": "1.6", "version": 1,
-           "metadata": {"component": metadata, "properties": properties(coverage="Resolved Android release runtime + patched AppAuth AAR + native files + pc-mobius npm lock; excludes OS/browser/build toolchains and unknown native static internals")},
-           "components": sorted(components, key=lambda c: c["bom-ref"]), "dependencies": [{"ref": ref, "dependsOn": sorted(deps)} for ref, deps in sorted(graph.items())],
-           "compositions": [{"aggregate": "incomplete", "assemblies": [root_ref]}]}
-    encoded = json.dumps(bom, sort_keys=True).encode()
-    bom["serialNumber"] = "urn:uuid:" + str(uuid.uuid5(uuid.NAMESPACE_URL, sha256(encoded)))
-    verify_graph(bom)
+    bom = assemble_bom(root_ref, "bubble-lock-release", inventory["version"], components, graph,
+                       "Resolved Android release runtime + patched AppAuth AAR + native files + selected npm lock trees + optional installed Gateway Python runtime snapshot; excludes OS/browser/build toolchains and unknown native static internals")
     write_json(args.output, bom)
     print(json.dumps({"result": "generated", "components": len(components), "dependency_nodes": len(graph), "sha256": sha256(pathlib.Path(args.output).read_bytes())}))
 
@@ -306,6 +472,8 @@ def scan(args):
             ecosystem, name, version = "Maven", component["group"] + ":" + component["name"], component["version"]
         elif purl.startswith("pkg:npm/"):
             ecosystem, name, version = "npm", component["name"], component["version"]
+        elif purl.startswith("pkg:pypi/"):
+            ecosystem, name, version = "PyPI", component["name"], component["version"]
         elif property_value(component, "privacybubble:upstream-maven"):
             ecosystem, name, version = "Maven", property_value(component, "privacybubble:upstream-maven"), property_value(component, "privacybubble:upstream-version")
         else:
@@ -342,12 +510,17 @@ def scan(args):
             active = continuation
     advisory_ids = sorted(set().union(*findings.values())) if findings else []
     advisories = {identifier: request_json(OSV + "vulns/" + urllib.parse.quote(identifier, safe="")) for identifier in advisory_ids}
+    contexts = {component["bom-ref"]: {"ref": component["bom-ref"], "scope": component.get("scope", "unspecified"),
+                 "application": property_value(component, "privacybubble:application-id") or property_value(component, "privacybubble:environment-id"),
+                 "dependency_kind": property_value(component, "privacybubble:dependency-kind"),
+                 "deployment_scope": property_value(component, "privacybubble:deployment-scope")} for component in bom["components"]}
     for key in package_keys:
-        records.append({"ecosystem": key[0], "name": key[1], "version": key[2], "component_refs": sorted(packages[key]), "vulnerability_ids": sorted(findings.get(key, set()))})
+        records.append({"ecosystem": key[0], "name": key[1], "version": key[2], "component_refs": sorted(packages[key]),
+                        "component_contexts": [contexts[reference] for reference in sorted(packages[key])], "vulnerability_ids": sorted(findings.get(key, set()))})
     report = {"format": "privacy-bubble.osv-sca.v1", "checked_at": stamp(), "sbom_sha256": sha256(pathlib.Path(args.sbom).read_bytes()),
               "status": "findings" if findings else "no-known-findings", "exact_package_versions": len(records), "affected_package_versions": len(findings),
               "unique_advisories": len(advisories), "querybatch_requests": len(trace), "packages": records, "advisories": advisories, "request_response_evidence": trace,
-              "excluded_components": excluded, "limitations": ["OSV database matches are not proof of runtime exploitability or absence of vulnerabilities.", "Patched AppAuth is queried using upstream 0.11.1; local patches require separate review.", "Native file hashes do not identify statically bundled third-party versions; those internals are not scanned.", "Node coverage is the complete checked-in pc-mobius package-lock tree, not an assertion that dependencies are embedded in the Android APK."]}
+              "excluded_components": excluded, "limitations": ["OSV database matches are not proof of runtime exploitability or absence of vulnerabilities.", "Patched AppAuth is queried using upstream 0.11.1; local patches require separate review.", "Native file hashes do not identify statically bundled third-party versions; those internals are not scanned.", "Selected npm lock trees include development/build dependencies; they are separate applications, not Android APK contents or exact browser bundle reachability.", "Optional Python package queries describe the declared runtime closure of a local validation interpreter; they do not inventory a physical Pi or deployed server."]}
     write_json(args.output, report)
     print(json.dumps({name: report[name] for name in ("status", "exact_package_versions", "affected_package_versions", "unique_advisories", "querybatch_requests")}))
     if findings and args.fail_on_findings:
@@ -361,7 +534,9 @@ def main():
     generate_parser = commands.add_parser("generate")
     generate_parser.add_argument("--inventory", required=True)
     generate_parser.add_argument("--npm-lock", default="pc-mobius/package-lock.json")
+    generate_parser.add_argument("--npm-application", action="append", default=[], metavar="ID=LOCKFILE")
     generate_parser.add_argument("--npm-licenses")
+    generate_parser.add_argument("--python-environment", action="append", default=[], metavar="ID=SNAPSHOT")
     generate_parser.add_argument("--android-notices", default="app/app/src/main/assets/licenses/manifest.json")
     generate_parser.add_argument("--apk")
     generate_parser.add_argument("--aab")
@@ -369,8 +544,21 @@ def main():
     generate_parser.set_defaults(function=generate)
     licenses_parser = commands.add_parser("licenses")
     licenses_parser.add_argument("--npm-lock", default="pc-mobius/package-lock.json")
+    licenses_parser.add_argument("--npm-application", action="append", default=[], metavar="ID=LOCKFILE")
     licenses_parser.add_argument("--output", required=True)
     licenses_parser.set_defaults(function=collect_licenses)
+    npm_parser = commands.add_parser("npm-bom")
+    npm_parser.add_argument("--npm-lock", default="pc-mobius/package-lock.json")
+    npm_parser.add_argument("--npm-application", action="append", default=[], metavar="ID=LOCKFILE")
+    npm_parser.add_argument("--npm-licenses")
+    npm_parser.add_argument("--python-environment", action="append", default=[], metavar="ID=SNAPSHOT")
+    npm_parser.add_argument("--output", required=True)
+    npm_parser.set_defaults(function=generate_npm)
+    python_parser = commands.add_parser("python-environment")
+    python_parser.add_argument("--python", required=True)
+    python_parser.add_argument("--root-distribution", default="privacy-bubble-gateway")
+    python_parser.add_argument("--output", required=True)
+    python_parser.set_defaults(function=collect_python_environment)
     validate_parser = commands.add_parser("validate")
     validate_parser.add_argument("--sbom", required=True)
     validate_parser.add_argument("--schema-cache", required=True)

@@ -1,0 +1,232 @@
+{
+  "checked_at": "2026-11-13T15:29:41Z",
+  "environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.12.3",
+    "os_name": "posix",
+    "platform_machine": "x86_64",
+    "platform_python_implementation": "CPython",
+    "platform_release": "6.6.87.2-microsoft-standard-WSL2",
+    "platform_system": "Linux",
+    "platform_version": "#1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025",
+    "python_full_version": "3.12.3",
+    "python_version": "3.12",
+    "sys_platform": "linux"
+  },
+  "excluded_installed_packages": [
+    "lxml",
+    "pip"
+  ],
+  "format": "privacy-bubble.python-environment.v1",
+  "packages": [
+    {
+      "license_expression": "MIT",
+      "license_name": null,
+      "metadata_sha256": "b184ac9cd097e2bb7f90d42799346cc91c276095d000d95d7f7ddd407d0c887e",
+      "name": "anyio",
+      "requires": [
+        "exceptiongroup>=1.0.2; python_version < \"3.11\"",
+        "idna>=2.8",
+        "typing_extensions>=4.16.0; python_version < \"3.15\"",
+        "trio>=0.32.0; extra == \"trio\""
+      ],
+      "version": "4.16.0"
+    },
+    {
+      "license_expression": "MIT",
+      "license_name": null,
+      "metadata_sha256": "f1c32dfd1ea70bee76c3c8bd55fa46f64da9c1bf2e3c49f2c5da6deec7af5352",
+      "name": "bleak",
+      "requires": [
+        "async-timeout>=3.0.0 ; python_full_version < '3.11'",
+        "typing-extensions>=4.7.0 ; python_full_version < '3.12'",
+        "pyobjc-core>=10.3 ; sys_platform == 'darwin'",
+        "pyobjc-framework-corebluetooth>=10.3 ; sys_platform == 'darwin'",
+        "pyobjc-framework-libdispatch>=10.3 ; sys_platform == 'darwin'",
+        "winrt-runtime>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-devices-bluetooth>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-devices-bluetooth-advertisement>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-devices-bluetooth-genericattributeprofile>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-devices-enumeration>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-devices-radios>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-foundation>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-foundation-collections>=3.1 ; sys_platform == 'win32'",
+        "winrt-windows-storage-streams>=3.1 ; sys_platform == 'win32'",
+        "dbus-fast>=4.0.0 ; sys_platform == 'linux'",
+        "bleak-pythonista>=0.1.1 ; extra == 'pythonista'"
+      ],
+      "version": "3.1.0"
+    },
+    {
+      "license_expression": null,
+      "license_name": "MPL-2.0",
+      "metadata_sha256": "e463e38f7fe7da36a11e6d3fecc5dfa5b97be8c8022620400750d79ae7d842bc",
+      "name": "certifi",
+      "requires": [],
+      "version": "2026.10.23"
+    },
+    {
+      "license_expression": null,
+      "license_name": "MIT",
+      "metadata_sha256": "a21def2493e6065792efebb4e802e36d82e4e2b7e677b90bfbd8f6fa542d8b35",
+      "name": "dbus-fast",
+      "requires": [],
+      "version": "5.2.0"
+    },
+    {
+      "license_expression": null,
+      "license_name": "MIT",
+      "metadata_sha256": "28f326098ac09fcba79b8f180f96087c841fe2456215cb7b872a9c7d5cd19d64",
+      "name": "h11",
+      "requires": [],
+      "version": "0.16.0"
+    },
+    {
+      "license_expression": "BSD-3-Clause",
+      "license_name": null,
+      "metadata_sha256": "fe2d4fda6199128978779e0cf27f3c045c531863fcdd987eacc74f3a18d41c21",
+      "name": "httpcore",
+      "requires": [
+        "certifi",
+        "h11>=0.16",
+        "anyio<5.0,>=4.0; extra == 'asyncio'",
+        "h2<5,>=3; extra == 'http2'",
+        "socksio==1.*; extra == 'socks'",
+        "trio<1.0,>=0.22.0; extra == 'trio'"
+      ],
+      "version": "1.0.9"
+    },
+    {
+      "license_expression": null,
+      "license_name": "BSD-3-Clause",
+      "metadata_sha256": "febb9b0f8f3e80d57c8199c304f35c4336e8581d1d18d7983c92766b82793b25",
+      "name": "httpx",
+      "requires": [
+        "anyio",
+        "certifi",
+        "httpcore==1.*",
+        "idna",
+        "brotli; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+        "brotlicffi; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+        "click==8.*; extra == 'cli'",
+        "pygments==2.*; extra == 'cli'",
+        "rich<14,>=10; extra == 'cli'",
+        "h2<5,>=3; extra == 'http2'",
+        "socksio==1.*; extra == 'socks'",
+        "zstandard>=0.18.0; extra == 'zstd'"
+      ],
+      "version": "0.28.1"
+    },
+    {
+      "license_expression": "BSD-3-Clause",
+      "license_name": null,
+      "metadata_sha256": "dbd8c14c1e4ca1e0c9824a6dbc7cbbf78884f38eb52d91148cd3025f671e4b85",
+      "name": "idna",
+      "requires": [
+        "ruff >= 0.16.0 ; extra == \"all\"",
+        "mypy >= 1.11.2 ; extra == \"all\"",
+        "ty >= 0.0.37 ; extra == \"all\"",
+        "pytest >= 8.3.2 ; extra == \"all\"",
+        "hypothesis >= 6.141.1 ; extra == \"all\"",
+        "coverage >= 7.10.0 ; extra == \"all\""
+      ],
+      "version": "3.20"
+    },
+    {
+      "license_expression": null,
+      "license_name": "BSD-3-Clause",
+      "metadata_sha256": "d2a20793094d4d3333e3e7397bc6676db1a0b7fbe96191c2128a97c9c911f794",
+      "name": "lxml",
+      "requires": [
+        "cssselect>=0.7; extra == \"cssselect\"",
+        "html5lib; extra == \"html5\"",
+        "BeautifulSoup4; extra == \"htmlsoup\"",
+        "lxml_html_clean; extra == \"html-clean\""
+      ],
+      "version": "6.0.2"
+    },
+    {
+      "license_expression": "EPL-2.0 OR BSD-3-Clause",
+      "license_name": null,
+      "metadata_sha256": "7a19440582d63aa7e483f713c9cb51182645c510167774587f0e32573bcb5bf6",
+      "name": "paho-mqtt",
+      "requires": [
+        "pysocks; extra == 'proxy'"
+      ],
+      "version": "2.2.0"
+    },
+    {
+      "license_expression": null,
+      "license_name": "MIT",
+      "metadata_sha256": "90d11f277fd5868da679ee257c97656dde511c8aac7d025231407e6ce90839e2",
+      "name": "pip",
+      "requires": [],
+      "version": "24.0"
+    },
+    {
+      "license_expression": null,
+      "license_name": null,
+      "metadata_sha256": "c17e428875535929da0f223426cd72910aae62fd9c6ca8f5f17dd7a9f667588a",
+      "name": "privacy-bubble-gateway",
+      "requires": [
+        "bleak<4,>=1",
+        "httpx<1,>=0.27",
+        "paho-mqtt<3,>=2"
+      ],
+      "version": "0.2.43"
+    },
+    {
+      "license_expression": "PSF-2.0",
+      "license_name": null,
+      "metadata_sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46",
+      "name": "typing_extensions",
+      "requires": [],
+      "version": "4.16.0"
+    }
+  ],
+  "root_distribution": "privacy-bubble-gateway",
+  "runtime_graph": {
+    "anyio": [
+      "idna",
+      "typing-extensions"
+    ],
+    "bleak": [
+      "dbus-fast"
+    ],
+    "certifi": [],
+    "dbus-fast": [],
+    "h11": [],
+    "httpcore": [
+      "certifi",
+      "h11"
+    ],
+    "httpx": [
+      "anyio",
+      "certifi",
+      "httpcore",
+      "idna"
+    ],
+    "idna": [],
+    "paho-mqtt": [],
+    "privacy-bubble-gateway": [
+      "bleak",
+      "httpx",
+      "paho-mqtt"
+    ],
+    "typing-extensions": []
+  },
+  "runtime_packages": [
+    "anyio",
+    "bleak",
+    "certifi",
+    "dbus-fast",
+    "h11",
+    "httpcore",
+    "httpx",
+    "idna",
+    "paho-mqtt",
+    "privacy-bubble-gateway",
+    "typing-extensions"
+  ],
+  "scope": "Local Gateway validation interpreter snapshot; not a lockfile, physical Pi environment, or deployed server inventory. Only the declared runtime closure enters the product BOM."
+}

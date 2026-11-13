@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "privacy-bubble.native-deployment.v1",
+  "publicOrigin": "https://bubblelock.iptime.org",
+  "issuer": "https://bubblelock.iptime.org/identity/realms/bubble",
+  "nativeClientId": "__REQUIRED_REGISTERED_NATIVE_CLIENT_ID__",
+  "apiAudience": "__REQUIRED_VERIFIED_API_AUDIENCE__",
+  "keycloakMajorVersion": "__REQUIRED_VERIFIED_KEYCLOAK_MAJOR_VERSION__",
+  "basicScopeExcludedFromTokenScope": false,
+  "publicCertificateSha256": "__REQUIRED_OUT_OF_BAND_CONFIRMED_HTTPS_CERT_SHA256__",
+  "publicCertificateConfirmed": false,
+  "upstreamOrigin": "__REQUIRED_HTTPS_INTEGRATION_API_ORIGIN__",
+  "upstreamTlsName": "__REQUIRED_UPSTREAM_CERTIFICATE_SAN_NAME__",
+  "upstreamCaFile": "__REQUIRED_ABSOLUTE_TRUSTED_UPSTREAM_CA_FILE__",
+  "upstreamVerifiesOidcAndEnrollment": false
+}

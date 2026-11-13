@@ -36,6 +36,7 @@ dist/
 *.sqlite3-wal
 *.sqlite3-shm
 *.lock
+!scripts/security/requirements.lock
 _local/
 keyring-journal-archives/
 keyring-gateway-archives/

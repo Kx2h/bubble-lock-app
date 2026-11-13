@@ -6,14 +6,35 @@ public final class KeyringLocation {
     public final String id, name, status, source, observedAt, receivedAt, expiresAt, connectivity;
     public final Double latitude, longitude, accuracyMeters;
     public final Integer batteryPercent;
+    public final boolean simulation, bleSimulation;
+    public final String provenance, gatewayId, bleObservedAt, relayAssociationId;
+    public final Integer rssiDbm;
 
     public KeyringLocation(String id, String name, String status, Double latitude, Double longitude,
             Double accuracyMeters, String observedAt, String receivedAt, String expiresAt,
             String source, String connectivity, Integer batteryPercent) {
+        this(id, name, status, latitude, longitude, accuracyMeters, observedAt, receivedAt, expiresAt,
+                source, connectivity, batteryPercent, false, "legacy", null, null, null, false, null);
+    }
+
+    public KeyringLocation(String id, String name, String status, Double latitude, Double longitude,
+            Double accuracyMeters, String observedAt, String receivedAt, String expiresAt,
+            String source, String connectivity, Integer batteryPercent, boolean simulation, String provenance,
+            String gatewayId, Integer rssiDbm, String bleObservedAt, boolean bleSimulation, String relayAssociationId) {
         this.id = id; this.name = name; this.status = status;
         this.latitude = latitude; this.longitude = longitude; this.accuracyMeters = accuracyMeters;
         this.observedAt = observedAt; this.receivedAt = receivedAt; this.expiresAt = expiresAt;
         this.source = source; this.connectivity = connectivity; this.batteryPercent = batteryPercent;
+        this.simulation = simulation; this.provenance = provenance;
+        this.gatewayId = gatewayId; this.rssiDbm = rssiDbm; this.bleObservedAt = bleObservedAt;
+        this.bleSimulation = bleSimulation; this.relayAssociationId = relayAssociationId;
+    }
+
+    public KeyringLocation asStale() {
+        if (!hasCoordinates() || "stale".equals(status)) return this;
+        return new KeyringLocation(id, name, "stale", latitude, longitude, accuracyMeters, observedAt, receivedAt,
+                expiresAt, source, connectivity, batteryPercent, simulation, provenance, gatewayId, rssiDbm,
+                bleObservedAt, bleSimulation, relayAssociationId);
     }
 
     public boolean hasCoordinates() {

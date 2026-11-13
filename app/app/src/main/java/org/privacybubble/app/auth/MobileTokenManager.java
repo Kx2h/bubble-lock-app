@@ -25,12 +25,12 @@ public final class MobileTokenManager {
             long started = System.currentTimeMillis() / 1000;
             String responseText = OidcTokenTransport.postForm(provider.tokenEndpoint,
                     "grant_type=refresh_token&client_id=" + enc(ticket.clientId) + "&refresh_token=" + enc(ticket.refreshToken));
-            TokenValues tokens = TokenValues.parse(responseText, ticket.refreshToken, false);
+            TokenValues tokens = TokenValues.parse(responseText, ticket.refreshToken, false, ticket.apiContract);
             JSONObject response = new JSONObject(responseText);
             if (response.has("id_token")) provider.verifyMobileRefresh(response.getString("id_token"), ticket.clientId,
                     ticket.identityContext, started, tokens.access);
             if (!store.saveTokensIfCurrent(tokens.access, tokens.refresh, ticket.subject, started + tokens.seconds,
-                    ticket.nonce, ticket.epoch, ticket.baseUrl, ticket.identityContext)) throw new Exception();
+                    ticket.nonce, ticket.epoch, ticket.baseUrl, ticket.identityContext, ticket.apiContract)) throw new Exception();
             return store.getAccessToken();
         } catch (Exception failure) { throw new ApiException(401, "로그인이 필요합니다."); }
     }
@@ -39,9 +39,13 @@ public final class MobileTokenManager {
         final String access, refresh; final long seconds;
         private TokenValues(String access, String refresh, long seconds) { this.access=access; this.refresh=refresh; this.seconds=seconds; }
         static TokenValues parse(JSONObject response, String oldRefresh, boolean initial) throws Exception {
-            return parse(response.toString(), oldRefresh, initial);
+            return parse(response.toString(), oldRefresh, initial, "keyrings-v1");
         }
         static TokenValues parse(String response, String oldRefresh, boolean initial) throws Exception {
+            return parse(response, oldRefresh, initial, "keyrings-v1");
+        }
+        static TokenValues parse(String response, String oldRefresh, boolean initial, String apiContract) throws Exception {
+            MobileApiAuthorization authorization = MobileApiAuthorization.forContract(apiContract);
             Map<String,Object> values = StrictJson.object(response,65536);
             Object access = values.get("access_token"), type = values.get("token_type"), expiry = values.get("expires_in");
             if (!(access instanceof String) || !(type instanceof String) || !"bearer".equalsIgnoreCase((String) type)
@@ -56,8 +60,8 @@ public final class MobileTokenManager {
             }
             if (values.containsKey("scope")) {
                 Object scope = values.get("scope");
-                if (!(scope instanceof String) || !validScope((String)scope)
-                        || !java.util.Arrays.asList(((String) scope).split(" ")).contains("location:read")) throw new Exception();
+                if (!(scope instanceof String)) throw new Exception();
+                authorization.requireResponseScope((String)scope);
             }
             if (values.containsKey("id_token") && (!(values.get("id_token") instanceof String) || !printable((String)values.get("id_token")))) throw new Exception();
             if (initial && !(values.get("id_token") instanceof String)) throw new Exception();
@@ -66,15 +70,6 @@ public final class MobileTokenManager {
         private static boolean printable(String token) {
             if (token.isEmpty() || token.length() > 16384) return false;
             for (int i=0;i<token.length();i++) if (token.charAt(i)<33 || token.charAt(i)>126) return false;
-            return true;
-        }
-        private static boolean validScope(String scope) {
-            if (scope.isEmpty() || scope.length() > 8192 || scope.charAt(0) == ' ' || scope.charAt(scope.length()-1) == ' ') return false;
-            for (int index=0;index<scope.length();index++) {
-                char value=scope.charAt(index);
-                if (value == ' ') { if (index > 0 && scope.charAt(index-1) == ' ') return false; }
-                else if (value < 33 || value > 126 || value == '"' || value == '\\') return false;
-            }
             return true;
         }
     }

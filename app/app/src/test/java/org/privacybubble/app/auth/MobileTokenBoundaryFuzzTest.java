@@ -11,6 +11,23 @@ public class MobileTokenBoundaryFuzzTest {
                 .put("refresh_token", "rotated-refresh").put("scope", "openid location:read").put("id_token", "signed.id.token");
     }
 
+    @Test public void tokenParsingBindsInitialAndRefreshScopesToContractWithoutExtraPermissions() throws Exception {
+        for (String contract : new String[]{"keyrings-v1", "portal-central-v1", "portal-web-v1"}) {
+            MobileApiAuthorization policy = MobileApiAuthorization.forContract(contract);
+            JSONObject value = new JSONObject().put("access_token","access.token").put("token_type","Bearer").put("expires_in",300)
+                    .put("scope",policy.requestScope()).put("id_token","signed.id.token");
+            assertEquals("access.token",MobileTokenManager.TokenValues.parse(value.toString(),"old-refresh",true,contract).access);
+            value.remove("id_token");
+            assertEquals("old-refresh",MobileTokenManager.TokenValues.parse(value.toString(),"old-refresh",false,contract).refresh);
+            value.put("scope",policy.requestScope() + " dashboard:read");
+            assertThrows(Exception.class, () -> MobileTokenManager.TokenValues.parse(value.toString(),"old-refresh",false,contract));
+            value.put("scope",contract.equals("keyrings-v1") ? "portal:read" : "location:read");
+            assertThrows(Exception.class, () -> MobileTokenManager.TokenValues.parse(value.toString(),"old-refresh",false,contract));
+            value.remove("scope");
+            assertEquals("access.token",MobileTokenManager.TokenValues.parse(value.toString(),"old-refresh",false,contract).access);
+        }
+    }
+
     @Test public void bearerGrammarIsSharedWithApiAndRefreshRemainsOpaque() throws Exception {
         for (String access : new String[]{"access.token-123", "a+b/c~d_ef==", "x".repeat(8192)}) {
             assertTrue(BearerToken.isValid(access));

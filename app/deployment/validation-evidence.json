@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "privacy-bubble.native-deployment-template-check.v1",
+  "checkedAt": "2026-11-13T15:36:51.078306+00:00",
+  "moduleTests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "unresolvedTemplateCli": {
+    "exitCode": 2,
+    "rejected": true
+  },
+  "syntheticOutputChecks": {
+    "workspaceContainment": true,
+    "filesMode": "0600",
+    "directoryMode": "0700",
+    "existingOutputRefused": true
+  },
+  "remoteActions": false,
+  "keycloakImportExecuted": false,
+  "nginxSyntaxTestExecuted": false,
+  "nginxReloadExecuted": false,
+  "operatingProfileStillUnconfirmed": true,
+  "sourceSha256": {
+    "README.md": "c5a163e7a35a9842234eda83fc16fe8d89b8995718e720986c83fa62a6bab090",
+    "android-profile.template.properties": "2babfc838e9a80182ab75670d83075d1551c40553819ef318d437154abfaf1b2",
+    "deployment.template.json": "06e77778bfd6bcebdf0404085883f3f5bbcceb7e115762e590d2869d9914a8bc",
+    "native-client.template.json": "c51a96126b7706214e5f682c08ac35a02d02f5b051f68522e082a31e816c1020",
+    "nginx-http.template.conf": "0d448c15e0a4c2b9fc89b3a14be3537f86a154dab16ea5edcbabe010be4a8263",
+    "nginx-server.template.conf": "7fa82e38d66c8fb0965807d9291f8b430ab0b33d08dab2ce9f905779e0bbb848",
+    "portal-read-scope.template.json": "981518882a21f9fcc7fbb653194e8fe93e04942d37ba352258fac80c19964f1b",
+    "prepare.py": "e01dae1e538e8b24724d76e8def3f82fa8083c18b225ae0c5d9a44a29e141985",
+    "test_prepare.py": "5af156836d22cf5521f5d5e01f4905d20a462e207aabaedd488556b5847701b5"
+  }
+}

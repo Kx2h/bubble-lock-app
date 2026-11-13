@@ -40,9 +40,12 @@ public final class SessionSecurityInstrumentation extends Instrumentation {
             check(store.getAccessToken().isEmpty() && !prefs.contains("credentials"),"reject-corrupt-ciphertext");
             check("https://new.example".equals(ServiceOrigin.effective("https://new.example","https://retired.example",false)),"release-origin-migration");
             assertions+=org.privacybubble.app.auth.AuthSecurityAssertions.run(this);
+            assertions+=LocationLeaseAssertions.run(this);
+            int pagingAssertions=LocationPagingAssertions.run(this);
+            assertions+=pagingAssertions;
             store.clearAll();
             check(store.getApiBaseUrl().isEmpty() && store.getSubject().isEmpty() && !prefs.contains("iv"),"cleanup");
-            result.putString("stream","PASS: "+assertions+" Keystore/session boundary assertions\n");
+            result.putString("stream","PASS: "+assertions+" Keystore/session boundary assertions\nPaging assertions: "+pagingAssertions+"; render ms: "+java.util.Arrays.toString(LocationPagingAssertions.lastRenderTimingsMillis())+"\n");
             finish(Activity.RESULT_OK,result);
         } catch (Throwable failure) {
             try { store.clearAll(); } catch (Exception ignored) { }

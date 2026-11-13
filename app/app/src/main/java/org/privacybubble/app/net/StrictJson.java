@@ -21,8 +21,13 @@ public final class StrictJson {
     }
 
     public static Map<String, Object> object(String text, int maximum) {
+        return object(text, maximum, 8192);
+    }
+
+    public static Map<String, Object> object(String text, int maximum, int maximumValues) {
+        if (maximumValues < 1 || maximumValues > 65536) throw invalid();
         if (text == null || text.length() > maximum) throw invalid();
-        Parser parser = new Parser(text);
+        Parser parser = new Parser(text, maximumValues);
         Object result = parser.value(0);
         parser.space();
         if (!(result instanceof Map) || parser.position != text.length()) throw invalid();
@@ -34,8 +39,9 @@ public final class StrictJson {
 
     private static final class Parser {
         private final String text;
+        private final int maximumValues;
         private int position, values;
-        Parser(String text) { this.text = text; }
+        Parser(String text, int maximumValues) { this.text = text; this.maximumValues = maximumValues; }
 
         private void space() {
             while (position < text.length()) {
@@ -51,7 +57,7 @@ public final class StrictJson {
         }
 
         private Object value(int depth) {
-            if (depth > 16 || ++values > 8192) throw invalid();
+            if (depth > 16 || ++values > maximumValues) throw invalid();
             space();
             if (position == text.length()) throw invalid();
             char first = text.charAt(position);

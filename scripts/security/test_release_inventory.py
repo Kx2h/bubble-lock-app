@@ -67,6 +67,79 @@ class SecurityInventoryTest(unittest.TestCase):
         self.assertEqual(inventory.resolve_npm("node_modules/a", "shared", packages), "node_modules/a/node_modules/shared")
         self.assertEqual(inventory.resolve_npm("node_modules/b", "shared", packages), "node_modules/shared")
 
+    def write_lock(self, name, packages):
+        path = pathlib.Path(self.directory.name) / (name + ".json")
+        inventory.write_json(path, {"lockfileVersion": 3, "packages": packages})
+        return path
+
+    def test_two_applications_keep_colliding_install_paths_and_dev_edges_separate(self):
+        pc = self.write_lock("pc", {"": {"name": "pc", "version": "1", "dependencies": {"shared": "1"}}, "node_modules/shared": {"version": "1.0.0"}})
+        web = self.write_lock("web", {"": {"name": "web", "version": "1", "dependencies": {"shared": "2"}, "devDependencies": {"builder": "1"}},
+                                      "node_modules/shared": {"version": "2.0.0"}, "node_modules/builder": {"version": "1.0.0", "dev": True, "peerDependencies": {"shared": "*"}}})
+        args = argparse.Namespace(npm_lock=pc, npm_application=["web=" + str(web)])
+        components, graph = [], {"root": set()}
+        for spec in inventory.npm_inputs(args):
+            inventory.add_npm_application(spec, components, graph, "root", {})
+        bom = inventory.assemble_bom("root", "test", "1", components, graph, "test only")
+        inventory.verify_graph(bom)
+        self.assertIn("npm-location:node_modules/shared", graph["application:pc-mobius"])
+        self.assertIn("npm-location:web:node_modules/shared", graph["application:web"])
+        self.assertIn("npm-location:web:node_modules/builder", graph["application:web"])
+        builder = next(item for item in components if item["name"] == "builder")
+        self.assertEqual(builder["scope"], "excluded")
+        self.assertEqual(inventory.property_value(builder, "privacybubble:dependency-kind"), "development")
+        self.assertEqual(graph[builder["bom-ref"]], {"npm-location:web:node_modules/shared"})
+
+    def test_duplicate_application_identity_or_lockfile_cannot_be_silently_merged(self):
+        pc, web = self.write_lock("pc", {}), self.write_lock("web", {})
+        for value in ["pc-mobius=" + str(web), "web=" + str(pc), "bad/id=" + str(web)]:
+            with self.assertRaises(ValueError):
+                inventory.npm_inputs(argparse.Namespace(npm_lock=pc, npm_application=[value]))
+
+    def test_optional_peer_absence_is_allowed_but_required_build_dependency_is_not(self):
+        path = self.write_lock("web", {"": {"name": "web", "version": "1", "peerDependencies": {"optional": "*"}, "peerDependenciesMeta": {"optional": {"optional": True}}}})
+        spec = {"id": "web", "path": path, "source": "web/package-lock.json", "legacy": False}
+        inventory.add_npm_application(spec, [], {"root": set()}, "root", {})
+        data = inventory.read_json(path)
+        data["packages"][""]["devDependencies"] = {"missing-build-tool": "1"}
+        inventory.write_json(path, data)
+        with self.assertRaisesRegex(ValueError, "Dependency missing"):
+            inventory.add_npm_application(spec, [], {"root": set()}, "root", {})
+
+    def test_python_runtime_closure_evaluates_target_markers_and_excludes_unrelated_tools(self):
+        from packaging.markers import default_environment
+        packages = [{"name": "gateway", "version": "1.0", "requires": ["network>=2", "linux-only; sys_platform == 'linux'"]},
+                    {"name": "network", "version": "2.0", "requires": []}, {"name": "linux-only", "version": "1", "requires": []},
+                    {"name": "pip", "version": "24.0", "requires": []}]
+        runtime, graph = inventory.python_runtime_closure(packages, "gateway", {**default_environment(), "sys_platform": "win32"})
+        self.assertEqual(runtime, ["gateway", "network"])
+        self.assertEqual(graph["gateway"], ["network"])
+        packages[1]["version"] = "1.0"
+        with self.assertRaisesRegex(ValueError, "violates"):
+            inventory.python_runtime_closure(packages, "gateway", {**default_environment(), "sys_platform": "win32"})
+
+    def test_python_extras_expand_only_requested_runtime_dependencies(self):
+        from packaging.markers import default_environment
+        packages = [{"name": "gateway", "version": "1", "requires": ["network[secure]"]},
+                    {"name": "network", "version": "1", "requires": ["tls; extra == 'secure'", "test-helper; extra == 'test'"]},
+                    {"name": "tls", "version": "1", "requires": []}]
+        runtime, graph = inventory.python_runtime_closure(packages, "gateway", default_environment())
+        self.assertEqual(runtime, ["gateway", "network", "tls"])
+        self.assertEqual(graph["network"], ["tls"])
+
+    def test_pypi_scan_is_classified_as_pypi_with_application_scope(self):
+        self.document["components"][0].update({"name": "network", "purl": "pkg:pypi/network@1.0", "scope": "required",
+                                               "properties": inventory.properties(environment_id="gateway-validation", deployment_scope="local validation only")})
+        inventory.write_json(self.bom, self.document)
+        queries = []
+        def respond(url, body=None):
+            queries.extend(body["queries"])
+            return {"results": [{} for _ in body["queries"]]}
+        self.assertEqual(self.run_scan(respond), 0)
+        self.assertIn({"package": {"ecosystem": "PyPI", "name": "network"}, "version": "1.0"}, queries)
+        record = next(item for item in inventory.read_json(self.output)["packages"] if item["ecosystem"] == "PyPI")
+        self.assertEqual(record["component_contexts"][0]["application"], "gateway-validation")
+
 
 if __name__ == "__main__":
     unittest.main()

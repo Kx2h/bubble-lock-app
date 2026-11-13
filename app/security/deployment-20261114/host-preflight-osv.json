@@ -1,0 +1,3978 @@
+{
+  "advisories": {},
+  "affected_package_versions": 0,
+  "checked_at": "2026-11-13T15:30:36Z",
+  "exact_package_versions": 149,
+  "excluded_components": [
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "application:pc-mobius"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "application:web-dashboard"
+    },
+    {
+      "reason": "first-party application, archive, or native file without verified package/version decomposition",
+      "ref": "python-environment:gateway-validation:privacy-bubble-gateway"
+    }
+  ],
+  "format": "privacy-bubble.osv-sca.v1",
+  "limitations": [
+    "OSV database matches are not proof of runtime exploitability or absence of vulnerabilities.",
+    "Patched AppAuth is queried using upstream 0.11.1; local patches require separate review.",
+    "Native file hashes do not identify statically bundled third-party versions; those internals are not scanned.",
+    "Selected npm lock trees include development/build dependencies; they are separate applications, not Android APK contents or exact browser bundle reachability.",
+    "Optional Python package queries describe the declared runtime closure of a local validation interpreter; they do not inventory a physical Pi or deployed server."
+  ],
+  "packages": [
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:anyio",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:anyio"
+      ],
+      "ecosystem": "PyPI",
+      "name": "anyio",
+      "version": "4.16.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:bleak",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:bleak"
+      ],
+      "ecosystem": "PyPI",
+      "name": "bleak",
+      "version": "3.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:certifi",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:certifi"
+      ],
+      "ecosystem": "PyPI",
+      "name": "certifi",
+      "version": "2026.10.23",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:dbus-fast",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:dbus-fast"
+      ],
+      "ecosystem": "PyPI",
+      "name": "dbus-fast",
+      "version": "5.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:h11",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:h11"
+      ],
+      "ecosystem": "PyPI",
+      "name": "h11",
+      "version": "0.16.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:httpcore",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:httpcore"
+      ],
+      "ecosystem": "PyPI",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:httpx",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:httpx"
+      ],
+      "ecosystem": "PyPI",
+      "name": "httpx",
+      "version": "0.28.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:idna",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:idna"
+      ],
+      "ecosystem": "PyPI",
+      "name": "idna",
+      "version": "3.20",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:paho-mqtt",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:paho-mqtt"
+      ],
+      "ecosystem": "PyPI",
+      "name": "paho-mqtt",
+      "version": "2.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "gateway-validation",
+          "dependency_kind": "runtime",
+          "deployment_scope": "local Gateway validation environment; not physical Pi or deployed server",
+          "ref": "python-environment:gateway-validation:typing-extensions",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "python-environment:gateway-validation:typing-extensions"
+      ],
+      "ecosystem": "PyPI",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/@babel/runtime",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/@babel/runtime"
+      ],
+      "ecosystem": "npm",
+      "name": "@babel/runtime",
+      "version": "7.29.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/aix-ppc64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/aix-ppc64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/aix-ppc64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/android-arm",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/android-arm"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/android-arm",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/android-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/android-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/android-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/android-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/android-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/android-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/darwin-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/darwin-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/darwin-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/darwin-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/darwin-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/darwin-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/freebsd-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/freebsd-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/freebsd-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/freebsd-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/freebsd-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/freebsd-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-arm",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-arm"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-arm",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-ia32",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-ia32"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-ia32",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-loong64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-loong64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-loong64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-mips64el",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-mips64el"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-mips64el",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-ppc64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-ppc64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-ppc64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-riscv64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-riscv64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-riscv64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-s390x",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-s390x"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-s390x",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/linux-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/linux-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/linux-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/netbsd-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/netbsd-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/netbsd-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/netbsd-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/netbsd-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/netbsd-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/openbsd-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/openbsd-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/openbsd-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/openbsd-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/openbsd-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/openbsd-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/openharmony-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/openharmony-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/openharmony-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/sunos-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/sunos-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/sunos-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/win32-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/win32-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/win32-arm64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/win32-ia32",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/win32-ia32"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/win32-ia32",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@esbuild/win32-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@esbuild/win32-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@esbuild/win32-x64",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@napi-rs/lzma-linux-x64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@napi-rs/lzma-linux-x64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@napi-rs/lzma-linux-x64-gnu",
+      "version": "1.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-android-arm-eabi",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-android-arm-eabi"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-android-arm-eabi",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-android-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-android-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-android-arm64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-darwin-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-darwin-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-darwin-arm64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-darwin-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-darwin-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-darwin-x64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-freebsd-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-freebsd-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-freebsd-arm64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-freebsd-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-freebsd-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-freebsd-x64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm-gnueabihf",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm-gnueabihf"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-arm-gnueabihf",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm-musleabihf",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm-musleabihf"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-arm-musleabihf",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-arm64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm64-musl",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-arm64-musl"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-arm64-musl",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-loong64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-loong64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-loong64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-loong64-musl",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-loong64-musl"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-loong64-musl",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-ppc64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-ppc64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-ppc64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-ppc64-musl",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-ppc64-musl"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-ppc64-musl",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-riscv64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-riscv64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-riscv64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-riscv64-musl",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-riscv64-musl"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-riscv64-musl",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-s390x-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-s390x-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-s390x-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-x64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-x64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-x64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-x64-musl",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-linux-x64-musl"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-linux-x64-musl",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-openbsd-x64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-openbsd-x64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-openbsd-x64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-openharmony-arm64",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-openharmony-arm64"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-openharmony-arm64",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-arm64-msvc",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-arm64-msvc"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-win32-arm64-msvc",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-ia32-msvc",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-ia32-msvc"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-win32-ia32-msvc",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-x64-gnu",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-x64-gnu"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-win32-x64-gnu",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-x64-msvc",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@rollup/rollup-win32-x64-msvc"
+      ],
+      "ecosystem": "npm",
+      "name": "@rollup/rollup-win32-x64-msvc",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/estree",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/estree"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/estree",
+      "version": "1.0.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/geojson",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/geojson"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/geojson",
+      "version": "7946.0.16",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/leaflet",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/leaflet"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/leaflet",
+      "version": "1.9.21",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/node",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/node"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/node",
+      "version": "24.19.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/@types/node",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/@types/node"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/node",
+      "version": "26.6.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/react",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/react"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/react",
+      "version": "19.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/@types/react-dom",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/@types/react-dom"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/react-dom",
+      "version": "19.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/@types/readable-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/@types/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/readable-stream",
+      "version": "4.0.25",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/@types/ws",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/@types/ws"
+      ],
+      "ecosystem": "npm",
+      "name": "@types/ws",
+      "version": "8.18.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/abort-controller",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/abort-controller"
+      ],
+      "ecosystem": "npm",
+      "name": "abort-controller",
+      "version": "3.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ajv",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/ajv",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ajv",
+        "npm-location:web-dashboard:node_modules/ajv"
+      ],
+      "ecosystem": "npm",
+      "name": "ajv",
+      "version": "8.20.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ajv-formats",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/ajv-formats",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ajv-formats",
+        "npm-location:web-dashboard:node_modules/ajv-formats"
+      ],
+      "ecosystem": "npm",
+      "name": "ajv-formats",
+      "version": "3.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/base64-js",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/base64-js"
+      ],
+      "ecosystem": "npm",
+      "name": "base64-js",
+      "version": "1.5.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/bl",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/bl"
+      ],
+      "ecosystem": "npm",
+      "name": "bl",
+      "version": "6.1.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/broker-factory",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/broker-factory"
+      ],
+      "ecosystem": "npm",
+      "name": "broker-factory",
+      "version": "3.1.15",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "buffer",
+      "version": "6.0.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/buffer-from",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/buffer-from"
+      ],
+      "ecosystem": "npm",
+      "name": "buffer-from",
+      "version": "1.1.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/commist",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/commist"
+      ],
+      "ecosystem": "npm",
+      "name": "commist",
+      "version": "3.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/concat-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/concat-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "concat-stream",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/csstype",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/csstype"
+      ],
+      "ecosystem": "npm",
+      "name": "csstype",
+      "version": "3.2.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/debug",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/debug"
+      ],
+      "ecosystem": "npm",
+      "name": "debug",
+      "version": "4.4.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/esbuild",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/esbuild"
+      ],
+      "ecosystem": "npm",
+      "name": "esbuild",
+      "version": "0.28.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/event-target-shim",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/event-target-shim"
+      ],
+      "ecosystem": "npm",
+      "name": "event-target-shim",
+      "version": "5.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/events",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/events"
+      ],
+      "ecosystem": "npm",
+      "name": "events",
+      "version": "3.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/fast-deep-equal",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/fast-deep-equal",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/fast-deep-equal",
+        "npm-location:web-dashboard:node_modules/fast-deep-equal"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-deep-equal",
+      "version": "3.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/fast-unique-numbers",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/fast-unique-numbers"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-unique-numbers",
+      "version": "9.0.27",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/fast-uri",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/fast-uri",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/fast-uri",
+        "npm-location:web-dashboard:node_modules/fast-uri"
+      ],
+      "ecosystem": "npm",
+      "name": "fast-uri",
+      "version": "3.1.9",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/fdir",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/fdir"
+      ],
+      "ecosystem": "npm",
+      "name": "fdir",
+      "version": "6.5.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/fsevents",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/fsevents"
+      ],
+      "ecosystem": "npm",
+      "name": "fsevents",
+      "version": "2.3.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/help-me",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/help-me"
+      ],
+      "ecosystem": "npm",
+      "name": "help-me",
+      "version": "5.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ieee754",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ieee754"
+      ],
+      "ecosystem": "npm",
+      "name": "ieee754",
+      "version": "1.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/inherits",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/inherits"
+      ],
+      "ecosystem": "npm",
+      "name": "inherits",
+      "version": "2.0.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ip-address",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ip-address"
+      ],
+      "ecosystem": "npm",
+      "name": "ip-address",
+      "version": "10.7.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/json-schema-traverse",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/json-schema-traverse",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/json-schema-traverse",
+        "npm-location:web-dashboard:node_modules/json-schema-traverse"
+      ],
+      "ecosystem": "npm",
+      "name": "json-schema-traverse",
+      "version": "1.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/leaflet",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/leaflet"
+      ],
+      "ecosystem": "npm",
+      "name": "leaflet",
+      "version": "1.9.4",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/lru-cache",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/lru-cache"
+      ],
+      "ecosystem": "npm",
+      "name": "lru-cache",
+      "version": "10.4.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/minimist",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/minimist"
+      ],
+      "ecosystem": "npm",
+      "name": "minimist",
+      "version": "1.2.8",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/mqtt",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/mqtt"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt",
+      "version": "5.16.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/mqtt-packet",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/mqtt-packet"
+      ],
+      "ecosystem": "npm",
+      "name": "mqtt-packet",
+      "version": "9.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ms",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ms"
+      ],
+      "ecosystem": "npm",
+      "name": "ms",
+      "version": "2.1.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/nanoid",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/nanoid"
+      ],
+      "ecosystem": "npm",
+      "name": "nanoid",
+      "version": "3.3.20",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg"
+      ],
+      "ecosystem": "npm",
+      "name": "pg",
+      "version": "8.23.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime-optional",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-cloudflare",
+          "scope": "optional"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-cloudflare"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-cloudflare",
+      "version": "1.4.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-connection-string",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-connection-string"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-connection-string",
+      "version": "2.14.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-int8",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-int8"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-int8",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-pool",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-pool"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-pool",
+      "version": "3.14.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-protocol",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-protocol"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-protocol",
+      "version": "1.16.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pg-types",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pg-types"
+      ],
+      "ecosystem": "npm",
+      "name": "pg-types",
+      "version": "2.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/pgpass",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/pgpass"
+      ],
+      "ecosystem": "npm",
+      "name": "pgpass",
+      "version": "1.0.5",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/picocolors",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/picocolors"
+      ],
+      "ecosystem": "npm",
+      "name": "picocolors",
+      "version": "1.1.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/picomatch",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/picomatch"
+      ],
+      "ecosystem": "npm",
+      "name": "picomatch",
+      "version": "4.0.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/postcss",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/postcss"
+      ],
+      "ecosystem": "npm",
+      "name": "postcss",
+      "version": "8.5.32",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/postgres-array",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/postgres-array"
+      ],
+      "ecosystem": "npm",
+      "name": "postgres-array",
+      "version": "2.0.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/postgres-bytea",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/postgres-bytea"
+      ],
+      "ecosystem": "npm",
+      "name": "postgres-bytea",
+      "version": "1.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/postgres-date",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/postgres-date"
+      ],
+      "ecosystem": "npm",
+      "name": "postgres-date",
+      "version": "1.0.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/postgres-interval",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/postgres-interval"
+      ],
+      "ecosystem": "npm",
+      "name": "postgres-interval",
+      "version": "1.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/process",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/process"
+      ],
+      "ecosystem": "npm",
+      "name": "process",
+      "version": "0.11.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/process-nextick-args",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/process-nextick-args"
+      ],
+      "ecosystem": "npm",
+      "name": "process-nextick-args",
+      "version": "2.0.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/react",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/react"
+      ],
+      "ecosystem": "npm",
+      "name": "react",
+      "version": "19.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/react-dom",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/react-dom"
+      ],
+      "ecosystem": "npm",
+      "name": "react-dom",
+      "version": "19.3.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/concat-stream/node_modules/readable-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/concat-stream/node_modules/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "readable-stream",
+      "version": "3.6.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/readable-stream",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/readable-stream"
+      ],
+      "ecosystem": "npm",
+      "name": "readable-stream",
+      "version": "4.8.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/require-from-string",
+          "scope": "required"
+        },
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/require-from-string",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/require-from-string",
+        "npm-location:web-dashboard:node_modules/require-from-string"
+      ],
+      "ecosystem": "npm",
+      "name": "require-from-string",
+      "version": "2.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/rfdc",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/rfdc"
+      ],
+      "ecosystem": "npm",
+      "name": "rfdc",
+      "version": "1.4.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/rollup",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/rollup"
+      ],
+      "ecosystem": "npm",
+      "name": "rollup",
+      "version": "4.66.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/safe-buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/safe-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "safe-buffer",
+      "version": "5.2.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "runtime",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/scheduler",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/scheduler"
+      ],
+      "ecosystem": "npm",
+      "name": "scheduler",
+      "version": "0.28.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/smart-buffer",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/smart-buffer"
+      ],
+      "ecosystem": "npm",
+      "name": "smart-buffer",
+      "version": "4.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/socks",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/socks"
+      ],
+      "ecosystem": "npm",
+      "name": "socks",
+      "version": "2.8.10",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/source-map-js",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/source-map-js"
+      ],
+      "ecosystem": "npm",
+      "name": "source-map-js",
+      "version": "1.2.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/split2",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/split2"
+      ],
+      "ecosystem": "npm",
+      "name": "split2",
+      "version": "4.2.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/string_decoder",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/string_decoder"
+      ],
+      "ecosystem": "npm",
+      "name": "string_decoder",
+      "version": "1.3.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/tinyglobby",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/tinyglobby"
+      ],
+      "ecosystem": "npm",
+      "name": "tinyglobby",
+      "version": "0.2.17",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/tslib",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/tslib"
+      ],
+      "ecosystem": "npm",
+      "name": "tslib",
+      "version": "2.8.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/typedarray",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/typedarray"
+      ],
+      "ecosystem": "npm",
+      "name": "typedarray",
+      "version": "0.0.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/typescript",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/typescript"
+      ],
+      "ecosystem": "npm",
+      "name": "typescript",
+      "version": "5.9.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/undici-types",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/undici-types"
+      ],
+      "ecosystem": "npm",
+      "name": "undici-types",
+      "version": "7.24.6",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/undici-types",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/undici-types"
+      ],
+      "ecosystem": "npm",
+      "name": "undici-types",
+      "version": "8.9.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/util-deprecate",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/util-deprecate"
+      ],
+      "ecosystem": "npm",
+      "name": "util-deprecate",
+      "version": "1.0.2",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "web-dashboard",
+          "dependency_kind": "development",
+          "deployment_scope": "web-dashboard host/browser build",
+          "ref": "npm-location:web-dashboard:node_modules/vite",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "npm-location:web-dashboard:node_modules/vite"
+      ],
+      "ecosystem": "npm",
+      "name": "vite",
+      "version": "7.3.7",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/worker-factory",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/worker-factory"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-factory",
+      "version": "7.0.50",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/worker-timers",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/worker-timers"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers",
+      "version": "8.0.34",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/worker-timers-broker",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/worker-timers-broker"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers-broker",
+      "version": "8.0.18",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/worker-timers-worker",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/worker-timers-worker"
+      ],
+      "ecosystem": "npm",
+      "name": "worker-timers-worker",
+      "version": "9.0.15",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/ws",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/ws"
+      ],
+      "ecosystem": "npm",
+      "name": "ws",
+      "version": "8.22.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "pc-mobius",
+          "dependency_kind": "runtime",
+          "deployment_scope": "PC Mobius host",
+          "ref": "npm-location:node_modules/xtend",
+          "scope": "required"
+        }
+      ],
+      "component_refs": [
+        "npm-location:node_modules/xtend"
+      ],
+      "ecosystem": "npm",
+      "name": "xtend",
+      "version": "4.0.2",
+      "vulnerability_ids": []
+    }
+  ],
+  "querybatch_requests": 2,
+  "request_response_evidence": [
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "anyio"
+            },
+            "version": "4.16.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "bleak"
+            },
+            "version": "3.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "certifi"
+            },
+            "version": "2026.10.23"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "dbus-fast"
+            },
+            "version": "5.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "h11"
+            },
+            "version": "0.16.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "httpcore"
+            },
+            "version": "1.0.9"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "httpx"
+            },
+            "version": "0.28.1"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "idna"
+            },
+            "version": "3.20"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "paho-mqtt"
+            },
+            "version": "2.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "typing-extensions"
+            },
+            "version": "4.16.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@babel/runtime"
+            },
+            "version": "7.29.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/aix-ppc64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/android-arm"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/android-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/android-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/darwin-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/darwin-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/freebsd-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/freebsd-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-arm"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-ia32"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-loong64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-mips64el"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-ppc64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-riscv64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-s390x"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/linux-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/netbsd-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/netbsd-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/openbsd-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/openbsd-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/openharmony-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/sunos-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/win32-arm64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/win32-ia32"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@esbuild/win32-x64"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@napi-rs/lzma-linux-x64-gnu"
+            },
+            "version": "1.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-android-arm-eabi"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-android-arm64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-darwin-arm64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-darwin-x64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-freebsd-arm64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-freebsd-x64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-arm-gnueabihf"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-arm-musleabihf"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-arm64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-arm64-musl"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-loong64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-loong64-musl"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-ppc64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-ppc64-musl"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-riscv64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-riscv64-musl"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-s390x-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-x64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-linux-x64-musl"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-openbsd-x64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-openharmony-arm64"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-win32-arm64-msvc"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-win32-ia32-msvc"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-win32-x64-gnu"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@rollup/rollup-win32-x64-msvc"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/estree"
+            },
+            "version": "1.0.9"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/geojson"
+            },
+            "version": "7946.0.16"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/leaflet"
+            },
+            "version": "1.9.21"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/node"
+            },
+            "version": "24.19.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/node"
+            },
+            "version": "26.6.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/react"
+            },
+            "version": "19.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/react-dom"
+            },
+            "version": "19.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/readable-stream"
+            },
+            "version": "4.0.25"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "@types/ws"
+            },
+            "version": "8.18.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "abort-controller"
+            },
+            "version": "3.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ajv"
+            },
+            "version": "8.20.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ajv-formats"
+            },
+            "version": "3.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "base64-js"
+            },
+            "version": "1.5.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "bl"
+            },
+            "version": "6.1.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "broker-factory"
+            },
+            "version": "3.1.15"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "buffer"
+            },
+            "version": "6.0.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "buffer-from"
+            },
+            "version": "1.1.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "commist"
+            },
+            "version": "3.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "concat-stream"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "csstype"
+            },
+            "version": "3.2.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "debug"
+            },
+            "version": "4.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "esbuild"
+            },
+            "version": "0.28.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "event-target-shim"
+            },
+            "version": "5.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "events"
+            },
+            "version": "3.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-deep-equal"
+            },
+            "version": "3.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-unique-numbers"
+            },
+            "version": "9.0.27"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fast-uri"
+            },
+            "version": "3.1.9"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fdir"
+            },
+            "version": "6.5.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "fsevents"
+            },
+            "version": "2.3.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "help-me"
+            },
+            "version": "5.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ieee754"
+            },
+            "version": "1.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "inherits"
+            },
+            "version": "2.0.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ip-address"
+            },
+            "version": "10.7.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "json-schema-traverse"
+            },
+            "version": "1.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "leaflet"
+            },
+            "version": "1.9.4"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "lru-cache"
+            },
+            "version": "10.4.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "minimist"
+            },
+            "version": "1.2.8"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    },
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt"
+            },
+            "version": "5.16.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "mqtt-packet"
+            },
+            "version": "9.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ms"
+            },
+            "version": "2.1.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "nanoid"
+            },
+            "version": "3.3.20"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg"
+            },
+            "version": "8.23.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-cloudflare"
+            },
+            "version": "1.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-connection-string"
+            },
+            "version": "2.14.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-int8"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-pool"
+            },
+            "version": "3.14.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-protocol"
+            },
+            "version": "1.16.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pg-types"
+            },
+            "version": "2.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "pgpass"
+            },
+            "version": "1.0.5"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "picocolors"
+            },
+            "version": "1.1.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "picomatch"
+            },
+            "version": "4.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postcss"
+            },
+            "version": "8.5.32"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-array"
+            },
+            "version": "2.0.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-bytea"
+            },
+            "version": "1.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-date"
+            },
+            "version": "1.0.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "postgres-interval"
+            },
+            "version": "1.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process"
+            },
+            "version": "0.11.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "process-nextick-args"
+            },
+            "version": "2.0.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "react"
+            },
+            "version": "19.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "react-dom"
+            },
+            "version": "19.3.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "3.6.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "readable-stream"
+            },
+            "version": "4.8.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "require-from-string"
+            },
+            "version": "2.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "rfdc"
+            },
+            "version": "1.4.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "rollup"
+            },
+            "version": "4.66.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "safe-buffer"
+            },
+            "version": "5.2.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "scheduler"
+            },
+            "version": "0.28.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "smart-buffer"
+            },
+            "version": "4.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "socks"
+            },
+            "version": "2.8.10"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "source-map-js"
+            },
+            "version": "1.2.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "split2"
+            },
+            "version": "4.2.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "string_decoder"
+            },
+            "version": "1.3.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "tinyglobby"
+            },
+            "version": "0.2.17"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "tslib"
+            },
+            "version": "2.8.1"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "typedarray"
+            },
+            "version": "0.0.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "typescript"
+            },
+            "version": "5.9.3"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "undici-types"
+            },
+            "version": "7.24.6"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "undici-types"
+            },
+            "version": "8.9.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "util-deprecate"
+            },
+            "version": "1.0.2"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "vite"
+            },
+            "version": "7.3.7"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-factory"
+            },
+            "version": "7.0.50"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers"
+            },
+            "version": "8.0.34"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers-broker"
+            },
+            "version": "8.0.18"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "worker-timers-worker"
+            },
+            "version": "9.0.15"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "ws"
+            },
+            "version": "8.22.0"
+          },
+          {
+            "package": {
+              "ecosystem": "npm",
+              "name": "xtend"
+            },
+            "version": "4.0.2"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    }
+  ],
+  "sbom_sha256": "bd6ce788de272f6a1d766a9886db24a02c09c7d9e4ffa66c2ba73b0561d1dc77",
+  "status": "no-known-findings",
+  "unique_advisories": 0
+}

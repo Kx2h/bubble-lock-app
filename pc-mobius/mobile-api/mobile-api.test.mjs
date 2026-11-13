@@ -154,16 +154,17 @@ test('HTTP requires signed auth, rejects mutation/body/query, returns no-store w
   state = null; assert.equal((await fetch(base + '/v1/keyrings', { headers })).status, 503);
 });
 
-test('actual IntegrationStore/MEC ingress writes can be read without modifying upstream modules', async t => {
+test('legacy reader cannot bypass the integrated MEC protected read model', async t => {
   const scratch = process.env.TMPDIR ?? fileURLToPath(new URL('../../../../.local/tmp/security/', import.meta.url));
   await mkdir(scratch, { recursive: true });
   const directory = await mkdtemp(join(scratch, 'mobile-location-read-')); t.after(() => rm(directory, { recursive: true, force: true }));
   const statePath = join(directory, 'runtime.json');
   const store = await new IntegrationStore(statePath).init();
   const ingress = new MecCallbackIngress({ store, clock: () => new Date(NOW).toISOString() });
-  await ingress.ingest(event());
+  const outcome = await ingress.ingest(event());
+  assert.equal(outcome.status, 'BINDING_REVIEW');
   const state = JSON.parse(await readFile(statePath, 'utf8'));
   const fix = readLocations({ state, bindings, subject: 'alice', now: NOW }).keyrings[0];
-  assert.equal(fix.latitude, 37.5); assert.equal(fix.status, 'available');
-  assert.equal(state.events['event-1'].status, 'RECONCILED');
+  assert.equal(fix.latitude, null); assert.equal(fix.longitude, null); assert.equal(fix.status, 'unavailable');
+  assert.equal(state.events['event-1'], undefined);
 });

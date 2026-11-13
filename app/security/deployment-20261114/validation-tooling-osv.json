@@ -1,0 +1,215 @@
+{
+  "advisories": {},
+  "affected_package_versions": 0,
+  "checked_at": "2026-11-13T15:36:14Z",
+  "exact_package_versions": 7,
+  "excluded_components": [],
+  "format": "privacy-bubble.osv-sca.v1",
+  "limitations": [
+    "OSV database matches are not proof of runtime exploitability or absence of vulnerabilities.",
+    "Patched AppAuth is queried using upstream 0.11.1; local patches require separate review.",
+    "Native file hashes do not identify statically bundled third-party versions; those internals are not scanned.",
+    "Selected npm lock trees include development/build dependencies; they are separate applications, not Android APK contents or exact browser bundle reachability.",
+    "Optional Python package queries describe the declared runtime closure of a local validation interpreter; they do not inventory a physical Pi or deployed server."
+  ],
+  "packages": [
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:attrs",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:attrs"
+      ],
+      "ecosystem": "PyPI",
+      "name": "attrs",
+      "version": "26.1.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:jsonschema",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:jsonschema"
+      ],
+      "ecosystem": "PyPI",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:jsonschema-specifications",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:jsonschema-specifications"
+      ],
+      "ecosystem": "PyPI",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:packaging",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:packaging"
+      ],
+      "ecosystem": "PyPI",
+      "name": "packaging",
+      "version": "26.3",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:referencing",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:referencing"
+      ],
+      "ecosystem": "PyPI",
+      "name": "referencing",
+      "version": "0.37.0",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:rpds-py",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:rpds-py"
+      ],
+      "ecosystem": "PyPI",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "vulnerability_ids": []
+    },
+    {
+      "component_contexts": [
+        {
+          "application": "sbom-validation-toolchain",
+          "dependency_kind": "validation tooling only",
+          "deployment_scope": "local validation environment; excluded from Android/PC/web/Gateway runtime",
+          "ref": "tooling:pypi:typing-extensions",
+          "scope": "excluded"
+        }
+      ],
+      "component_refs": [
+        "tooling:pypi:typing-extensions"
+      ],
+      "ecosystem": "PyPI",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "vulnerability_ids": []
+    }
+  ],
+  "querybatch_requests": 1,
+  "request_response_evidence": [
+    {
+      "request": {
+        "queries": [
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "attrs"
+            },
+            "version": "26.1.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "jsonschema"
+            },
+            "version": "4.26.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "jsonschema-specifications"
+            },
+            "version": "2025.9.1"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "packaging"
+            },
+            "version": "26.3"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "referencing"
+            },
+            "version": "0.37.0"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "rpds-py"
+            },
+            "version": "2026.9.1"
+          },
+          {
+            "package": {
+              "ecosystem": "PyPI",
+              "name": "typing-extensions"
+            },
+            "version": "4.16.0"
+          }
+        ]
+      },
+      "response": {
+        "results": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    }
+  ],
+  "sbom_sha256": "394560c185f8525ee9f13c6dd0bfb5c762aa90d31d93c404f5dfe6abf2005add",
+  "status": "no-known-findings",
+  "unique_advisories": 0
+}
