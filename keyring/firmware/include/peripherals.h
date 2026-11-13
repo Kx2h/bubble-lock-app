@@ -13,6 +13,12 @@ struct KeyringScreen {
   float supplyCurrentMa = 0;
   uint64_t supplyReadAt = 0;
   uint32_t motionEvents = 0;
+  uint32_t confirmPress = 0, panicPress = 0;
+};
+
+struct KeyringDisplayTest {
+  const char *status;
+  uint32_t confirmPress, panicPress;
 };
 
 // One worker owns every LCD and microSD SPI operation, including initialization.
@@ -20,13 +26,13 @@ struct KeyringScreen {
 class Peripherals {
 public:
   void begin();
-  void update(const KeyringScreen &screen);
-  void show();
+  void update(const KeyringScreen &screen, bool requestDisplay = false);
   void logReceipt(const char *jsonLine, size_t length);
   bool busy();
   bool prepareSleep(); // Freeze new worker I/O only when no I/O or queued receipt exists.
   void resume();
   const char *displayStatus();
+  KeyringDisplayTest displayTest();
   const char *sdStatus();
   uint32_t droppedLogs();
 private:
@@ -34,6 +40,7 @@ private:
   static void entry(void *context);
   void run();
   void draw(const KeyringScreen &screen);
+  bool takeScreen(KeyringScreen &screen, bool due, bool &requestDisplay);
   void append(const LogLine &line);
   bool setIo(bool active);
   void drop();
@@ -43,6 +50,8 @@ private:
   QueueHandle_t logs = nullptr;
   KeyringScreen snapshot;
   const char *displayState = "disabled", *sdState = "disabled";
+  uint32_t drawnConfirmPress = 0, drawnPanicPress = 0;
+  bool displayRequested = false;
   bool ioActive = false, sleeping = false, displayReady = false, sdReady = false;
   uint32_t drops = 0;
 };
