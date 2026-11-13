@@ -1,0 +1,111 @@
+{
+  "repository": "https://github.com/IoTKETI/mobius4",
+  "revision": "e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8",
+  "version": "4.25.0",
+  "archive": "https://codeload.github.com/IoTKETI/mobius4/tar.gz/e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8",
+  "archiveSHA256": "cd22adacf6800a1450c2c45033ba1f58079ef9104bd7f06b3c24fbcc994c8aa4",
+  "securityPatch": {
+    "patch": "BUBBLE_SUBSCRIPTION_SECURITY_V2",
+    "files": [
+      {
+        "file": "cse/reqPrim.js",
+        "status": "APPLIED",
+        "beforeSHA256": "4d51d85ecef0a9c30ed49fd5b1b409566de6db9066ad40bff98f240262892ce7",
+        "sha256": "ae957b2c1a3f8b926335d527d6df3e570e495f68205d77d5b92b7a99b6c87cb3"
+      },
+      {
+        "file": "cse/hostingCSE.js",
+        "status": "APPLIED",
+        "beforeSHA256": "11128f360fbf9fcb5deae1684a3a2c430375f1b724b9ffcfc234a13b4a14bb47",
+        "sha256": "a82a75aa776f2fc512f5b80666f22accb2033c2aec71927ba5a3717358f0f97f"
+      },
+      {
+        "file": "cse/noti.js",
+        "status": "APPLIED",
+        "beforeSHA256": "0535478aafa4e3dce108cd785dc6715223ffb2674ec5156c98634ca254f3ca19",
+        "sha256": "83fa43579c3bd40842451ea96d0a173989c10230efd11ee42225a39f7cb8062c"
+      },
+      {
+        "file": "cse/resources/sub.js",
+        "status": "APPLIED",
+        "beforeSHA256": "dfe265c6d3d9d19a4830eb7134eeca4d5d2a11a9799a276cb1e2c94aa6ef0e75",
+        "sha256": "da331ed9fb5f9fc69578cb469c0ef2cb16d7790e21aebc7e28e4cf8f174476fb"
+      },
+      {
+        "file": "docker/node-config.js",
+        "status": "APPLIED",
+        "beforeSHA256": "0da67674ada6d2e71ca4c05cdb3607ecb7a2715dd44d9cef7f348d9f2c74edb9",
+        "sha256": "d2381b52f9b547c2c0810bd779ae25c3fa63bb97f839b5519d9ae3004e0f709a"
+      }
+    ]
+  },
+  "artifact": "mobius4-e8f75b1d6ee13a0e034379ec8dab26a6ef4fe8f8-bubble-subscription-v2.tar.gz",
+  "artifactSHA256": "7b57d9a314a544cfb4a244b26e62ccf1e598e5a8ef2bf7545053a11f03e8721f",
+  "lockSHA256": "3000582f544a8bec07c2e28acea6b73efb4ea1f35da6e7bc68160ea97ff7231c",
+  "patcherSHA256": "f5be26ab0c34760f6dd5b2502c0887c89fe6a73263aeeb8798e9ebb2fb6c0a89",
+  "repeatedApplication": {
+    "patch": "BUBBLE_SUBSCRIPTION_SECURITY_V2",
+    "files": [
+      {
+        "file": "cse/reqPrim.js",
+        "status": "ALREADY_APPLIED",
+        "sha256": "ae957b2c1a3f8b926335d527d6df3e570e495f68205d77d5b92b7a99b6c87cb3"
+      },
+      {
+        "file": "cse/hostingCSE.js",
+        "status": "ALREADY_APPLIED",
+        "sha256": "a82a75aa776f2fc512f5b80666f22accb2033c2aec71927ba5a3717358f0f97f"
+      },
+      {
+        "file": "cse/noti.js",
+        "status": "ALREADY_APPLIED",
+        "sha256": "83fa43579c3bd40842451ea96d0a173989c10230efd11ee42225a39f7cb8062c"
+      },
+      {
+        "file": "cse/resources/sub.js",
+        "status": "ALREADY_APPLIED",
+        "sha256": "da331ed9fb5f9fc69578cb469c0ef2cb16d7790e21aebc7e28e4cf8f174476fb"
+      },
+      {
+        "file": "docker/node-config.js",
+        "status": "ALREADY_APPLIED",
+        "sha256": "d2381b52f9b547c2c0810bd779ae25c3fa63bb97f839b5519d9ae3004e0f709a"
+      }
+    ]
+  },
+  "dependencyPatch": {
+    "patch": "BUBBLE_DEPENDENCIES_V1",
+    "files": [
+      {
+        "file": "package.json",
+        "status": "APPLIED",
+        "beforeSHA256": "4becf0cd79cf85f3d79c4f5b3475555b2c716b2c554260c2749a7e8a51f55a5a",
+        "sha256": "a436885310e90f67a6a887cb6f8f112ddd3a2635aae2406e680b3a339a9a7b03"
+      },
+      {
+        "file": "package-lock.json",
+        "status": "APPLIED",
+        "beforeSHA256": "100e29c3b4feecc3fcd95f4af5b214180305326a5890651b165ec63fea72aea6",
+        "sha256": "3000582f544a8bec07c2e28acea6b73efb4ea1f35da6e7bc68160ea97ff7231c"
+      }
+    ]
+  },
+  "repeatedDependencies": {
+    "patch": "BUBBLE_DEPENDENCIES_V1",
+    "files": [
+      {
+        "file": "package.json",
+        "status": "ALREADY_APPLIED",
+        "beforeSHA256": "4becf0cd79cf85f3d79c4f5b3475555b2c716b2c554260c2749a7e8a51f55a5a",
+        "sha256": "a436885310e90f67a6a887cb6f8f112ddd3a2635aae2406e680b3a339a9a7b03"
+      },
+      {
+        "file": "package-lock.json",
+        "status": "ALREADY_APPLIED",
+        "beforeSHA256": "100e29c3b4feecc3fcd95f4af5b214180305326a5890651b165ec63fea72aea6",
+        "sha256": "3000582f544a8bec07c2e28acea6b73efb4ea1f35da6e7bc68160ea97ff7231c"
+      }
+    ]
+  },
+  "dependencyPatcherSHA256": "ac068ff42f8bd8b10b012bfb911571d3f9f85d04c0b6c4f9a791bc7789d16dfa"
+}
