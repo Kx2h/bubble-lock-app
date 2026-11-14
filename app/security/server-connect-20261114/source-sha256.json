@@ -1,0 +1,13 @@
+{
+  "app/app/build.gradle": "31d36ebb665505865d51948ebc713fd17d6f4db3363ce6c52e2bfda2e35cf33d",
+  "app/app/src/main/AndroidManifest.xml": "203c7c23fe472cda091b00b91d8801d4d532938ea02db0c9ede713785a7ad880",
+  "app/app/src/main/java/org/privacybubble/app/MainActivity.java": "263a3dca0a8ac7e49967ccb4f6122be6a5f34177529b5b8759a7b61c7d5dcbb4",
+  "app/app/src/main/java/org/privacybubble/app/ServerPortalActivity.java": "03478434acb4f30390120156571a2f2de40ea80e03672cf1f36a12e7c3d0f19e",
+  "app/app/src/main/java/org/privacybubble/app/portal/ServerPortalPolicy.java": "f0a393743f63bdf25ce0d521f0ac3f2e715f000a833d0fb699d6ace20581c9cc",
+  "app/app/src/main/res/values/strings.xml": "9cfb581701464986832f2fd1084a3d59023b1cf5d4923349f259e80aea046687",
+  "app/scripts/check-release-security.py": "048e7bae4443556ada825df26f81bea00c9fd060a7a3ff81215db070aafbb026",
+  "app/scripts/check-build-isolation.sh": "5a8e3c92c879d1cfa02a60964ce2b04acda998233e1dbd74f4ecde1849ee61dd",
+  "app/scripts/verify-release.sh": "e41d41ec5a6da5aa0522346f0ebf4304706d564282f884fc192b11c4e23c97c4",
+  "scripts/security/release_inventory.py": "8c17d173bffe7b7687c2ae1ef0a6891235b0b7e23b39b2113ef40349e8617a8b",
+  "app/security/export-dependencies.gradle": "21660fcc16167358e565023985ffd40dea87d712aa7f459050dae04f6a5ed5ff"
+}

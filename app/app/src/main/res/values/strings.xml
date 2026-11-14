@@ -2,4 +2,20 @@
     <string name="app_name">Bubble</string>
     <string name="nav_location">위치</string><string name="nav_keyrings">키링</string><string name="nav_settings">설정</string>
     <string name="keyring_page_status">%1$d / %2$d 페이지</string>
+    <string name="portal_open">웹 서비스 열기</string>
+    <string name="portal_close">닫기</string>
+    <string name="portal_back">뒤로</string>
+    <string name="portal_home">홈</string>
+    <string name="portal_reload">새로고침</string>
+    <string name="portal_logout">로그아웃</string>
+    <string name="portal_cancel">취소</string>
+    <string name="portal_logout_confirm">이 기기의 웹 서비스에서 로그아웃할까요?</string>
+    <string name="portal_signing_out">안전하게 로그아웃하고 있어요.</string>
+    <string name="portal_signed_out">로그아웃했어요. 다른 계정으로 로그인할 수 있어요.</string>
+    <string name="portal_logout_failed">로그아웃을 완료하지 못했어요. 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="portal_navigation_blocked">서비스 안에서 열 수 없는 주소예요.</string>
+    <string name="portal_external_unavailable">이 주소를 열 수 있는 브라우저가 없어요.</string>
+    <string name="portal_secure_connection_failed">안전한 서비스 연결을 확인하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="portal_connection_failed">서비스에 연결하지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</string>
+    <string name="portal_download_unavailable">이 화면에서는 파일을 내려받을 수 없어요.</string>
 </resources>

@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-11-14T10:36:00.571Z",
+  "node": "v22.23.4",
+  "mode": "verify",
+  "status": "PASS",
+  "results": [
+    {
+      "label": "core-tests",
+      "exitCode": 0,
+      "durationMs": 6342,
+      "log": "01-core-tests.log",
+      "sha256": "356bbe303a7e20a73aa20027848054b9dcdd295f37e39cdfcbf5dcf82ef10be5"
+    },
+    {
+      "label": "web-tests",
+      "exitCode": 0,
+      "durationMs": 751,
+      "log": "02-web-tests.log",
+      "sha256": "c16a03120789f2d054919b4083c52765ba7dd7d5794a43d9ccc86216c0a5d6c6"
+    },
+    {
+      "label": "gateway-tests",
+      "exitCode": 0,
+      "durationMs": 11659,
+      "log": "03-gateway-tests.log",
+      "sha256": "c6767572fae6aa2d3ddbe755ec6ac8ec1658f54dd5722d8caaca8d1e9b989a08"
+    },
+    {
+      "label": "cross-runtime-mtls",
+      "exitCode": 0,
+      "durationMs": 8551,
+      "log": "04-cross-runtime-mtls.log",
+      "sha256": "34f5fa6a425b9e3178a20d39e354835f05f7676d0bcc32e062e0f9792878ec92"
+    },
+    {
+      "label": "sdt-xsd-closure",
+      "exitCode": 0,
+      "durationMs": 39,
+      "log": "05-sdt-xsd-closure.log",
+      "sha256": "27ef9eb64139f1ec749856b73abe55c9f9e6a2ad9468337507ebec361e43f337"
+    },
+    {
+      "label": "core-contract",
+      "exitCode": 0,
+      "durationMs": 71,
+      "log": "06-core-contract.log",
+      "sha256": "d88b329214a670d570c3de6f6e255193fee2118a639559b071b1cf964defcf20"
+    },
+    {
+      "label": "canonical-sdt-contract",
+      "exitCode": 0,
+      "durationMs": 70,
+      "log": "07-canonical-sdt-contract.log",
+      "sha256": "6334bff684b039e13ef4e361c89addfb5fa71fa35ed0361b3a7b8b970a475f4d"
+    },
+    {
+      "label": "integration-contract",
+      "exitCode": 0,
+      "durationMs": 72,
+      "log": "08-integration-contract.log",
+      "sha256": "0821a6b29809a032270d09f537d3867aafd9346294e057f610cc9fac6d5ebaca"
+    },
+    {
+      "label": "onem2m-dry-run",
+      "exitCode": 0,
+      "durationMs": 84,
+      "log": "09-onem2m-dry-run.log",
+      "sha256": "462d87f1129363a0b7034cdf184d0f960787d1eb1ba92f0651c5a0e60828a5fc"
+    },
+    {
+      "label": "integration-demo",
+      "exitCode": 0,
+      "durationMs": 345,
+      "log": "10-integration-demo.log",
+      "sha256": "1ab593fedc282c3484ffcde220a5c538bd24c7eedf87ecb05b69743834a087f3"
+    },
+    {
+      "label": "integration-replay",
+      "exitCode": 0,
+      "durationMs": 73,
+      "log": "11-integration-replay.log",
+      "sha256": "5af1ccbcb62836af9da5fca4240c1d446297315d9d1cfa55bc148b3b98e8a0e7"
+    },
+    {
+      "label": "web-contract-types",
+      "exitCode": 0,
+      "durationMs": 1906,
+      "log": "12-web-contract-types.log",
+      "sha256": "099af85b345e78760c006c9d28215239abb039d7f2d7ec9494c53fd3d9df6b1d"
+    },
+    {
+      "label": "web-build",
+      "exitCode": 0,
+      "durationMs": 3907,
+      "log": "13-web-build.log",
+      "sha256": "dcb67757cce33ca7635c37a549849e79600dd84ed996099e128f78fd083f4b6d"
+    }
+  ]
+}

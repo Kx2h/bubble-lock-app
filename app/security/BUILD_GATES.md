@@ -31,7 +31,7 @@ PATH="$WORKSPACE_ROOT/.local/node/bin:$PATH" npm run verify
 
 `--help` works without a configured environment. `--check` checks executable versions, required files, exact Python pins, and coverage plus exact selected-lock hashes of the reviewed npm license snapshots. It verifies the CSE archive, its external/internal lock and listed source patch hashes without extracting it. It also recalculates the selected Gateway snapshot's runtime closure and checks its first-party version against current source. Missing snapshots, incomplete/mismatched lock coverage, altered recorded lock or archive hashes, unsafe archive paths, unresolved npm declarations, invalid Python closure, or a stale Gateway source version fail preflight. `--dry-run` additionally prints the commands; neither runs tests, builds packages or performs a vulnerability query. Tool version checks can initialize tool caches. `TMPDIR` must already exist, be writable and resolve inside `WORKSPACE_ROOT`; `GRADLE_USER_HOME` and `ANDROID_USER_HOME` must also be existing directories inside the workspace. Java receives the temporary directory through `java.io.tmpdir` and the explicit Android user directory through `user.home`, so JVM tools keep their user state inside the workspace. The script defaults `WORKSPACE_ROOT` to the checkout root if it is omitted. Explicitly set a larger workspace when tools and temporary files live beside the checkout.
 
-The default profile explicitly passes empty issuer, client and API properties to Gradle. This produces an unprovisioned release whose manifest omits the AppAuth callback receiver. For an operator-provisioned candidate, supply the three public build profile values and enable the matching manifest expectation:
+The default profile explicitly passes empty issuer, client and API properties to Gradle. Without Server Portal inputs it produces an unprovisioned native release whose manifest omits the AppAuth callback receiver. For a separately provisioned native candidate, supply the three public build profile values and enable the matching manifest expectation:
 
 ```sh
 export EXPECT_PRODUCTION_AUTH=1
@@ -68,3 +68,17 @@ Schema validation can download the official schema snapshots into the gate's sch
 Node tests create temporary fixtures and ephemeral loopback listeners. They do not query a production IdP or device. Host logs can contain build paths; review them before publishing. Physical-device instrumentation, real IdP lifecycle tests, production signing, deployment authentication/rate limits, and any final signed/provisioned artifact inventory remain separate release checks. A changed APK/AAB requires a fresh inventory/SBOM. Test scope and actual recorded results are in [ANDROID_TESTS.md](ANDROID_TESTS.md) and [README.md](README.md).
 
 For the deployed portal, select `portal-central-v1` only after registering the native public client and exposing its authenticated read route. `portal-web-v1` selects the normalized WEB wire shape; it does not convert browser session cookies into a native bearer. The default `keyrings-v1` remains the older standalone mobile contract. See [deployment preparation](../deployment/README.md).
+
+## Private-server BFF profile
+
+The 0.4.1 Server Portal profile uses the existing deployed web BFF and its OIDC client. It is separate from the native profile above. With the same workspace environment, run:
+
+```sh
+unset MOBILE_API_BASE_URL OIDC_ISSUER OIDC_CLIENT_ID
+export EXPECT_PRODUCTION_AUTH=0
+export SERVER_PORTAL_ORIGIN='https://bubblelock.iptime.org'
+export SERVER_PORTAL_CERTIFICATE="$WORKSPACE_ROOT/.local/deployment-connect-20261114/server.pem"
+"$REPO/app/scripts/verify-release.sh"
+```
+
+Both Portal inputs are mandatory; Gradle limits the certificate to the explicit ignored workspace path. The certificate is a public user-approved private-server leaf, never a private key. This mode rejects concurrent native OIDC or synthetic QA CA inputs. Its exact-host anchor and SPKI pin apply only inside the app; system/browser trust is unchanged. The gate inspects the actual launcher, domain, pin and packaged public certificate and uses the same complete dependency inventory. It still does not install or test a phone. [Actual optimized-release phone result](../evidence/server-connect-20261114/device-release.txt), [profile documentation](../deployment/SERVER_PORTAL.md).

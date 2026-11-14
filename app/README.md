@@ -2,11 +2,28 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 
-DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.4.0 / versionCode 4
+DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.4.1 / versionCode 5
 
-Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 확인하는 Android 앱입니다. 제품 화면은 `위치 / 키링 / 설정`으로 구성합니다. 기존 합성 시험 화면은 debug 빌드의 `설정 → 개발 도구 → 시험 도구 열기`로 옮겼습니다.
+Bubble은 공유가 허용된 키링의 위치 정보를 확인하는 Android 앱입니다. 0.4.1의 Server Portal 프로필은 실행 시 `https://bubblelock.iptime.org/#/user/map`에 직접 연결하며 기존 웹 BFF의 실제 계정 로그인·조회·로그아웃을 사용합니다. 별도의 기본 native 프로필은 `위치 / 키링 / 설정` 화면과 MapLibre 지도·public OIDC client 경로를 유지합니다.
 
-## 제품 화면과 위치의 의미
+## 연결된 Server Portal 프로필
+
+운영 서버의 guardian·operator 계정으로 host 로그인·session·snapshot·locations 조회·로그아웃을 확인했습니다. 삼성폰에서는 debug 프로필 45개 assertion과 QA 서명한 최적화 release 프로필 46개 assertion을 통과했습니다. release 시험은 실제 ApplicationInfo의 DEBUG=false와 R8 적용 WebView 경로도 확인했습니다. 이 시험은 로그인과 웹 제품 조회 흐름의 수용 시험이며, 현재 서버의 기기·위치 목록은 0개입니다. 기기 등록·동의·명령 등의 제어 mutation과 실물 좌표는 실행·검증하지 않았습니다.
+
+이 프로필은 승인된 HTTPS leaf를 exact-domain 앱 전용 trust anchor와 SPKI pin으로 사용합니다. 시스템·외부 브라우저 신뢰는 바꾸지 않습니다. BFF의 HttpOnly 세션은 WebView 내부에서만 사용하고 비밀번호·쿠키·token을 native 저장소로 추출하지 않습니다. 뒤로·홈·새로고침·로그아웃을 제공하며, 서버 로그아웃 200 응답 뒤 해당 앱의 웹 쿠키와 저장소를 지워 계정을 전환합니다. 웹 지도는 배포 웹의 Leaflet과 웹 read lease를 사용합니다. native MapLibre·Keystore AAD·독립 lease 구현과는 별도입니다.
+
+저장소 `app/`에서 아래 두 입력으로 빌드합니다. native OIDC 및 `oidcTestCa` 프로필과 함께 사용하지 않습니다.
+
+```sh
+"$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon --dependency-verification=strict \
+  -PserverPortalOrigin=https://bubblelock.iptime.org \
+  -PserverPortalCertificate="$WORKSPACE/.local/deployment-connect-20261114/server.pem" \
+  :app:assembleDebug :app:assembleRelease
+```
+
+[Server Portal 설정·세션 경계](deployment/SERVER_PORTAL.md) · [0.4.1 실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md). 증거는 `evidence/server-connect-20261114/`와 `security/server-connect-20261114/`에 구분합니다. 아래 native 화면·로그인 설명은 기본 native 프로필에 해당하며, Android public client 등록은 이 Server Portal 연결의 선행 조건이 아닙니다.
+
+## 기본 native 화면과 위치의 의미
 
 - MapLibre Native Android 13.7.1의 Vulkan/OpenGL ES 지도와 OpenFreeMap 배경을 사용합니다. 키링 핀은 인증된 위치 API의 유효 좌표로만 만듭니다. 기본 한국 광역 배경은 키링의 위치가 아닙니다.
 - 선택한 키링의 정보 시각·정확도·출처·좌표·제공된 연결/배터리 정보를 표시합니다. 지도 제스처를 사용하지 않아도 `키링` 목록에서 같은 정보를 읽고 위치를 선택할 수 있습니다.
@@ -17,15 +34,15 @@ Bubble은 공유가 허용된 키링의 위치 정보를 지도와 목록으로 
 
 Portal 위치는 중앙 서비스의 권한 검사를 거친 GPS/MEC/릴레이 관측을 읽습니다. 모의 관측에는 `모의`를 표시하고 BLE RSSI만 있는 관측은 신호 기록으로 표시합니다. 좌표·배터리·연결 상태가 없으면 만들어 넣지 않습니다. 기존 `keyrings-v1`은 `IntegrationStore`의 MEC `Location` 이벤트를 읽는 별도 계약입니다. 정보 시각은 실물 센서의 fix 시각을 증명하지 않으며 휴대폰 GPS나 RSSI를 키링 좌표로 바꾸지 않습니다.
 
-[Portal 응답 계약](contracts/portal-location.v1.json) · [기존 모바일 계약](contracts/mobile-location.v1.json) · [실서버 통합 기록](docs/DEPLOYMENT-20261114.md) · [지도 출처](docs/MAP_PROVIDER.md) · [배포 잔여 조건](docs/APP_IMPLEMENTATION_STATUS.md)
+[Portal 응답 계약](contracts/portal-location.v1.json) · [기존 모바일 계약](contracts/mobile-location.v1.json) · [0.4.0 통합 기록](docs/DEPLOYMENT-20261114.md) · [두 프로필의 지도 출처](docs/MAP_PROVIDER.md) · [구현 상태와 잔여 조건](docs/APP_IMPLEMENTATION_STATUS.md)
 
-## 로그인과 연결 설정
+## 기본 native 로그인과 연결 설정
 
 release는 현재 빌드에 고정된 서비스 주소를 읽기 전용으로 표시합니다. 업데이트 후 이전 저장 주소로 토큰을 보내지 않으며, 주소가 바뀌면 이전 주소에 묶인 세션을 무효화합니다. `이 기기의 데이터 삭제`는 로그인 정보와 표시된 위치를 지웁니다. debug에서만 서비스 주소를 직접 저장·해제할 수 있습니다. 제품의 issuer와 client ID는 빌드 프로필에 고정하며, 일반 설정 화면에서 임의 공급자나 bearer를 입력하지 않습니다. 브라우저 Authorization Code + PKCE S256 흐름과 discovery/JWKS·ID token 검증을 사용합니다.
 
 access/refresh token과 subject·identity 검증 맥락은 Android Keystore의 비추출 키를 사용하는 AES-GCM 저장소에 암호화합니다. 암호문은 API origin·issuer·client·API 계약에 묶이며 0.3.0 세션은 다시 로그인해야 합니다. access token이 만료되면 worker에서 refresh를 한 번 수행합니다. 회전하는 refresh credential은 요청 전에 내구성 있게 소비하며, 응답 유실·검증 실패 시 이전 credential을 재전송하지 않고 로그인을 다시 요구합니다. 토큰은 앱 로그나 UI saved state에 넣지 않습니다.
 
-실제 배포에서는 아래 빌드 절의 환경변수를 설정한 뒤 다음 세 프로필을 함께 제공합니다. 사용자 설정에 비밀키나 client secret을 넣지 않습니다.
+native API 경로를 배포할 때는 아래 빌드 절의 환경변수를 설정한 뒤 다음 세 입력을 함께 제공합니다. 이 public client의 운영 등록과 전체 native 로그인은 별도 잔여 작업입니다. 사용자 설정에 비밀키나 client secret을 넣지 않습니다.
 
 ```sh
 "$WORKSPACE/.local/gradle-8.13/bin/gradle" --no-daemon :app:assembleRelease \
@@ -58,7 +75,9 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 
 APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
 
-현재 0.4.0의 실행 결과와 실서버·격리 기기 시험의 범위는 [통합 기록](docs/DEPLOYMENT-20261114.md), [SBOM·SCA와 해시](security/deployment-20261114/README.md), [릴리스 검증 절차](security/BUILD_GATES.md)에 기록합니다. 기본 미서명 APK/AAB는 운영 IdP/API 프로필과 운영 서명을 아직 포함하지 않습니다.
+현재 0.4.1은 debug 92개·release 83개 단위시험, release lint 문제 0건, 포장 검사 42건과 13단계 gate를 통과했습니다. SBOM은 debug 492개·release 417개 구성요소이며 OSV 조회 결과는 0건입니다. 정확한 프로필·APK·기기 시험 범위는 [실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md)와 `security/server-connect-20261114/`에 기록합니다. 기기 release는 workspace QA 서명본이며 운영 배포 서명본과 구분합니다. 기본 미설정 native APK/AAB에는 운영 native IdP/API 입력이 없습니다.
+
+이전 0.4.0의 85/76개 단위시험·합성 lease/목록 시험과 당시 신뢰 조사 결과는 [통합 기록](docs/DEPLOYMENT-20261114.md), [당시 SBOM·해시](security/deployment-20261114/README.md)에 보존합니다. 현재 릴리스 절차는 [BUILD_GATES](security/BUILD_GATES.md)를 따릅니다.
 
 이전 0.3.0의 Debug 56 / Release 47 단위시험, API 38,958개 공격 입력, 기기 27개 보안 assertion과 지도·큰 글씨·회전 기록은 [0.3.0 보안 릴리스 기록](security/RELEASE-0.3.0.md)의 당시 증거입니다.
 
@@ -79,7 +98,7 @@ WSL wrapper는 `install -r`의 최종 로컬 APK 경로도 Windows 경로로 변
 
 versionCode 3에서 이전 APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
 
-이번 보안 QA에서는 최적화된 0.3.0 release의 workspace QA 서명 사본을 기기에 남겼습니다. 운영 서명본은 아닙니다. 시험용 인증과 instrumentation 패키지를 정리하고 표시 설정을 복원했습니다. 원본 0.2.0 APK와 세션 설정 백업은 workspace `.local/security-release/`에 보관합니다. 기존 앱 전체 데이터나 시스템·브라우저 인증서 신뢰는 변경하지 않았습니다. [최종 기기·정리 기록](security/RELEASE-0.3.0.md)을 참고하세요.
+0.3.0 당시 보안 QA에서는 최적화 release의 workspace QA 서명 사본을 기기에 남겼습니다. 당시 시험용 인증과 instrumentation 패키지 정리·표시 설정 복원, 원본 0.2.0 APK·세션 백업은 [0.3.0 기기·정리 기록](security/RELEASE-0.3.0.md)의 범위입니다. 현재 0.4.1 설치·서명·시험 정리 상태는 [실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md)를 따릅니다.
 
 ## 소유권을 확인하는 개발 시험 설치·정리 도구
 

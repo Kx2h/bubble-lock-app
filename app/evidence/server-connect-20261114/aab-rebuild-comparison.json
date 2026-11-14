@@ -1,0 +1,15 @@
+{
+  "originalSha256": "254afdc538564820b692a2e85f74f146c20634e7e82544c5f7ca29c9ebbc6df6",
+  "rebuiltSha256": "9edf21372ee357d5d741aa6ab900af4ddab9782ea36828386f66175e77024d44",
+  "differentEntries": [
+    {
+      "name": "BUNDLE-METADATA/com.android.tools/r8.json",
+      "oldBytes": 1592,
+      "newBytes": 1592
+    }
+  ],
+  "originalValidatedAabPreserved": true,
+  "runtimeEntriesIdentical": true,
+  "changedMetadataField": "compilation.buildTimeNs",
+  "validatedOriginalAabRestored": true
+}

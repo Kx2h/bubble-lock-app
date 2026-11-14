@@ -1,6 +1,8 @@
 # Release security inventory
 
-Current: [0.4.0 integrated release evidence](deployment-20261114/README.md), covering Android, PC/web, Gateway validation dependencies and the pinned CSE source/lock. [Actual full release-gate execution](../evidence/deployment-20261114/release-gate.json) also passed after the recorded preflight checks. Production TLS, native client registration and real-account acceptance remain pending.
+Current: [0.4.1 private-server connection evidence](server-connect-20261114/README.md). The app's BFF profile passed actual guardian/operator login, API, dashboard and logout checks on the connected phone in both debug and optimized release builds. Exact certificate trust is scoped to that app; system/browser trust is unchanged. [Connection/device report](../docs/SERVER-CONNECTION-20261114.md).
+
+The [0.4.0 integrated evidence](deployment-20261114/README.md) and [its full gate](../evidence/deployment-20261114/release-gate.json) remain historical records of the preceding unprovisioned native build. Separate native public-client registration and its production profile are not asserted by the current BFF connection.
 
 ## Historical 0.3.0
 

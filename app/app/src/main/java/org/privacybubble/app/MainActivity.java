@@ -162,6 +162,12 @@ public final class MainActivity extends AppCompatActivity {
         connectionPill = theme.text("연결 필요", 13, theme.muted);
         connectionPill.setPadding(theme.dp(12), theme.dp(8), theme.dp(12), theme.dp(8));
         connectionPill.setBackground(theme.shape(theme.subtle, Color.TRANSPARENT, 24)); header.addView(connectionPill); header.setVisibility(compact ? View.GONE : View.VISIBLE); root.addView(header);
+        if (!BuildConfig.SERVER_PORTAL_ORIGIN.isEmpty()) {
+            MaterialButton portalButton = theme.button(getString(R.string.portal_open), true,
+                    view -> startActivity(new Intent(this, ServerPortalActivity.class)));
+            LinearLayout.LayoutParams portalParams = new LinearLayout.LayoutParams(-1, -2);
+            portalParams.setMargins(theme.dp(20), theme.dp(8), theme.dp(20), theme.dp(8)); root.addView(portalButton, portalParams);
+        }
         progress = new LinearProgressIndicator(this); progress.setIndeterminate(true); progress.setIndicatorColor(theme.accent);
         progress.setTrackColor(theme.subtle); root.addView(progress, new LinearLayout.LayoutParams(-1, theme.dp(3)));
         banner = theme.text("", 14, theme.warning); banner.setPadding(theme.dp(22), theme.dp(12), theme.dp(22), theme.dp(12));

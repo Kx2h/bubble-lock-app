@@ -1,10 +1,18 @@
 # 키링 위치 지도
 
-ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-11-14 · APP 0.4.0.
+ROLE: APP · DOC-REV: 2.0.0 · 기준일: 2026-11-14 · APP 0.4.1 / versionCode 5.
 
-제품 지도는 MapLibre Native Android `13.7.1`의 벡터 지도이며 기본 스타일은 OpenFreeMap Liberty다. 지도 배경과 키링 위치 데이터는 별도로 처리한다. 배경을 불러오지 못해도 키링 목록에서 위치·관측 시각·정확도를 확인할 수 있고, 위치 API에 데이터가 없으면 배경에 임의의 키링 핀을 만들지 않는다.
+Server Portal 프로필의 제품 지도는 운영 웹 BFF에서 제공하는 Leaflet 화면이다. 별도의 기본 native 프로필은 MapLibre Native Android `13.7.1`과 OpenFreeMap Liberty를 사용한다. 두 모드의 renderer·타일 설정·세션·read lease는 독립적이며 `MAP_STYLE_URL`은 native 지도에만 적용한다. 지도 배경은 키링의 실제 위치를 의미하지 않는다.
 
-## 구현과 데이터 경계
+## 연결된 Server Portal의 웹 지도
+
+Server Portal 런처는 `https://bubblelock.iptime.org/#/user/map`을 직접 열고 웹 홈에서 운영자 지도로 이동할 수 있다. 기존 웹 BFF의 same-origin HttpOnly 세션으로 `/api/portal/locations`를 조회하며 BFF가 허용한 관측을 배포 웹의 Leaflet 지도에 표시한다. 앱은 이 응답이나 쿠키를 native MapLibre·Keystore 저장소로 전달하지 않는다. 새 Android public client 등록은 이 웹 연결의 조건이 아니다.
+
+웹은 `LocationMap`·`useLocations`의 read-expiry timer와 401/403 처리로 snapshot·레이어를 제거한다. 이 구현은 아래 native의 HTTP Date 정규화·wall/monotonic 독립 lease와 별도다. WebView가 중지되면 페이지를 비우고 복귀 때 다시 로드하며, 앱의 `FLAG_SECURE`와 recents 보호를 적용한다. 로그아웃은 BFF POST 성공 뒤 앱 전용 웹 쿠키·저장소를 정리한다.
+
+웹 타일은 배포 웹의 공급자 설정·`VITE_MAP_TILE_URL`·출처 설정을 따르며 앱의 OpenFreeMap 스타일 설정으로 바뀌지 않는다. 웹 지도 하단의 공급자 출처를 유지한다. 웹에서 BLE 근접 영역을 표시하는 경우 그 중심은 gateway 기준 위치이며 키링 좌표가 아니다. 현재 live 기기·좌표 목록은 0개다. 실제 키링 핀·GPS 정확도·Pi/BLE 지연·회수 동작은 이후 실물 시험으로 확인해야 하며 배경의 기본 시점을 실물 위치로 표시하지 않는다.
+
+## 별도 native 지도의 구현과 데이터 경계
 
 [KeyringMapView](../app/src/main/java/org/privacybubble/app/ui/KeyringMapView.java)는 지도 SDK의 전체 Activity lifecycle을 위임한다. SDK의 실험적 plugin API나 deprecated marker API 대신 GeoJSON source와 Circle/Fill layer를 사용한다. 선택한 키링의 실제 좌표에만 카메라를 맞추며, 첫 응답 전의 한국 광역 배경은 키링 위치가 아니다.
 
@@ -22,7 +30,7 @@ Portal central/web은 배포 프로필로 명시적으로 선택한다. 최대 1
 
 기본 OpenFreeMap dark 스타일의 도로·지역·물 이름은 위치를 찾는 데 읽을 수 있도록 밝은 글자와 어두운 halo로 대비를 높인다. 이 보정은 정확히 `https://tiles.openfreemap.org/styles/dark`일 때만 적용하며 다른 제공자나 사용자 설정 스타일에는 적용하지 않는다. 상태 범례는 지도 아래의 가변 높이 줄에 배치해 큰 글자에서도 SDK 출처·로고와 조작 버튼을 가리지 않는다. SDK 출처 버튼은 로고 옆 여백을 확보하는 기본 배치를 유지한다.
 
-## 제공자와 라이선스
+## native 제공자와 라이선스
 
 MapLibre Native는 BSD 2-Clause로 배포된다. 사용하는 `android-sdk-vulkan-opengl` 아티팩트는 Vulkan과 OpenGL ES를 포함하며 SDK의 자동 선택을 사용한다. 한 backend만 포함된 아티팩트와 다른 backend를 선택하는 조합은 사용하지 않는다. [공식 SDK·라이선스](https://github.com/maplibre/maplibre-native), [13.7.1 릴리스](https://github.com/maplibre/maplibre-native/releases/tag/android-v13.7.1), [backend 문서](https://maplibre.org/maplibre-native/android/examples/artifacts/)
 
@@ -32,4 +40,6 @@ SDK의 attribution을 유지하고 지도 아래에 OpenStreetMap·OpenMapTiles 
 
 ## 검증 범위
 
-APP 0.4.0 빌드와 1,000개 목록·페이지·View 재사용 기기 fixture를 통과했다. 별도 HTTPS/Main fixture는 7초 지연된 403 응답을 기다리는 동안 4.124초에 만료 위치가 제거되는 것을 확인했다. 이 실행은 잠긴 기기의 privileged harness에서 수행했으며 실제 브라우저 OIDC·눈에 보이는 지도 터치·실물 좌표 시험이 아니다. [현재 배포·검증 보고서](DEPLOYMENT-20261114.md)에서 정확한 APK·검증 범위·운영 HTTPS와 Android client의 잔여 조건을 확인한다. 기존 큰 글자·화면 회전 QA는 당시 APK의 기록이며 현재 버전의 수동 사용성은 별도 검증한다.
+APP 0.4.1은 debug 92개·release 83개 단위시험, lint 문제 0건과 포장 검사 42건을 통과했다. Server Portal은 실제 운영 guardian·operator의 host 로그인·조회·로그아웃, 삼성폰 debug 45개·QA 서명 최적화 release 46개 assertion을 통과했다. 사용자·운영자 웹 지도 DOM과 빈 live 목록을 확인했으며 제어 mutation이나 실물 좌표는 시험하지 않았다. [현재 실서버 연결 보고서](SERVER-CONNECTION-20261114.md)와 `../evidence/server-connect-20261114/`에서 정확한 APK와 수용 범위를 확인한다. 실제 지도 제스처·큰 글자·회전·화면 읽기 프로그램의 전체 수동 검증과 다른 OS/GPU 시험은 구분한다.
+
+이전 APP 0.4.0의 native 1,000개 목록·페이지·View 재사용 fixture와 HTTPS/Main fixture는 [당시 통합 보고서](DEPLOYMENT-20261114.md)에 보존한다. 7초 지연된 403 응답을 기다리는 동안 4.124초에 위치를 제거한 기록은 잠긴 기기의 합성 native 시험이며, 0.4.1 웹 read lease나 실제 키링 위치의 검증으로 합산하지 않는다. 기존 큰 글자·회전 QA도 당시 APK에 한정한다.

@@ -1,0 +1,33 @@
+{
+  "version": "0.4.1",
+  "versionCode": 5,
+  "profile": "server-portal-bff",
+  "origin": "https://bubblelock.iptime.org",
+  "optimizedRelease": true,
+  "debuggable": false,
+  "qaSigned": true,
+  "productionSigning": false,
+  "apkSha256": "fd9e91807a69555d1bd0fe9208844de25b36116241d8d060bdebf3622570c29d",
+  "installedBytesMatchHandoff": true,
+  "realServerDebugAssertions": 45,
+  "realServerReleaseAssertions": 46,
+  "realServerAccounts": [
+    "guardian",
+    "operator"
+  ],
+  "locationsDeviceCount": 0,
+  "scopeSeparationChecked": true,
+  "roleDashboardDomChecked": true,
+  "nativeTouchSmokePassed": true,
+  "launcherResolvedToPortal": true,
+  "testPackageInstalledForUser0": false,
+  "privateCredentialFileRemovedByTargetUidTest": true,
+  "qaWebViewCookiesCleared": true,
+  "displaySettingsMatchBaseline": true,
+  "restoredDisplaySettings": [
+    "accelerometer_rotation"
+  ],
+  "reverseConnectionsChanged": false,
+  "systemBrowserTrustChanged": false,
+  "deviceCommandsSent": 0
+}

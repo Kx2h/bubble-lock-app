@@ -16,9 +16,18 @@ release_path=$(xml_path "$release")
 [[ -n $debug_path && -n $release_path ]] || { echo 'Network config not found.' >&2; exit 1; }
 debug_xml=$("$aapt" dump xmltree "$debug" "$debug_path")
 release_xml=$("$aapt" dump xmltree "$release" "$release_path")
-[[ $debug_xml == *'C: "127.0.0.1"'* && $debug_xml == *'cleartextTrafficPermitted=(type 0x12)0xffffffff'* ]] || { echo 'Debug local test exception is missing.' >&2; exit 1; }
-[[ $debug_xml != *'C: "localhost"'* && $debug_xml != *'trust-anchors'* ]] || { echo 'Default debug APK unexpectedly trusts a synthetic CA.' >&2; exit 1; }
-[[ $release_xml == *'cleartextTrafficPermitted=(type 0x12)0x0'* && $release_xml != *'domain-config'* && $release_xml != *'0xffffffff'* ]] || { echo 'Release cleartext policy is unsafe.' >&2; exit 1; }
+if [[ -n ${SERVER_PORTAL_ORIGIN:-}${SERVER_PORTAL_CERTIFICATE:-} ]]; then
+  [[ -n ${SERVER_PORTAL_ORIGIN:-} && -f ${SERVER_PORTAL_CERTIFICATE:-} && ${EXPECT_PRODUCTION_AUTH:-0} == 0 ]] || { echo 'Portal isolation requires origin/certificate separately from native auth.' >&2; exit 1; }
+  [[ $debug_xml != *'0xffffffff'* && $debug_xml != *'C: "localhost"'* && $debug_xml != *'C: "127.0.0.1"'* ]] || { echo 'Portal debug unexpectedly retains a loopback or cleartext exception.' >&2; exit 1; }
+  [[ $debug_xml == "$release_xml" ]] || { echo 'Portal debug/release trust policies differ.' >&2; exit 1; }
+  ANDROID_HOME=${ANDROID_HOME:-$(dirname "$(dirname "$(dirname "$aapt")")")} "${PYTHON_BIN:-python3}" "$app_dir/scripts/check-release-security.py" "$release" \
+    --portal-origin "$SERVER_PORTAL_ORIGIN" --portal-certificate "$SERVER_PORTAL_CERTIFICATE" \
+    --output "$app_dir/app/build/reports/portal-isolation-inspection.json"
+else
+  [[ $debug_xml == *'C: "127.0.0.1"'* && $debug_xml == *'cleartextTrafficPermitted=(type 0x12)0xffffffff'* ]] || { echo 'Debug local test exception is missing.' >&2; exit 1; }
+  [[ $debug_xml != *'C: "localhost"'* && $debug_xml != *'trust-anchors'* ]] || { echo 'Default debug APK unexpectedly trusts a synthetic CA.' >&2; exit 1; }
+  [[ $release_xml == *'cleartextTrafficPermitted=(type 0x12)0x0'* && $release_xml != *'domain-config'* && $release_xml != *'0xffffffff'* ]] || { echo 'Release cleartext policy is unsafe.' >&2; exit 1; }
+fi
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'net.openid.appauth.RedirectUriReceiverActivity' || { echo 'Debug test redirect receiver is missing.' >&2; exit 1; }
 if [[ ${EXPECT_PRODUCTION_AUTH:-0} == 1 ]]; then
   "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -q 'net.openid.appauth.RedirectUriReceiverActivity' || { echo 'Provisioned production redirect receiver is missing.' >&2; exit 1; }
@@ -28,4 +37,4 @@ if "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -Eq 'org.privacybubb
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticObservationActivity' || { echo 'Debug observation test Activity is missing.' >&2; exit 1; }
 "$aapt" dump xmltree "$debug" AndroidManifest.xml | grep -q 'org.privacybubble.app.SyntheticReceiptActivity' || { echo 'Debug receipt test Activity is missing.' >&2; exit 1; }
 if "$aapt" dump xmltree "$release" AndroidManifest.xml | grep -Eq 'org.privacybubble.app.(DeveloperToolsActivity|SyntheticConsentActivity|SyntheticObservationActivity|SyntheticReceiptActivity|auth.(OidcSyntheticActivity|AuthenticatedConsentActivity|StateMismatchProbeActivity))'; then echo 'Test Activity is present in release.' >&2; exit 1; fi
-echo 'PASS: default debug excludes synthetic CA and Activity; release rejects cleartext and test Activities'
+echo 'PASS: selected debug/release profiles enforce explicit trust and exclude release test Activities'

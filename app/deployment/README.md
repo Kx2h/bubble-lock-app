@@ -2,7 +2,9 @@
 
 ROLE: APP · DOC-REV: 2.0.0 · 2026-11-14 KST
 
-이 디렉터리는 기존 웹 BFF와 별도의 Native public OIDC client, 그 client의 사용자 token을 받는 정확한 읽기 API 경로를 준비한다. 원격 Keycloak 등록·Nginx 수정·reload는 실행하지 않는다. 현재 서버의 Native client 등록과 공개 API audience의 운영 설정은 확인되지 않았으며, 기본 템플릿은 그 값을 채우기 전 검증에 실패한다.
+현재 0.4.1의 실제 서버 연결은 [Server Portal BFF 프로필](SERVER_PORTAL.md)로 완료했다. 이 프로필은 기존 운영 로그인과 웹 제품을 앱에서 사용하며 새 native client 등록을 요구하지 않는다. [기기 검증 결과](../docs/SERVER-CONNECTION-20261114.md)
+
+아래 준비물은 별도의 Native public OIDC client와 그 사용자 token을 받는 정확한 읽기 API 경로를 위한 것이다. 원격 Keycloak 등록·Nginx 수정·reload는 실행하지 않는다. 해당 Native client 등록과 공개 API audience의 운영 설정은 확인되지 않았으며, 기본 템플릿은 그 값을 채우기 전 검증에 실패한다.
 
 공개 관찰의 issuer는 `https://bubblelock.iptime.org/identity/realms/bubble`, 웹 client는 `bubble-lock-dashboard`다. 웹 BFF는 HttpOnly 세션 cookie와 서버 메모리 token을 사용한다. Native 앱이 웹 client secret, 계정 비밀번호, 브라우저 cookie 또는 Gateway 키를 복사하지 않는다. 제공된 Gateway 개인키는 Pi에만 둔다. 443 웹 인증서는 제공 ZIP의 MQTT CA와 다르므로 웹 인증서의 신뢰 경로·fingerprint를 독립적으로 확인해야 한다.
 

@@ -1,0 +1,204 @@
+[
+  {
+    "account": "guardian",
+    "startedAt": "2026-11-14T10:22:37Z",
+    "trustBasis": "User explicitly trusts this private server; certificate scoped to this client only",
+    "deviceCommandsSent": 0,
+    "callbackStatus": 200,
+    "authenticated": true,
+    "principalId": "guardian-1",
+    "scopeCount": 10,
+    "sessionExpiresAt": "2026-11-14T18:22:39.135Z",
+    "sessionCookieFlags": [
+      {
+        "secure": true,
+        "httpOnly": true,
+        "sameSiteLax": true
+      },
+      {
+        "secure": true,
+        "httpOnly": true,
+        "sameSiteLax": true
+      }
+    ],
+    "locations": {
+      "status": 200,
+      "noStore": true,
+      "readExpiresAt": "2026-11-14T10:22:44.383Z",
+      "topLevelKeys": [
+        "caughtUp",
+        "devices",
+        "gateways",
+        "mode",
+        "readExpiresAt",
+        "rejectedRecords",
+        "schemaVersion",
+        "simulation",
+        "source",
+        "updatedAt"
+      ],
+      "deviceCount": 0,
+      "observationCount": 0
+    },
+    "snapshot": {
+      "status": 200,
+      "noStore": true
+    },
+    "logoutStatus": 200,
+    "logoutClearedSession": true,
+    "status": "PASS",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/auth/login",
+        "status": 302
+      },
+      {
+        "method": "GET",
+        "path": "/identity/realms/bubble/protocol/openid-connect/auth",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/identity/realms/bubble/login-actions/authenticate",
+        "status": 302
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/callback",
+        "status": 303
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/portal/locations",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/portal/snapshot",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/logout",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200
+      }
+    ]
+  },
+  {
+    "account": "operator",
+    "startedAt": "2026-11-14T10:22:39Z",
+    "trustBasis": "User explicitly trusts this private server; certificate scoped to this client only",
+    "deviceCommandsSent": 0,
+    "callbackStatus": 200,
+    "authenticated": true,
+    "principalId": "operator-1",
+    "scopeCount": 2,
+    "sessionExpiresAt": "2026-11-14T18:22:39.913Z",
+    "sessionCookieFlags": [
+      {
+        "secure": true,
+        "httpOnly": true,
+        "sameSiteLax": true
+      },
+      {
+        "secure": true,
+        "httpOnly": true,
+        "sameSiteLax": true
+      }
+    ],
+    "locations": {
+      "status": 200,
+      "noStore": true,
+      "readExpiresAt": "2026-11-14T10:22:45.087Z",
+      "topLevelKeys": [
+        "caughtUp",
+        "devices",
+        "gateways",
+        "mode",
+        "readExpiresAt",
+        "rejectedRecords",
+        "schemaVersion",
+        "simulation",
+        "source",
+        "updatedAt"
+      ],
+      "deviceCount": 0,
+      "observationCount": 0
+    },
+    "snapshot": {
+      "status": 200,
+      "noStore": true
+    },
+    "logoutStatus": 200,
+    "logoutClearedSession": true,
+    "status": "PASS",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/auth/login",
+        "status": 302
+      },
+      {
+        "method": "GET",
+        "path": "/identity/realms/bubble/protocol/openid-connect/auth",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/identity/realms/bubble/login-actions/authenticate",
+        "status": 302
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/callback",
+        "status": 303
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/portal/locations",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/portal/snapshot",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/logout",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200
+      }
+    ]
+  }
+]

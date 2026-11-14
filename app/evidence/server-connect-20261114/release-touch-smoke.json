@@ -1,0 +1,19 @@
+{
+  "optimizedRelease": true,
+  "touches": [
+    "native-home",
+    "native-back",
+    "native-reload"
+  ],
+  "realAccountsLoggedOutBeforeSmoke": true,
+  "passed": true,
+  "nativeButtons": [
+    "뒤로",
+    "홈",
+    "새로고침",
+    "로그아웃"
+  ],
+  "initialWebViewPresent": true,
+  "homeHasRoleEntry": true,
+  "webViewAfterReload": true
+}

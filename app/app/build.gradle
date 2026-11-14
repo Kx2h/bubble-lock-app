@@ -32,6 +32,45 @@ if (oidcTestCa != null) {
     }
 }
 
+def serverPortalOrigin = providers.gradleProperty('serverPortalOrigin').orElse('').get()
+def serverPortalCertificate = providers.gradleProperty('serverPortalCertificate').orNull
+def serverPortalConfigured = !serverPortalOrigin.isEmpty() || serverPortalCertificate != null
+def serverPortalHost = '', serverPortalPin = '', serverPortalPem = ''
+def serverPortalCertificateFile = null
+if (serverPortalConfigured) {
+    if (serverPortalOrigin.isEmpty() || serverPortalCertificate == null || oidcTestCa != null || configuredAuth)
+        throw new GradleException('serverPortalOrigin and serverPortalCertificate are required together, separately from native OIDC and oidcTestCa profiles')
+    def uri = new URI(serverPortalOrigin)
+    def host = uri.host?.toLowerCase(java.util.Locale.ROOT)
+    if (uri.scheme != 'https' || host == null || uri.userInfo != null || uri.query != null || uri.fragment != null
+            || !(uri.rawPath in ['', '/']) || uri.port == 0 || uri.port > 65535
+            || !host.matches('[a-z0-9-]+(?:\\.[a-z0-9-]+)+') || host.length() > 253
+            || host.split('\\.').any { it.length() > 63 || it.startsWith('-') || it.endsWith('-') }
+            || !host.tokenize('.').last().matches('[a-z][a-z0-9-]*')
+            || host.matches('.*\\.(localhost|local|localdomain|internal|home\\.arpa)$')
+            || !uri.rawAuthority.equalsIgnoreCase(host + (uri.port == -1 ? '' : ':' + uri.port)))
+        throw new GradleException('serverPortalOrigin must be one exact public HTTPS origin')
+    serverPortalHost = host
+    serverPortalOrigin = 'https://' + host + (uri.port == -1 || uri.port == 443 ? '' : ':' + uri.port)
+    def workspaceLocal = file("${rootDir}/../../../.local").canonicalFile
+    def allowed = file("${workspaceLocal}/deployment-connect-20261114/server.pem").canonicalFile
+    serverPortalCertificateFile = file(serverPortalCertificate).canonicalFile
+    if (!allowed.isFile() || serverPortalCertificateFile != allowed
+            || !allowed.toPath().startsWith(workspaceLocal.toPath()) || allowed.length() > 65536)
+        throw new GradleException('serverPortalCertificate must be the fixed workspace .local/deployment-connect-20261114/server.pem')
+    def pem = allowed.getText('US-ASCII')
+    if (!(pem ==~ /(?s)\s*-----BEGIN CERTIFICATE-----[A-Za-z0-9+\/=\r\n]+-----END CERTIFICATE-----\s*/))
+        throw new GradleException('The server portal input must contain one public certificate')
+    def certificate = java.security.cert.CertificateFactory.getInstance('X.509')
+            .generateCertificate(new ByteArrayInputStream(allowed.bytes))
+    certificate.checkValidity()
+    if (!certificate.subjectAlternativeNames?.any { it[0] == 2 && host.equalsIgnoreCase(it[1].toString()) }
+            || (certificate.extendedKeyUsage != null && !certificate.extendedKeyUsage.contains('1.3.6.1.5.5.7.3.1')))
+        throw new GradleException('The server portal certificate must cover the exact HTTPS hostname and server authentication')
+    serverPortalPin = java.util.Base64.encoder.encodeToString(java.security.MessageDigest.getInstance('SHA-256').digest(certificate.publicKey.encoded))
+    serverPortalPem = '-----BEGIN CERTIFICATE-----\n' + java.util.Base64.getMimeEncoder(64, '\n'.bytes).encodeToString(certificate.encoded) + '\n-----END CERTIFICATE-----\n'
+}
+
 apply from: '../security/export-dependencies.gradle'
 
 android {
@@ -42,14 +81,15 @@ android {
         applicationId 'org.privacybubble.app'
         minSdk 29
         targetSdk 36
-        versionCode 4
-        versionName '0.4.0'
+        versionCode 5
+        versionName '0.4.1'
         testInstrumentationRunner 'org.privacybubble.app.security.SessionSecurityInstrumentation'
         buildConfigField 'String', 'MOBILE_API_BASE_URL', profileString('mobileApiBaseUrl')
         buildConfigField 'String', 'MOBILE_API_CONTRACT', profileString('mobileApiContract', 'keyrings-v1')
         buildConfigField 'String', 'OIDC_ISSUER', profileString('oidcIssuer')
         buildConfigField 'String', 'OIDC_CLIENT_ID', profileString('oidcClientId')
         buildConfigField 'String', 'MAP_STYLE_URL', profileString('mapStyleUrl', 'https://tiles.openfreemap.org/styles/liberty')
+        buildConfigField 'String', 'SERVER_PORTAL_ORIGIN', '"' + serverPortalOrigin + '"'
         manifestPlaceholders = [appAuthRedirectScheme: 'org.privacybubble.app']
     }
     buildTypes {
@@ -71,6 +111,12 @@ android {
     }
     if (configuredAuth) {
         sourceSets.release.manifest.srcFile 'src/productionAuth/AndroidManifest.xml'
+    }
+    if (serverPortalConfigured) {
+        ['debug', 'release'].each { variant ->
+            sourceSets[variant].manifest.srcFile "$buildDir/generated/server-portal/${variant}/AndroidManifest.xml"
+            sourceSets[variant].res.setSrcDirs(["$buildDir/generated/server-portal/res"])
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -95,4 +141,45 @@ if (oidcTestCa != null) {
         rename { 'oidc_test_ca.pem' }
     }
     tasks.matching { it.name == 'preDebugBuild' }.configureEach { dependsOn stageOidcTestCa }
+}
+
+if (serverPortalConfigured) {
+    def output = file("$buildDir/generated/server-portal")
+    def stageServerPortal = tasks.register('stageServerPortal') {
+        inputs.file serverPortalCertificateFile
+        inputs.property 'origin', serverPortalOrigin
+        inputs.property 'pin', serverPortalPin
+        inputs.file 'src/debug/AndroidManifest.xml'
+        inputs.file(configuredAuth ? 'src/productionAuth/AndroidManifest.xml' : 'src/release/AndroidManifest.xml')
+        outputs.dir output
+        doLast {
+            def raw = new File(output, 'res/raw'); raw.mkdirs()
+            new File(raw, 'server_portal_certificate.pem').setText(serverPortalPem, 'US-ASCII')
+            def xml = new File(output, 'res/xml'); xml.mkdirs()
+            new File(xml, 'network_security_config.xml').setText("""<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="false"><trust-anchors><certificates src="system" /></trust-anchors></base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">${serverPortalHost}</domain>
+        <trust-anchors><certificates src="@raw/server_portal_certificate" /></trust-anchors>
+        <!-- One user-approved private leaf; key rotation requires an updated application profile. -->
+        <pin-set tools:ignore="MissingBackupPin"><pin digest="SHA-256">${serverPortalPin}</pin></pin-set>
+    </domain-config>
+</network-security-config>
+""", 'UTF-8')
+            ['debug', 'release'].each { variant ->
+                def source = variant == 'debug' ? 'src/debug/AndroidManifest.xml'
+                        : configuredAuth ? 'src/productionAuth/AndroidManifest.xml' : 'src/release/AndroidManifest.xml'
+                def manifest = file(source).getText('UTF-8')
+                if (!manifest.contains('xmlns:tools=')) manifest = manifest.replace('<manifest ', '<manifest xmlns:tools="http://schemas.android.com/tools" ')
+                manifest = manifest.replace('</application>', '''<activity android:name=".MainActivity" android:exported="false" tools:replace="android:exported"><intent-filter tools:node="removeAll" /></activity>
+        <activity android:name=".ServerPortalActivity" android:exported="true" tools:replace="android:exported">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+    </application>''')
+                def directory = new File(output, variant); directory.mkdirs()
+                new File(directory, 'AndroidManifest.xml').setText(manifest, 'UTF-8')
+            }
+        }
+    }
+    tasks.matching { it.name in ['preDebugBuild', 'preReleaseBuild'] }.configureEach { dependsOn stageServerPortal }
 }

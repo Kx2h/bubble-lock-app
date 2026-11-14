@@ -40,6 +40,9 @@ Paths and profile:
   EXPECT_PRODUCTION_AUTH=1 requires MOBILE_API_BASE_URL, OIDC_ISSUER and
   OIDC_CLIENT_ID. Default 0 explicitly builds an unprovisioned profile.
   MOBILE_API_CONTRACT keyrings-v1 (default), portal-central-v1 or portal-web-v1.
+  SERVER_PORTAL_ORIGIN with SERVER_PORTAL_CERTIFICATE builds the private-server
+  BFF web-session profile using an exact app-only trust anchor and SPKI pin.
+  This mode is separate from native OIDC provisioning and synthetic QA trust.
 
 Dependency lockfiles, verification metadata, source legal notices and signing
 keys are never updated. Gradle uses strict dependency verification. OSV and
@@ -187,6 +190,8 @@ for file in app/gradle/verification-metadata.xml app/app/gradle.lockfile app/ven
 done
 [[ -f "$ANDROID_HOME/platforms/android-36/android.jar" ]] || fail 'Install Android SDK platform 36 before running the gate.'
 profile=${EXPECT_PRODUCTION_AUTH:-0}
+portal_origin=${SERVER_PORTAL_ORIGIN:-}
+portal_certificate=${SERVER_PORTAL_CERTIFICATE:-}
 api_contract=${MOBILE_API_CONTRACT:-keyrings-v1}
 case $api_contract in
   keyrings-v1|portal-central-v1|portal-web-v1) ;;
@@ -201,6 +206,12 @@ gradle=("$GRADLE_BIN" --no-daemon --max-workers=2 --dependency-verification=stri
     "-PmobileApiBaseUrl=${MOBILE_API_BASE_URL:-}" "-PoidcIssuer=${OIDC_ISSUER:-}" "-PoidcClientId=${OIDC_CLIENT_ID:-}" "-PmobileApiContract=$api_contract")
 inspection=()
 [[ $profile == 0 ]] || inspection+=(--configured-auth)
+if [[ -n $portal_origin$portal_certificate ]]; then
+  [[ -n $portal_origin && -f $portal_certificate ]] || fail 'Portal profile requires SERVER_PORTAL_ORIGIN and SERVER_PORTAL_CERTIFICATE together.'
+  [[ $profile == 0 && -z ${MOBILE_API_BASE_URL:-}${OIDC_ISSUER:-}${OIDC_CLIENT_ID:-} ]] || fail 'The BFF Portal profile is separate from native OIDC provisioning.'
+  gradle+=("-PserverPortalOrigin=$portal_origin" "-PserverPortalCertificate=$portal_certificate")
+  inspection+=(--portal-origin "$portal_origin" --portal-certificate "$portal_certificate")
+fi
 bom_inputs=(--npm-licenses "$npm_licenses")
 if [[ $include_web == 1 || $include_cse == 1 ]]; then
   bom_inputs=(--npm-licenses "$all_npm_licenses")
@@ -214,7 +225,7 @@ fi
 if [[ $include_gateway == 1 ]]; then
   bom_inputs+=(--python-environment "gateway-validation=$gateway_snapshot")
 fi
-printf 'PASS: release-gate prerequisites; callback profile=%s; API contract=%s; web inventory=%s; CSE inventory=%s; Gateway snapshot=%s\n' "$profile" "$api_contract" "$include_web" "$include_cse" "$include_gateway"
+printf 'PASS: release-gate prerequisites; callback profile=%s; API contract=%s; Portal=%s; web inventory=%s; CSE inventory=%s; Gateway snapshot=%s\n' "$profile" "$api_contract" "${portal_origin:-disabled}" "$include_web" "$include_cse" "$include_gateway"
 [[ $mode != check ]] || exit 0
 [[ $mode == dry ]] || mkdir -p -- "$output_dir"
 

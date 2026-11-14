@@ -80,6 +80,6 @@ npm run api
 
 ## Android 앱 통합
 
-APP 0.4.0은 최신 main·키링·최종 배포 브랜치를 통합하며, 중앙 Portal 위치 계약과 제한된 위치 표시 수명, 1,000개 목록의 페이지 처리, Keystore 세션과 릴리스 최적화를 포함합니다. [앱 안내](app/README.md), [실서버 통합 기록](app/docs/DEPLOYMENT-20261114.md), [현재 공급망 증거](app/security/deployment-20261114/README.md)를 참고하세요.
+APP 0.4.1은 실제 운영 서버의 BFF 로그인과 지도 화면을 직접 사용하는 프로필을 제공합니다. 연결된 삼성 휴대폰에서 guardian/operator의 실제 로그인·조회·로그아웃을 debug와 최적화 release로 검증했습니다. 기존 native MapLibre·Portal adapter·Keystore 모드도 보존합니다. [앱 안내](app/README.md), [현재 실제 서버·기기 결과](app/docs/SERVER-CONNECTION-20261114.md), [현재 공급망 증거](app/security/server-connect-20261114/README.md)를 참고하세요.
 
-배포 웹의 인증·위치 API와 기존 모바일 계약은 다르므로 호환 경계를 확인해 연결합니다. 운영 계정·인증서 개인키·로컬 상태는 저장소에 포함하지 않습니다. 시스템·브라우저 인증서 신뢰 설정은 변경하지 않습니다.
+운영 계정·인증서 개인키·로컬 상태는 저장소에 포함하지 않습니다. 사설 서버 인증서는 명시한 운영 프로필의 앱 안에서만 신뢰하며 시스템·브라우저 설정은 변경하지 않습니다. [기존 브랜치 통합 기록](app/docs/DEPLOYMENT-20261114.md)은 당시 범위의 증거로 보존합니다.

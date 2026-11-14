@@ -1,0 +1,29 @@
+{
+  "version": "0.4.1",
+  "versionCode": 5,
+  "authentication": "Existing production OIDC/BFF web session; no new native public client",
+  "portalOrigin": "https://bubblelock.iptime.org",
+  "trust": "User-approved private-server leaf, app-only exact host anchor and SPKI pin",
+  "productionSigning": false,
+  "artifacts": [
+    {
+      "name": "app-release-unsigned.apk",
+      "role": "unsigned portal APK",
+      "sha256": "7b9adc66b0a542499842226f1b028ff39700d8d9201c2da2fb20e38d6db789d9",
+      "bytes": 94458889
+    },
+    {
+      "name": "app-release.aab",
+      "role": "unsigned portal AAB",
+      "sha256": "254afdc538564820b692a2e85f74f146c20634e7e82544c5f7ca29c9ebbc6df6",
+      "bytes": 35911989
+    },
+    {
+      "name": "bubble-lock-0.4.1-server.apk",
+      "role": "QA-signed portal APK installed on phone",
+      "sha256": "fd9e91807a69555d1bd0fe9208844de25b36116241d8d060bdebf3622570c29d",
+      "bytes": 94527652
+    }
+  ],
+  "bomSha256": "af4da423dfb46e36ce890c5793830719baacf1dad23189db303c8ab23584b9da"
+}

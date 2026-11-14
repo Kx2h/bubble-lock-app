@@ -1,0 +1,71 @@
+{
+  "format": "privacy-bubble.release-inspection.v1",
+  "apk_sha256": "7b9adc66b0a542499842226f1b028ff39700d8d9201c2da2fb20e38d6db789d9",
+  "size_bytes": 94458889,
+  "configured_auth": false,
+  "portal_origin": "https://bubblelock.iptime.org",
+  "portal_spki_sha256": "aJ/db96pjBGf1YRsoc35ZPgHGWEPRey4IRJ6al+nVVw=",
+  "passed": true,
+  "checks": [
+    "Android 10 minimum and API 36 target",
+    "release is not debuggable",
+    "backup disabled",
+    "explicit cloud and device-transfer policy",
+    "no phone GPS or Wi-Fi identifier permissions",
+    "no test components",
+    "callback matches provisioning profile",
+    "Portal profile rejects cleartext and retains system roots",
+    "Portal profile has only system and explicit server trust anchors",
+    "Portal trust limited to the configured exact host",
+    "Portal host has exact leaf SPKI pin without subdomain inheritance",
+    "Portal Activity is packaged",
+    "Provisioned portal is the actual launch Activity",
+    "credentials excluded from cloud and device transfer",
+    "Only the explicit user-trusted public server certificate is bundled",
+    "DEX excludes DeveloperToolsActivity",
+    "DEX excludes SyntheticConsentActivity",
+    "DEX excludes debug-device-session",
+    "DEX excludes TestStateClient",
+    "DEX excludes OidcBrowserFlow",
+    "DEX excludes RotatingSession",
+    "DEX excludes setDebugAccessToken",
+    "DEX excludes build workspace paths",
+    "offline legal notices bundled",
+    "64-bit ELF lib/arm64-v8a/libmaplibre-opengl.so",
+    "16KB load alignment lib/arm64-v8a/libmaplibre-opengl.so",
+    "non-executable stack lib/arm64-v8a/libmaplibre-opengl.so",
+    "RELRO lib/arm64-v8a/libmaplibre-opengl.so",
+    "64-bit ELF lib/arm64-v8a/libmaplibre.so",
+    "16KB load alignment lib/arm64-v8a/libmaplibre.so",
+    "non-executable stack lib/arm64-v8a/libmaplibre.so",
+    "RELRO lib/arm64-v8a/libmaplibre.so",
+    "64-bit ELF lib/x86_64/libmaplibre-opengl.so",
+    "16KB load alignment lib/x86_64/libmaplibre-opengl.so",
+    "non-executable stack lib/x86_64/libmaplibre-opengl.so",
+    "RELRO lib/x86_64/libmaplibre-opengl.so",
+    "64-bit ELF lib/x86_64/libmaplibre.so",
+    "16KB load alignment lib/x86_64/libmaplibre.so",
+    "non-executable stack lib/x86_64/libmaplibre.so",
+    "RELRO lib/x86_64/libmaplibre.so",
+    "both renderers and both 64-bit ABIs covered",
+    "16KB native ZIP alignment"
+  ],
+  "native_files": [
+    {
+      "name": "lib/arm64-v8a/libmaplibre-opengl.so",
+      "sha256": "a4258bffdb021caf3379622f315c4b34210800863d8f59416bd514a57d255a58"
+    },
+    {
+      "name": "lib/arm64-v8a/libmaplibre.so",
+      "sha256": "e74238622f45e8066ecd18034a7707e3fa91188a9dd23ba215e3207acc5323d8"
+    },
+    {
+      "name": "lib/x86_64/libmaplibre-opengl.so",
+      "sha256": "23954081df5cac20c6f910038fe1fd589d8c583aa2ab7c5d4f35844f47b14dff"
+    },
+    {
+      "name": "lib/x86_64/libmaplibre.so",
+      "sha256": "7050123ca5f62971f8000e3e7e9466656b7acee8f692b479bc9521a7c4c8ceb0"
+    }
+  ]
+}

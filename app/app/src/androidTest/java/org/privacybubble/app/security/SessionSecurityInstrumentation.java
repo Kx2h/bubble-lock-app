@@ -10,12 +10,17 @@ import org.privacybubble.app.session.ServiceOrigin;
 public final class SessionSecurityInstrumentation extends Instrumentation {
     private int assertions;
     private boolean portalNetwork;
+    private boolean portalLive;
+    private boolean portalLiveRelease;
     @Override public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
         portalNetwork=arguments!=null && "portal-network".equals(arguments.getString("mode"));
+        portalLiveRelease=arguments!=null && "portal-live-release".equals(arguments.getString("mode"));
+        portalLive=portalLiveRelease || (arguments!=null && "portal-live".equals(arguments.getString("mode")));
         start();
     }
     @Override public void onStart() {
+        if (portalLive) { runPortalLive(); return; }
         if (portalNetwork) { runPortalNetwork(); return; }
         Bundle result=new Bundle();
         MobileSessionStore store=new MobileSessionStore(getTargetContext());
@@ -69,6 +74,19 @@ public final class SessionSecurityInstrumentation extends Instrumentation {
             finish(Activity.RESULT_OK,result);
         } catch (Throwable failure) {
             result.putString("stream","FAIL portal-network: "+failure.getClass().getSimpleName()
+                    +(failure instanceof AssertionError?" "+failure.getMessage():"")+"\n");
+            finish(Activity.RESULT_CANCELED,result);
+        }
+    }
+    private void runPortalLive() {
+        Bundle result=new Bundle();
+        try {
+            assertions=ServerPortalAssertions.run(this,!portalLiveRelease);
+            result.putString("stream","PASS: "+assertions+" real-server Portal assertions\n"
+                    +ServerPortalAssertions.lastSummary()+"\n");
+            finish(Activity.RESULT_OK,result);
+        } catch (Throwable failure) {
+            result.putString("stream","FAIL portal-live: "+failure.getClass().getSimpleName()
                     +(failure instanceof AssertionError?" "+failure.getMessage():"")+"\n");
             finish(Activity.RESULT_CANCELED,result);
         }

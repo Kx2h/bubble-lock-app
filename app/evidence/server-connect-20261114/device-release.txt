@@ -1,0 +1,4 @@
+PASS: 46 real-server Portal assertions
+guardian: session/locations/snapshot/dashboard-DOM/logout PASS; devices=0, positions=0, BLE=0
+operator: session/locations/snapshot/dashboard-DOM/logout PASS; devices=0, positions=0, BLE=0
+Real server WebView instrumentation; no visible/manual UI claim.
