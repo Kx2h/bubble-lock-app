@@ -5,6 +5,8 @@
 #include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLESecurity.h>
+#include <esp_ota_ops.h>
+#include <esp_partition.h>
 #include <esp_timer.h>
 
 #if !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32_V2)
@@ -19,6 +21,9 @@
 #ifndef KEYRING_FEATHER_ENABLE_COMMANDS
 #define KEYRING_FEATHER_ENABLE_COMMANDS 0
 #endif
+#ifndef KEYRING_FEATHER_DEVICE_ID
+#define KEYRING_FEATHER_DEVICE_ID "keyring-feather-lab"
+#endif
 #if KEYRING_FEATHER_ENABLE_COMMANDS
 #include <driver/gpio.h>
 #include "feather_commands.h"
@@ -30,7 +35,18 @@ static_assert(KEYRING_FEATHER_PASSKEY == 0 ||
               "Set a six digit local Feather passkey");
 
 namespace {
-constexpr char DeviceId[] = "keyring-feather-lab";
+constexpr char DeviceId[] = KEYRING_FEATHER_DEVICE_ID;
+constexpr bool validDeviceId() {
+  if (sizeof(DeviceId) < 2 || sizeof(DeviceId) > 65) return false;
+  for (size_t index = 0; index < sizeof(DeviceId) - 1; ++index) {
+    const char value = DeviceId[index];
+    const bool alphanumeric = (value >= 'A' && value <= 'Z') ||
+        (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9');
+    if (!alphanumeric && (!index || (value != '.' && value != '_' && value != ':' && value != '-'))) return false;
+  }
+  return true;
+}
+static_assert(validDeviceId(), "Use a 1..64 byte ASCII device ID: [A-Za-z0-9][A-Za-z0-9._:-]*");
 #if KEYRING_FEATHER_ENABLE_COMMANDS
 constexpr char FirmwareRevision[] = "feather-probe-0.2.1";
 constexpr char CommandId[] = "7f8a0003-4b6e-4f4e-9b0a-505249564255";
@@ -51,6 +67,28 @@ Adafruit_ST7789 display(32, 33, 27);
 BLEServer *server;
 BLECharacteristic *observation;
 char bootId[17];
+char bootRecord[384];
+
+void recordBoot() {
+  char digestHex[65] = "unavailable";
+  uint8_t digest[32];
+  const esp_partition_t *running = esp_ota_get_running_partition();
+  if (running && esp_partition_get_sha256(running, digest) == ESP_OK) {
+    constexpr char hex[] = "0123456789abcdef";
+    for (size_t index = 0; index < sizeof(digest); ++index) {
+      digestHex[index * 2] = hex[digest[index] >> 4];
+      digestHex[index * 2 + 1] = hex[digest[index] & 15];
+    }
+    digestHex[64] = '\0';
+  }
+  const int length = snprintf(bootRecord, sizeof(bootRecord),
+      "FEATHER boot: device=%s board=feather-esp32-v2 firmware=%s boot=%s appSha256=%s flashBytes=%lu psramBytes=%lu provisioned=%u",
+      DeviceId, FirmwareRevision, bootId, digestHex,
+      static_cast<unsigned long>(ESP.getFlashChipSize()), static_cast<unsigned long>(ESP.getPsramSize()),
+      Provisioned ? 1U : 0U);
+  if (length > 0 && static_cast<size_t>(length) < sizeof(bootRecord)) Serial.println(bootRecord);
+  else bootRecord[0] = '\0';
+}
 #if KEYRING_FEATHER_ENABLE_COMMANDS
 FeatherCommands commands(DeviceId, FirmwareRevision, bootId);
 BLECharacteristic *commandAttribute, *receiptAttribute;
@@ -384,9 +422,11 @@ void setup() {
   sample(ButtonState::Released, state);
   if (Provisioned) initBle();
   Serial.println(Provisioned ? "FEATHER PROBE READY" : "FEATHER PROBE READY (BLE LOCKED)");
+  recordBoot();
 }
 
 void loop() {
+  if (Serial.available() > 0 && Serial.read() == '?' && bootRecord[0] != '\0') Serial.println(bootRecord);
   static ButtonState previous = ButtonState::Released;
   static ButtonState displayed = ButtonState::Released;
   static bool confirmWasPressed = false, panicWasPressed = false;

@@ -86,6 +86,7 @@ export class PortalLocationService {
       }
       observations.push(...latestMec.values());
       observations.sort((left, right) => left.observedAt.localeCompare(right.observedAt));
+      for (const observation of observations) observation.label = this.store.get('portalDevices', observation.deviceId)?.label ?? observation.deviceId;
       const leases=[...allowed].map((deviceId)=>this.privacy.leaseFor(principal,deviceId));
       return { deviceIds: [...allowed], observations,readExpiresAt:new Date(Math.min(now+5000,...leases.map((lease)=>Date.parse(lease.expiresAt)))).toISOString() };
     });

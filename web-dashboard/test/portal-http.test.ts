@@ -21,7 +21,7 @@ async function fixture(t:TestContext) {
   return {get,post,service};
 }
 
-test('포털 HTTP: 동의→위치권한→방문자 위치→회수 경로',async(t)=>{
+test('포털 HTTP: 동의 목적을 유지한 권한→위치 공유→조회→회수 경로',async(t)=>{
   const f=await fixture(t);
   const guardian=await f.get('snapshot');
   assert.equal(guardian.headers.get('cache-control'),'no-store');
@@ -32,12 +32,24 @@ test('포털 HTTP: 동의→위치권한→방문자 위치→회수 경로',asy
   assert.equal((await locations('operator')).devices.length,0);
   const consent=await f.post('consents',{householdId:'household-demo',purpose:'위치 공유 시험',scopes:['location:read'],ttlSec:900});
   assert.equal(consent.status,200);
-  const grant=await f.post('grants',{consentId:consent.body.result.consentId,scopes:['location:read'],ttlSec:300});
+  const purpose=consent.body.result.purpose;
+  assert.equal(purpose,'위치 공유 시험');
+  const grant=await f.post('grants',{consentId:consent.body.result.consentId,purpose,scopes:['location:read'],ttlSec:300});
   assert.equal(grant.status,200);
+  assert.equal(grant.body.result.purpose,purpose);
   assert.equal((await locations('visitor')).devices.length,0);
   const incident=await f.post('incidents',{householdId:'household-demo',kind:'SAFETY',message:'위치 승인 시험'});
-  const lease=await f.post('location-leases',{grantId:grant.body.result.grantId,recipientId:'visitor-demo',deviceIds:['keyring-A','keyring-B','keyring-C'],purpose:grant.body.result.purpose,incidentId:incident.body.result.incidentId,ttlSec:60});
+  assert.equal(incident.status,200);
+  const leaseInput={grantId:grant.body.result.grantId,recipientId:'visitor-demo',deviceIds:['keyring-A','keyring-B','keyring-C'],purpose,incidentId:incident.body.result.incidentId,ttlSec:60};
+  assert.equal((await f.post('location-leases',{...leaseInput,purpose:'다른 조회 목적'})).status,403);
+  assert.equal((await locations('visitor')).devices.length,0);
+  const lease=await f.post('location-leases',leaseInput);
   assert.equal(lease.status,200);
+  assert.equal(lease.body.result.purpose,purpose);
+  const snapshot=(await(await f.get('snapshot')).json()).snapshot;
+  assert.equal(snapshot.consents.find((item:{consentId:string})=>item.consentId===consent.body.result.consentId).purpose,purpose);
+  assert.equal(snapshot.grants.find((item:{grantId:string})=>item.grantId===grant.body.result.grantId).purpose,purpose);
+  assert.equal(snapshot.locationLeases.find((item:{leaseId:string})=>item.leaseId===lease.body.result.leaseId).purpose,purpose);
   assert.equal((await locations('visitor')).devices.length,3);
   const revoked=await f.post('grants/revoke',{grantId:grant.body.result.grantId});
   assert.equal(revoked.status,200);
@@ -163,7 +175,7 @@ async function liveLocationFixture(t:TestContext,options:{records?:unknown[];ups
 test('LIVE 위치 HTTP: 중앙 BLE와 등록 anchor를 연결하고 가구 밖 수신기를 분리',async(t)=>{
   const observedAt=new Date().toISOString();
   const f=await liveLocationFixture(t,{upstream:async({path})=>({status:200,body:path.endsWith('/location-access')?{deviceIds:['keyring-A']}:{deviceIds:['keyring-A'],observations:[
-    {deviceId:'keyring-A',gatewayId:'pi-01',observedAt,rssiDbm:-69,simulation:false},
+    {deviceId:'keyring-A',label:'우리 가족 키링',gatewayId:'pi-01',observedAt,rssiDbm:-69,simulation:false},
     {deviceId:'foreign-device',gatewayId:'pi-foreign',observedAt,rssiDbm:-60,simulation:false},
   ]}})});
   const snapshot=await f.read();
@@ -171,6 +183,7 @@ test('LIVE 위치 HTTP: 중앙 BLE와 등록 anchor를 연결하고 가구 밖 �
   assert.deepEqual(snapshot.devices.map((entry)=>entry.deviceId),['keyring-A']);
   assert.deepEqual(snapshot.gateways.map((entry)=>entry.gatewayId),['pi-01']);
   const device=snapshot.devices[0];assert.ok(device?.ble);assert.equal(device.position,null);
+  assert.equal(device.label,'우리 가족 키링');
   const proximity=estimateBleProximity(device.ble,snapshot.gateways);assert.ok(proximity);
   assert.deepEqual(proximity.center,{lat:37.5,lon:127});
   assert.ok(Math.abs(proximity.distanceM-Math.sqrt(10))<1e-10);

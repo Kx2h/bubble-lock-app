@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "scope": "Real ESP32 / Windows BLE gateway / live HTTPS server / installed Android release automation",
+  "status": "FUNCTIONAL_PATH_VERIFIED_WITH_LIMITATIONS",
+  "firmware": {
+    "chip": "ESP32-PICO-V3-02 rev3.1",
+    "flashBytes": 8388608,
+    "psramBytes": 2097152,
+    "selectedProfile": "esp32:esp32:adafruit_feather_esp32_v2",
+    "physicalBoardModelConfirmed": false,
+    "firmwareRevision": "feather-probe-0.2.1",
+    "runningImageFooterSha256": "ff0a632fb70737144d7bd79db1d8e0ef3a9180069d4e9da6b6a20e278ab52975"
+  },
+  "flashPreservation": {
+    "status": "PASS",
+    "checkedBeforeFirstNewFirmwareBoot": true,
+    "nvsAndOtaMetadataPreservedByteForByte": true,
+    "bytesCompared": 28672,
+    "sha256": "a9d942e0379026e77e634b0c01e6935f278915be4c6c91b762a66ac0de4cd2e1"
+  },
+  "bleAttempts": [
+    {
+      "artifactSha256": "391e3cdcd4ea6e568f9694da33f25c4da02f5833b0bb1f0ef5c4c1a4116317ab",
+      "attempt": "ble-result-01.json",
+      "status": "FAIL",
+      "stage": "authenticated_pairing",
+      "observations": 0,
+      "notifications": 0,
+      "errorCode": "authenticated_pin_pairing_failed",
+      "errorType": null
+    },
+    {
+      "artifactSha256": "faf99a831112b4b61c67f38132b5137d18572ad848a8342aa8de9fb119087bac",
+      "attempt": "ble-result-02.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 9,
+      "notifications": 8,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "20abeb5127e648923fcd379b9aee5485d7008005a3bdac7a2d7e1b5c23ec1c96",
+      "attempt": "ble-reconnect-03.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 8,
+      "notifications": 7,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "5b5203d7e612c6a4dd5de521a4296a59f323d57441d1fed1e95d85c9016b495f",
+      "attempt": "ble-live-04.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 9,
+      "notifications": 8,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "62aabdedce3501cd6b0cd7eea9cba15568fce349ccb86802f74fb8be4084c70c",
+      "attempt": "ble-live-05.json",
+      "status": "FAIL",
+      "stage": "gatt_identity",
+      "observations": 0,
+      "notifications": 0,
+      "errorCode": "runtime_failure",
+      "errorType": "BleakError"
+    },
+    {
+      "artifactSha256": "8c6342b6d28f654bf0baf097686666ac8a4655845804b32b4a70751013527efc",
+      "attempt": "ble-live-06.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 9,
+      "notifications": 8,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "af6b608c65492489d7b4290e4a53bdc54ede08dc399690790615e1ae58afa85a",
+      "attempt": "ble-reboot-07.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 8,
+      "notifications": 7,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "608efb21eeb2313d5960cf8e576fdf487cb75e252115e637ca7535550e06045a",
+      "attempt": "ble-live-08.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 8,
+      "notifications": 7,
+      "errorCode": null,
+      "errorType": null
+    },
+    {
+      "artifactSha256": "b4bdd1e2b542cb87350ea39d89095d49190117d2e966524d51dd2e42f53aa640",
+      "attempt": "ble-live-09.json",
+      "status": "FAIL",
+      "stage": "gatt_identity",
+      "observations": 0,
+      "notifications": 0,
+      "errorCode": "runtime_failure",
+      "errorType": "BleakError"
+    },
+    {
+      "artifactSha256": "0694aa9335268eac54f6b2f84a0bd9978fb8faa0dea2d0e454685b7362848346",
+      "attempt": "ble-live-10.json",
+      "status": "PASS",
+      "stage": "complete",
+      "observations": 9,
+      "notifications": 8,
+      "errorCode": null,
+      "errorType": null
+    }
+  ],
+  "confirmedForwardAttempts": [
+    {
+      "status": "PASS",
+      "postAttempts": 9,
+      "acceptedCount": 8,
+      "duplicateCount": 1,
+      "staleCount": 0,
+      "attempt": "telemetry-live-04-retry.json",
+      "artifactSha256": "bccc11d3a824291ad37acf270d654039abe5fbca9bfd992fafa8d15329822980"
+    },
+    {
+      "status": "PASS",
+      "postAttempts": 9,
+      "acceptedCount": 9,
+      "duplicateCount": 0,
+      "staleCount": 0,
+      "attempt": "telemetry-live-06.json",
+      "artifactSha256": "e578b0674dddd6b4fcbff526d37e1f1f55b754da145f5ffd3597eb554c5f58ce"
+    },
+    {
+      "status": "PASS",
+      "postAttempts": 9,
+      "acceptedCount": 0,
+      "duplicateCount": 1,
+      "staleCount": 8,
+      "attempt": "telemetry-duplicate-06.json",
+      "artifactSha256": "981b59e4196e7131c69815bf6d13b34bb61783b8e2e52ce6a871603feb831351"
+    },
+    {
+      "status": "PASS",
+      "postAttempts": 8,
+      "acceptedCount": 8,
+      "duplicateCount": 0,
+      "staleCount": 0,
+      "attempt": "telemetry-reboot-07.json",
+      "artifactSha256": "d5a4a92b3338329174348ba4f88f3b00b45389446efc9dfbe7d3e81c5c6db4ce"
+    },
+    {
+      "status": "PASS",
+      "postAttempts": 8,
+      "acceptedCount": 8,
+      "duplicateCount": 0,
+      "staleCount": 0,
+      "attempt": "telemetry-live-08.json",
+      "artifactSha256": "539d2297306609ba7e7b86b6ae49a07b6ad821ef504cc4b22cd6bb940dd3be9f"
+    },
+    {
+      "status": "PASS",
+      "postAttempts": 9,
+      "acceptedCount": 9,
+      "duplicateCount": 0,
+      "staleCount": 0,
+      "attempt": "telemetry-live-10.json",
+      "artifactSha256": "f0b6ea6676343d5bf5a35b7547522c6445cddd2c84f0ae086ecaed822c5216db"
+    }
+  ],
+  "portalReadback": {
+    "status": "PASS",
+    "scope": "authorized guardian portal API subset readback, not full original telemetry hash",
+    "fieldsMatched": [
+      "deviceId",
+      "gatewayId",
+      "observedAt",
+      "rssiDbm"
+    ],
+    "positionNull": true,
+    "simulation": false,
+    "beforeLeaseDeviceCount": 0,
+    "operatorWhileGuardianLeaseDeviceCount": 0,
+    "afterLeaseExpiryDeviceCount": 0
+  },
+  "finalCleanup": {
+    "status": "PASS",
+    "registeredDevices": 1,
+    "registeredPhysicalDeviceRetained": true,
+    "activeConsents": 0,
+    "activeGrants": 0,
+    "openIncidents": 0,
+    "activeLocationLeases": 0,
+    "visibleLocations": 0
+  },
+  "app": {
+    "version": "0.4.1",
+    "nondebug": true,
+    "targetAppReplaced": false,
+    "targetAppDataCleared": false,
+    "phoneLockedDuringAutomation": true,
+    "finalLocationChecks": 20,
+    "realRssiAndPhysicalDeviceDomVerified": true,
+    "position": null,
+    "mapMarkerCount": 0,
+    "registeredLabelMatchesLocation": false,
+    "testPackageRemovedForUser0": true
+  },
+  "localChecks": {
+    "npmVerifyStagesPassed": 13,
+    "factoryUploadRegressionTestsPassed": 10,
+    "featherDeviceIdBoundaryCasesPassed": 11
+  },
+  "remaining": [
+    "Production registered-label fix not deployed",
+    "Intermittent Windows GATT disconnects occurred; later attempts passed",
+    "New-pair Windows protection-level API proof remains unconfirmed",
+    "No manual visible touch test while phone locked",
+    "No real GPS or receiver anchor configured",
+    "No LED/motor command actuation tested",
+    "No Raspberry Pi or continuous gateway daemon configured"
+  ],
+  "rawEvidence": "Private git-excluded workspace only; this summary excludes credentials, addresses, device PIN, certificates and provisioned binaries"
+}

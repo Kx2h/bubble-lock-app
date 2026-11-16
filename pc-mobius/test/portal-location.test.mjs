@@ -34,10 +34,31 @@ test('지도는 인증된 Gateway GPS/RSSI와 현재 MEC 좌표·출처·정확�
   assert.equal((await f.ingest(f.observation())).body.status, 'ACCEPTED');
   await f.mec(); const data = await f.read();
   assert.equal(data.length, 2);
-  assert.deepEqual(data.find((entry) => entry.location?.source === 'gps'), { deviceId: 'keyring-A', gatewayId: 'gateway-1', observedAt: f.clock(), simulation: false, location: { lat: 37.5, lon: 127, source: 'gps', accuracyM: 8 }, rssiDbm: -65 });
+  assert.deepEqual(data.find((entry) => entry.location?.source === 'gps'), { deviceId: 'keyring-A', label: 'keyring-A', gatewayId: 'gateway-1', observedAt: f.clock(), simulation: false, location: { lat: 37.5, lon: 127, source: 'gps', accuracyM: 8 }, rssiDbm: -65 });
   assert.ok(data.find((entry) => entry.location?.source === 'mec').location.accuracyM>12);
   assert.equal((await f.read(f.visitor)).length, 2);
   assert.deepEqual(await f.read({ principalId: 'outsider', scopes: ['portal:read'] }), []);
+});
+
+test('위치 표시 이름은 현재 가구 등록을 따르며 BLE·MEC 원본이나 접근 범위를 바꾸지 않는다', async () => {
+  const f = await fixture();
+  assert.equal((await f.ingest(f.observation({ sensorValues: {} }))).body.status, 'ACCEPTED');
+  await f.mec();
+  for (const label of ['우리 가족 키링', '이름을 변경한 키링']) {
+    await f.runtime.portalService.registerDevice(f.guardian, { householdId: 'home-1', gatewayId: 'gateway-1', deviceId: 'keyring-A', label, idempotencyKey: `rename-${label}` });
+    for (const principal of [f.guardian, f.visitor]) {
+      const observations = await f.read(principal);
+      assert.equal(observations.length, 2);
+      assert.ok(observations.every((entry) => entry.deviceId === 'keyring-A' && entry.label === label && entry.observedAt === f.clock()));
+      const ble = observations.find((entry) => entry.rssiDbm !== undefined);
+      assert.equal(ble.rssiDbm, -65);
+      assert.equal(ble.location, undefined);
+      assert.equal(ble.simulation, false);
+    }
+  }
+  assert.deepEqual(await f.read({ principalId: 'outsider', scopes: ['portal:read'] }), []);
+  await f.runtime.policyService.revokeGrant({ principal: f.guardian, grantId: f.grant.grantId });
+  assert.deepEqual(await f.read(f.visitor), []);
 });
 
 test('Gateway 인증·기기 연결·관측 식별자·시간을 검사하고 RSSI 단독 자료를 보존한다', async () => {

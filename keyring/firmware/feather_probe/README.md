@@ -16,6 +16,10 @@ arduino-cli compile --fqbn esp32:esp32:adafruit_feather_esp32_v2 keyring/firmwar
 
 BLE 등록에는 이 스케치 폴더의 Git 제외 파일 `provisioning.h`에 시험용 6자리 숫자를 `KEYRING_FEATHER_PASSKEY`로 정의한다. 기본 빌드는 화면·버튼만 시작하고 `BLE LOCKED`를 표시한다. 비밀값은 등록하는 PC나 Pi에서 로컬로 관리한다.
 
+이 스케치는 ESP32 Arduino 3.3.11의 BLE API를 사용한다. r18 PlatformIO 환경의 Arduino 2.0.17 대신 위 FQBN의 해당 core를 사용한다. `provisioning.h`에서 선택적으로 `KEYRING_FEATHER_DEVICE_ID`를 문자열로 정의하면 서버의 등록 ID를 사용할 수 있다. 기본값은 `keyring-feather-lab`이며 ID는 ASCII `[A-Za-z0-9][A-Za-z0-9._:-]*`, 1~64자다. Gateway의 장치 매핑과 등록에도 같은 ID를 지정한다. 보드 식별값은 `feather-esp32-v2`를 유지한다.
+
+UART 모니터 115200에서 `FEATHER boot:` 줄로 장치 ID·보드·펌웨어 revision·부팅 ID·실행 중인 앱의 `appSha256`·flash 및 PSRAM 크기·provisioning 여부를 읽을 수 있다. `?`를 보내면 같은 부팅 기록을 다시 출력한다. PIN은 출력하지 않는다. 앱 해시는 이미지 끝의 SHA-256 digest이며 `.bin` 파일 전체 해시와 구분한다. 실제 장치에서 이 기록을 확보하기 전에는 컴파일 결과만으로 실물 실행을 주장하지 않는다.
+
 기본 관측 프로필의 시험 Gateway에 `keyring-feather-lab` 장치 ID와 실제 BLE 주소를 등록하고 `core-v1`을 선택한다. 펌웨어 허용 목록에는 `feather-probe-0.1.1`을 넣는다. 격리된 시험 Gateway와 관측 컨테이너에서 A0의 `confirm`, A1의 `panic`, 떼었을 때 `released`를 확인한다. 배터리는 `null`이므로 native oneM2M 관측 경로에서 확인한다.
 
 ## 내장 LED를 쓰는 명령 프로필

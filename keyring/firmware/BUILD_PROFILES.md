@@ -8,6 +8,20 @@ keyring-0.7.1의 출력 차단 변경은 아래 세 프로필과 호스트 시�
 
 ROLE KEYRING / 남호 · DOC-REV 2.0.0 · firmware keyring-0.7.0.
 
+## 2026-11-16 factory 업로드 주소와 NVS 보존
+
+`r18` 파티션의 NVS는 `0x9000..0x18fff`, factory 앱 시작은 `0x20000`이다. Arduino/PlatformIO 기본 앱 주소 `0x10000`과 OTA 초기화 이미지 `boot_app0.bin`의 `0xe000` 쓰기가 모두 NVS 안에 들어가는 문제를 수정했다. 앱 주소를 명시하고 `scripts/factory_upload.py`에서 OTA 이미지의 실제 업로더 인수도 제거한다. 업로드 직전 생성된 파일의 쓰기 범위·앱 크기를 확인하며, provisioning을 제외하는 `keyring_compile_*` 환경의 업로드는 거절한다.
+
+로컬 PlatformIO `espressif32@6.9.0`의 `keyring_compile_minimal -t envdump`를 실행하여 앱 주소 `0x20000`, 부트로더 `0x0000`, 파티션 테이블 `0x8000`과 `boot_app0.bin`이 없는 업로드 인수를 확인했다. 회귀시험 10개는 이전 주소·OTA 레이아웃·추가 쓰기·실제 파일의 NVS 침범·앱 크기 초과·compile-only 업로드 거절을 확인한다.
+
+```sh
+python3 -m unittest discover -s keyring/firmware/tests -p test_factory_upload.py -v
+```
+
+이 결과는 `LOCAL_TOOLCHAIN_AND_MOCK_FILES` 검증이다. 기존 장치의 파티션이 이 CSV와 같은지, 전원 중단 시 보존되는지와 실제 BLE bond·journal 보존은 실물에서 별도로 확인한다. `keyring_r18` 계열은 ESP32-S3 N16R8용이며 classic ESP32-PICO-V3-02에는 업로드하지 않는다. Feather V2 실물은 [별도 스케치](feather_probe/README.md)를 사용한다.
+
+같은 날 Feather 스케치를 Arduino CLI 1.4.1·ESP32 Arduino 3.3.11·정식 Feather V2 FQBN으로 컴파일했다. `KEYRING_FEATHER_IGNORE_PROVISIONING=1`인 **BLE LOCKED 로컬 빌드**이며 program 905433 bytes, global 36724 bytes다. 공식 릴리스·패키지 index에 있는 CLI·core/toolchain 19개·라이브러리 6개의 SHA-256을 내려받은 파일과 대조했다. 선택적 장치 ID의 실제 constexpr 검증 함수는 허용·거절 경계값 11개를 호스트 컴파일러로 통과했다. flash·실물 등록은 이 빌드 검증에 포함하지 않는다. Arduino의 `merged.bin`은 8MB 전체 이미지이므로 기존 NVS 보존이 필요한 갱신에 사용하지 않는다.
+
 ## 2026-11-10 MAX9850 PCM 컴파일 및 host 시험
 
 승인 generation·deadline·GPIO mute와 MAX9850 DAC 순서를 연결한 최종 소스로 4개 환경을 컴파일했다. 아래 결과는 `LOCAL_COMPILE_AND_MOCK_IO`이며 [receipt·소스 및 산출물 SHA-256](../evidence/2026-11-10-headphone-pcm/receipt.json), [컴파일 로그](../evidence/2026-11-10-headphone-pcm/compile.log), [host 시험 로그](../evidence/2026-11-10-headphone-pcm/host-test.log)에 결속한다.
