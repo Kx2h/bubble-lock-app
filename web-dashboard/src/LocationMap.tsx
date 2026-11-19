@@ -9,7 +9,7 @@ import { useLocations } from './useLocations.ts';
 import { Badge, Timestamp } from './ui.tsx';
 import './location-map.css';
 
-const colors = ['#0d8b84', '#5266cf', '#d38b34', '#a55481', '#3585aa'];
+const colors = ['#0070d1', '#7d4cdb', '#c2410c', '#0f8a5f', '#b4237a'];
 const coordinate = (point: Coordinates): L.LatLngTuple => [point.lat, point.lon];
 const meters = (value: number) => value < 10 ? `${value.toFixed(1)} m` : `${Math.round(value).toLocaleString()} m`;
 const observationTime = (device: LocationDevice) => [device.position?.observedAt, device.ble?.observedAt]
@@ -35,10 +35,10 @@ function MapIcon({ name }: { readonly name: 'locate' | 'refresh' | 'pin' | 'sign
 }
 
 function sourceName(device: LocationDevice, user: boolean) {
-  if (device.position?.source === 'relay') return user ? '릴레이 주변 관측 범위' : 'BLE·MEC 릴레이 범위';
+  if (device.position?.source === 'relay') return user ? '근처 릴레이가 감지한 범위' : '릴레이 범위 (BLE, MEC)';
   if (device.position?.source === 'gps') return user ? 'GPS로 확인한 위치' : 'GPS 위치';
-  if (device.position?.source === 'mec') return user ? '위치 서비스로 확인' : 'MEC 위치';
-  return user ? '수신기 주변에서 감지' : 'BLE 수신기 기준';
+  if (device.position?.source === 'mec') return user ? '통신망 위치 서비스로 확인' : '통신망 위치 (MEC)';
+  return user ? '수신기 근처에서 감지' : '수신기 기준 (BLE)';
 }
 
 export function LocationMap({ refresh, variant = 'operator', geofences = emptyGeofences, locationUrl = '/api/locations' }: {
@@ -109,11 +109,11 @@ export function LocationMap({ refresh, variant = 'operator', geofences = emptyGe
       const shape = fence.shape;
       const geometry = shape.type === 'circle' ? L.circle([shape.lat, shape.lon], { ...style, radius: shape.radiusM })
         : L.rectangle([[shape.minLat, shape.minLon], [shape.maxLat, shape.maxLon]], style);
-      geometry.bindTooltip(textElement(`${fence.label} · ${fence.simulation ? '모의 안전 구역' : '등록 안전 구역'}`)).addTo(group);
+      geometry.bindTooltip(textElement(`${fence.label} (${fence.simulation ? '모의 안전 구역' : '등록한 안전 구역'})`)).addTo(group);
     }
     for (const gateway of feed.snapshot.gateways) {
       L.circleMarker(coordinate(gateway.position), { radius: 5, color: '#3b5067', fillColor: '#fff', fillOpacity: 1, weight: 2 })
-        .bindTooltip(textElement(`${gateway.label} · BLE 수신기`)).addTo(group);
+        .bindTooltip(textElement(`${gateway.label} (수신기)`)).addTo(group);
     }
     devices.forEach((device, index) => {
       const color = colors[index % colors.length]!;
@@ -126,16 +126,16 @@ export function LocationMap({ refresh, variant = 'operator', geofences = emptyGe
           radius: proximity.radiusM, color, weight: active ? 2 : 1,
           fillOpacity: old ? 0.025 : active ? 0.14 : 0.055, opacity: old ? 0.35 : active ? 0.85 : 0.45,
           dashArray: old ? '2 6' : '5 5',
-        }).bindTooltip(textElement(`${device.label} · ${proximity.simulation ? '모의' : '실측 기반'} BLE 추정 ${meters(proximity.distanceM)} · ${device.ble.rssiDbm} dBm · ${proximity.gatewayLabel} 기준`))
+        }).bindTooltip(textElement(`${device.label}: ${proximity.gatewayLabel}에서 약 ${meters(proximity.distanceM)} (${device.ble.rssiDbm} dBm, ${proximity.simulation ? '모의' : '실측'})`))
           .on('click', () => setSelectedId(device.deviceId)).addTo(group);
       }
       if (fix?.accuracyM) {
         L.circle(coordinate(fix.coordinates), { radius: fix.accuracyM, color, weight: 1, fillOpacity: 0.035, opacity: 0.25 })
-          .bindTooltip(textElement(`${device.label} · 위치 정확도 ${meters(fix.accuracyM)}`)).addTo(group);
+          .bindTooltip(textElement(`${device.label}: 오차 범위 ${meters(fix.accuracyM)}`)).addTo(group);
       }
       const point = fix?.coordinates ?? proximity?.center;
       if (!point) return;
-      const markerName = `${device.label} · ${fix ? `${fix.source.toUpperCase()} 위치` : 'BLE 수신기 기준'}`;
+      const markerName = `${device.label}, ${fix ? `${fix.source.toUpperCase()} 위치` : '수신기 기준 위치'}`;
       const icon = document.createElement('div');
       icon.className = `keyring-pin${fix ? '' : ' receiver-pin'}${active ? ' selected' : ''}`;
       icon.style.setProperty('--pin-color', color);
@@ -167,24 +167,24 @@ export function LocationMap({ refresh, variant = 'operator', geofences = emptyGe
   }
   const selectedTime = selected && observationTime(selected);
   const status = selectedTime ? freshness(selectedTime, feed.now) : 'unknown';
-  const signalLabel = selected?.ble ? selected.ble.rssiDbm >= -65 ? '강한 수신' : selected.ble.rssiDbm >= -80 ? '보통 수신' : '약한 수신' : '관측 대기';
-  const sourceLabel = demo ? '모의 위치' : feed.snapshot ? feed.snapshot.simulation ? '모의 위치 피드' : '현장 위치 피드' : '위치 연결 중';
+  const signalLabel = selected?.ble ? selected.ble.rssiDbm >= -65 ? '강함' : selected.ble.rssiDbm >= -80 ? '보통' : '약함' : '신호 기다리는 중';
+  const sourceLabel = demo ? '모의 데이터' : feed.snapshot ? feed.snapshot.simulation ? '모의 데이터' : '실제 위치' : '연결하는 중';
   const geofenceCount = geofences.filter(validMapGeofence).length;
 
   return <div className={`location-experience location-${variant}`}>
     <div className="location-toolbar">
       <div className="location-feed-state"><span className={`location-status-dot${feed.error ? ' attention' : ''}`} />
-        <strong>{user ? '키링 위치' : '위치 모니터링'}</strong><span className="location-divider" /><span>{devices.length}개 키링</span>
+        <strong>{user ? '키링 위치' : '위치 모니터링'}</strong><span className="location-divider" /><span>키링 {devices.length}개</span>
         <Badge tone={feed.snapshot?.simulation ? 'warning' : 'info'}>{sourceLabel}</Badge>
       </div>
       <div className="location-actions">
-        <button type="button" className="map-quiet-button" onClick={fitAll}><MapIcon name="locate" />전체 위치</button>
+        <button type="button" className="map-quiet-button" onClick={fitAll}><MapIcon name="locate" />모두 보기</button>
         <button type="button" className="map-icon-button" onClick={feed.reload} aria-label="위치 새로고침" title="위치 새로고침"><MapIcon name="refresh" /></button>
       </div>
     </div>
     {feed.error && <p className="location-alert" role="alert">{feed.error}</p>}
-    {tileError && <div className="location-alert" role="status"><span>배경 지도 연결을 확인해 주세요. 위치와 수신 범위는 계속 표시합니다.</span>
-      <button type="button" onClick={() => { setTileError(false); if (tileStyle === 'light') setTileStyle('street'); else tiles.current?.redraw(); }}>{tileStyle === 'light' ? '일반 지도 사용' : '지도 다시 불러오기'}</button></div>}
+    {tileError && <div className="location-alert" role="status"><span>배경 지도를 불러오지 못했어요. 키링 위치와 범위는 그대로 보여 드려요.</span>
+      <button type="button" onClick={() => { setTileError(false); if (tileStyle === 'light') setTileStyle('street'); else tiles.current?.redraw(); }}>{tileStyle === 'light' ? '일반 지도로 바꾸기' : '지도 다시 불러오기'}</button></div>}
     <div className="location-layout">
       <div className="map-frame">
         <div ref={container} className="location-canvas" role="region" aria-label="키링 위치 지도" />
@@ -192,10 +192,10 @@ export function LocationMap({ refresh, variant = 'operator', geofences = emptyGe
           <button type="button" aria-pressed={tileStyle === 'light'} onClick={() => setTileStyle('light')}>기본 지도</button>
           <button type="button" aria-pressed={tileStyle === 'street'} onClick={() => setTileStyle('street')}>일반 지도</button>
         </div>
-        <div className="map-corner-note"><span className="map-live-dot" />4초마다 위치 갱신</div>
-        <div className="map-legend"><span><i className="legend-pin" />GPS · MEC 위치</span><span><i className="legend-ring" />BLE 추정 범위</span><span><i className="legend-anchor" />수신기 기준</span>
+        <div className="map-corner-note"><span className="map-live-dot" />4초마다 새로고침</div>
+        <div className="map-legend"><span><i className="legend-pin" />GPS/통신망 위치</span><span><i className="legend-ring" />블루투스 추정 범위</span><span><i className="legend-anchor" />수신기</span>
           {geofenceCount > 0 && <span><i className="legend-zone" />안전 구역 {geofenceCount}개</span>}
-          <button type="button" className="map-layer-toggle" aria-pressed={showProximity} onClick={() => setShowProximity((value) => !value)}>{showProximity ? 'BLE 원 숨기기' : 'BLE 원 보기'}</button>
+          <button type="button" className="map-layer-toggle" aria-pressed={showProximity} onClick={() => setShowProximity((value) => !value)}>{showProximity ? '추정 범위 숨기기' : '추정 범위 보기'}</button>
         </div>
       </div>
       <aside className="location-side" aria-label="키링 위치 정보">
@@ -207,39 +207,39 @@ export function LocationMap({ refresh, variant = 'operator', geofences = emptyGe
             <span className="keyring-option-copy"><strong>{device.label}</strong><span>{sourceName(device, user)}</span></span>
             <span className="keyring-option-signal">{device.ble ? <><MapIcon name="signal" /><span>{device.ble.rssiDbm}</span></> : <MapIcon name="pin" />}</span>
           </button>)}
-          {devices.length === 0 && <p className="location-empty" role="status">{feed.loading ? '키링 위치를 불러오고 있습니다…' : '키링 위치 관측을 기다리고 있습니다.'}</p>}
+          {devices.length === 0 && <p className="location-empty" role="status">{feed.loading ? '키링 위치를 불러오고 있어요…' : '키링 위치가 들어오면 여기에 표시돼요.'}</p>}
         </div>
         {selected && <article className="location-detail" aria-label="선택한 키링 위치 상세">
           <div className="location-detail-heading"><div><span className="map-overline">선택한 키링</span><h3>{selected.label}</h3></div>
-            <Badge tone={demo ? 'warning' : status === 'fresh' ? 'success' : 'warning'}>{demo ? '모의 기록' : status === 'fresh' ? '최근 수신' : status === 'future' ? '시각 확인' : '갱신 대기'}</Badge></div>
-          <div className="location-measurements"><div><span>BLE 수신</span><strong>{selected.ble?.rssiDbm ?? '—'}<small>dBm</small></strong><span>{signalLabel} · {selected.ble?.simulation ? '모의' : selected.ble ? '실측' : '관측 대기'}</span></div>
-            <div><span>추정 반경</span><strong>{selectedProximity ? meters(selectedProximity.distanceM) : '—'}</strong><span>{selectedProximity?.simulation ? '모의 수신기 기준' : selectedProximity ? '수신기 중심' : '수신기 등록 대기'}</span></div></div>
-          <dl className="location-facts"><dt>위치 기준</dt><dd>{sourceName(selected, user)}{selected.position && ` · ${selected.position.simulation ? '모의' : '실측'}`}</dd>
-            <dt>수신기</dt><dd>{selectedProximity?.gatewayLabel ?? selected.ble?.gatewayId ?? '관측 대기'}</dd>
-            {selectedTime && <><dt>최근 관측</dt><dd><Timestamp at={selectedTime} /></dd></>}
-            {selected.position && !demo && freshness(selected.position.observedAt, feed.now) !== 'fresh' && <><dt>위치 갱신</dt><dd>마지막 수신 좌표 · 관측 시각 확인</dd></>}
+            <Badge tone={demo ? 'warning' : status === 'fresh' ? 'success' : 'warning'}>{demo ? '모의 데이터' : status === 'fresh' ? '방금 받음' : status === 'future' ? '시각 확인 필요' : '업데이트 기다리는 중'}</Badge></div>
+          <div className="location-measurements"><div><span>블루투스 신호</span><strong>{selected.ble?.rssiDbm ?? '-'}<small>dBm</small></strong><span>{signalLabel}{selected.ble ? (selected.ble.simulation ? ' (모의)' : ' (실측)') : ''}</span></div>
+            <div><span>수신기와의 거리</span><strong>{selectedProximity ? meters(selectedProximity.distanceM) : '-'}</strong><span>{selectedProximity?.simulation ? '모의 수신기 기준 추정' : selectedProximity ? '수신기 기준 추정' : '수신기 등록 전'}</span></div></div>
+          <dl className="location-facts"><dt>확인 방법</dt><dd>{sourceName(selected, user)}{selected.position && (selected.position.simulation ? ' (모의)' : ' (실측)')}</dd>
+            <dt>수신기</dt><dd>{selectedProximity?.gatewayLabel ?? selected.ble?.gatewayId ?? '확인 전'}</dd>
+            {selectedTime && <><dt>마지막 확인</dt><dd><Timestamp at={selectedTime} variant={user ? 'friendly' : 'precise'} /></dd></>}
+            {selected.position && !demo && freshness(selected.position.observedAt, feed.now) !== 'fresh' && <><dt>위치 상태</dt><dd>마지막으로 받은 좌표예요. 받은 시각을 확인해 주세요.</dd></>}
           </dl>
-          <details className="location-coordinate-details" open={!user}><summary>{user ? '좌표와 관측 자세히 보기' : '좌표 · 관측 정보'}</summary>
+          <details className="location-coordinate-details" open={!user}><summary>{user ? '좌표 자세히 보기' : '좌표와 수신 정보'}</summary>
             <dl className="location-facts">
-              {selected.position && <><dt>위도 / 경도</dt><dd className="map-coordinate">{selected.position.coordinates.lat.toFixed(6)}, {selected.position.coordinates.lon.toFixed(6)}</dd>
-                {selected.position.accuracyM !== null && <><dt>위치 정확도</dt><dd>{meters(selected.position.accuracyM)}</dd></>}
-                <dt>위치 관측</dt><dd><Timestamp at={selected.position.observedAt} /></dd></>}
-              {selected.ble && <><dt>BLE 관측</dt><dd><Timestamp at={selected.ble.observedAt} /></dd></>}
+              {selected.position && <><dt>위도, 경도</dt><dd className="map-coordinate">{selected.position.coordinates.lat.toFixed(6)}, {selected.position.coordinates.lon.toFixed(6)}</dd>
+                {selected.position.accuracyM !== null && <><dt>오차 범위</dt><dd>{meters(selected.position.accuracyM)}</dd></>}
+                <dt>위치 받은 시각</dt><dd><Timestamp at={selected.position.observedAt} /></dd></>}
+              {selected.ble && <><dt>신호 받은 시각</dt><dd><Timestamp at={selected.ble.observedAt} /></dd></>}
               {selectedProximity && <><dt>수신기 좌표</dt><dd className="map-coordinate">{selectedProximity.center.lat.toFixed(6)}, {selectedProximity.center.lon.toFixed(6)}</dd>
-                {selectedProximity.capped && <><dt>지도 반경</dt><dd>{meters(selectedProximity.radiusM)} 상한 적용</dd></>}
+                {selectedProximity.capped && <><dt>지도 표시 반경</dt><dd>최대 {meters(selectedProximity.radiusM)}까지 표시</dd></>}
               </>}
             </dl>
           </details>
         </article>}
       </aside>
     </div>
-    <p className="location-caption">핀은 GPS·위치 서비스 좌표, 점선 원은 BLE 수신기 중심의 추정 범위입니다. 옅은 실선 원은 위치 정확도를 나타냅니다.</p>
-    {!user && <details className="location-method"><summary>위치 연동과 거리 계산</summary>
-      <div><p>위치와 BLE 관측은 원본 시각을 유지하며 4초마다 갱신합니다. 모의 관측은 출처 배지로 구분합니다.</p>
-        <p>추정 거리 = 10 ^ ((1 m 기준 RSSI − 현재 RSSI) / (10 × 경로 손실 계수)). 수신기 교정값과 관측 환경이 반경에 반영됩니다.</p>
-        {selectedProximity && <p>선택 수신기: 1 m 기준 {selectedProximity.referenceRssiDbm} dBm · 경로 손실 계수 {selectedProximity.pathLossExponent}</p>}
-        {!!feed.snapshot?.rejectedRecords && <p>형식 확인 대상 {feed.snapshot.rejectedRecords}건 · 유효 관측을 표시하고 있습니다.</p>}
-        <p>기본 지도는 공급자 설정에 따라 표시하며, 키·등록 도메인이 없으면 OpenStreetMap을 사용합니다. 지도 하단에서 공급자 출처를 확인할 수 있습니다. 키링 식별자와 관측 값은 로컬 서버에서 처리합니다.</p>
+    <p className="location-caption">핀은 GPS나 위치 서비스로 받은 좌표예요. 점선 원은 수신기를 중심으로 키링이 있을 만한 범위이고 옅은 실선 원은 위치 오차 범위예요.</p>
+    {!user && <details className="location-method"><summary>위치를 받는 방법과 거리 계산</summary>
+      <div><p>위치와 블루투스 신호는 4초마다 새로 받고, 각 기록이 만들어진 시각을 그대로 보여 줘요. 모의 데이터는 배지로 구분해요.</p>
+        <p>추정 거리 = 10 ^ ((1 m 기준 RSSI - 현재 RSSI) / (10 x 경로 손실 계수)). 수신기 교정값과 주변 환경이 반경에 반영돼요.</p>
+        {selectedProximity && <p>선택한 수신기: 1 m 기준 {selectedProximity.referenceRssiDbm} dBm, 경로 손실 계수 {selectedProximity.pathLossExponent}</p>}
+        {!!feed.snapshot?.rejectedRecords && <p>형식이 맞지 않는 기록 {feed.snapshot.rejectedRecords}건은 빼고 올바른 기록만 표시해요.</p>}
+        <p>기본 지도는 공급자 설정에 따라 표시해요. 키나 등록 도메인이 없으면 OpenStreetMap을 사용하며, 지도 하단에서 출처를 확인할 수 있어요. 키링 식별자와 신호 값은 로컬 서버에서 처리해요.</p>
       </div>
     </details>}
   </div>;

@@ -14,8 +14,22 @@ export function Section({ id, number, title, children }: {
   </section>;
 }
 
-export function Timestamp({ at }: { readonly at: string }) {
-  const korean = new Date(new Date(at).getTime() + 9 * 60 * 60 * 1000).toISOString();
+const friendlyFormat = new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit',
+});
+
+/**
+ * precise: KST with milliseconds for command and audit records.
+ * friendly: "11월 19일 오후 3:20" for family screens.
+ * Both keep the original offset-bearing value in dateTime and the title.
+ */
+export function Timestamp({ at, variant = 'precise' }: { readonly at: string; readonly variant?: 'precise' | 'friendly' }) {
+  const time = new Date(at).getTime();
+  if (Number.isNaN(time)) return <time className="stage-time" title={`원본: ${at}`}>{at}</time>;
+  if (variant === 'friendly') {
+    return <time className="friendly-time" dateTime={at} title={`원본: ${at}`}>{friendlyFormat.format(time)}</time>;
+  }
+  const korean = new Date(time + 9 * 60 * 60 * 1000).toISOString();
   return <time className="stage-time" dateTime={at} title={`원본: ${at}`}>
     <span className="stage-date">{korean.slice(0, 10)}</span>{' '}{korean.slice(11, -1)} <span className="caption">KST</span>
   </time>;
@@ -23,7 +37,7 @@ export function Timestamp({ at }: { readonly at: string }) {
 
 function StageTime({ stage }: { readonly stage: Stage }) {
   switch (stage.status) {
-    case 'pending': return <span className="muted small">대기 · 시각 미수신</span>;
+    case 'pending': return <span className="muted small">기다리는 중</span>;
     case 'complete': return <span title={stage.source}><Timestamp at={stage.at} /></span>;
   }
 }
@@ -32,15 +46,15 @@ export function Stages({ stages }: { readonly stages: TimelineStages }) {
   const steps = [
     ['accepted', '수락'], ['sent', '전송'], ['applied', '적용'], ['verified', '확인'],
   ] as const;
-  return <ol className="stages" aria-label="명령 처리 시각">
-    {steps.map(([key, label]) => <li className="stage" key={key}>
-      <strong className="small">{label}</strong><StageTime stage={stages[key]} />
+  return <ol className="stages" aria-label="명령 처리 단계">
+    {steps.map(([key, title]) => <li className={`stage${stages[key].status === 'complete' ? ' complete' : ''}`} key={key}>
+      <strong className="small">{title}</strong><StageTime stage={stages[key]} />
     </li>)}
   </ol>;
 }
 
 export function BooleanState({ value }: { readonly value: unknown }) {
-  return <Badge tone={typeof value === 'boolean' ? 'info' : ''}>
-    {value === true ? 'ON · true' : value === false ? 'OFF · false' : '미수신'}
+  return <Badge tone={value === true ? 'success' : typeof value === 'boolean' ? 'info' : ''}>
+    {value === true ? '켜짐 (ON)' : value === false ? '꺼짐 (OFF)' : '받기 전'}
   </Badge>;
 }

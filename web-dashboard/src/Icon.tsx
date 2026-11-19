@@ -19,6 +19,7 @@ const paths = {
   server: 'M3 3h18v7H3zM3 14h18v7H3zM6 6h.01M6 17h.01',
   exit: 'M9 3H3v18h6m4-16 7 7-7 7M8 12h12',
   plus: 'M12 4v16M4 12h16',
+  home: 'M3 11.5 12 4l9 7.5M5.5 9.5V20h4.5v-6h4v6h4.5V9.5',
 } as const;
 export type IconName = keyof typeof paths;
 export function Icon({ name, size = 20, style }: { name: IconName; size?: number; style?: CSSProperties }) {

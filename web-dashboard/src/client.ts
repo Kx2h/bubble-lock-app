@@ -10,7 +10,7 @@ export class ReadError extends Error {
 }
 
 export function errorMessage(error: unknown): string {
-  return error instanceof Error ? `조회하지 못했습니다. 진단: ${error.message}` : '알 수 없는 조회 오류';
+  return error instanceof Error ? `불러오지 못했어요. (${error.message})` : '불러오지 못했어요.';
 }
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -25,9 +25,9 @@ export async function getJson(url: string | URL, signal: AbortSignal, headers?: 
     headers: { Accept: 'application/json', ...headers },
     signal: AbortSignal.any([signal, AbortSignal.timeout(12000)]),
   });
-  if (!response.ok) throw new ReadError(`조회 연결 확인: HTTP ${response.status} ${response.statusText}`,response.status);
+  if (!response.ok) throw new ReadError(`서버 응답 HTTP ${response.status} ${response.statusText}`.trim(),response.status);
   const rsc = response.headers.get('X-M2M-RSC');
-  if (rsc !== null && rsc !== '2000') throw new ReadError(`oneM2M 조회 실패: RSC ${rsc}`);
+  if (rsc !== null && rsc !== '2000') throw new ReadError(`oneM2M 응답 코드 ${rsc}`);
   const value: unknown = await response.json();
   return { value, headers: response.headers };
 }
@@ -55,7 +55,7 @@ export async function fixtureResources(signal: AbortSignal): Promise<readonly Re
   const { value } = await getJson('/api/resources', signal);
   if (!isRecord(value) || value['source'] !== 'fixture' || value['simulation'] !== true ||
     !Array.isArray(value['resources']) || !value['resources'].every(isResource)) {
-    throw new ReadError('모의 자원 응답이 계약과 다릅니다.');
+    throw new ReadError('모의 자원 데이터 형식이 예상과 달라요.');
   }
   return value['resources'];
 }
@@ -64,7 +64,7 @@ export async function fixtureAudit(query: string, signal: AbortSignal): Promise<
   const { value } = await getJson(`/api/audit?q=${encodeURIComponent(query)}`, signal);
   if (!isRecord(value) || !['fixture', 'integration-journal-replay'].includes(String(value['source'])) || value['simulation'] !== true ||
     !Array.isArray(value['records']) || !value['records'].every(isAudit)) {
-    throw new ReadError('모의 감사 응답이 계약과 다릅니다.');
+    throw new ReadError('모의 활동 기록 형식이 예상과 달라요.');
   }
   return value['records'];
 }
@@ -97,10 +97,10 @@ function authority(settings: MobiusSettings): URL {
   const base = new URL(settings.baseUrl);
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password ||
     base.pathname !== '/' || base.search || base.hash) {
-    throw new ReadError('Mobius 주소에는 HTTP(S) origin만 입력하세요. 경로·비밀값은 넣지 마세요.');
+    throw new ReadError('Mobius 서버 주소는 http:// 또는 https://로 시작하는 주소만 입력하세요. 예: http://127.0.0.1:7579');
   }
   if (!settings.originator.trim() || !settings.rvi.trim() || !settings.aePath.trim()) {
-    throw new ReadError('운영자 Originator, AE 경로, RVI를 입력하세요.');
+    throw new ReadError('운영자 식별자, 검색 시작 경로, 규격 버전을 입력하세요.');
   }
   return base;
 }
@@ -112,11 +112,11 @@ function authority(settings: MobiusSettings): URL {
 export function resourceUrl(settings: MobiusSettings, uri: string): URL {
   const base = authority(settings);
   if (!uri || uri.includes('\\') || uri.includes('?') || uri.includes('#') || uri.includes('..')) {
-    throw new ReadError('조회할 자원 경로가 올바르지 않습니다.');
+    throw new ReadError('자원 경로 형식을 확인해 주세요.');
   }
   const url = new URL(uri.startsWith('/') ? uri : `/${uri}`, base);
   if (url.origin !== base.origin || /^[a-z]+:/i.test(uri)) {
-    throw new ReadError('다른 서버의 discovery 주소는 자동 조회하지 않습니다.');
+    throw new ReadError('설정한 서버 안의 자원만 불러와요. 다른 서버 주소는 직접 확인해 주세요.');
   }
   return url;
 }
@@ -139,7 +139,7 @@ export interface Discovery {
 export async function discover(settings: MobiusSettings, signal: AbortSignal): Promise<Discovery> {
   const url = resourceUrl(settings, settings.aePath.trim());
   if (!/^[1-9]\d*$/.test(settings.ty) || !/^[1-9]\d*$/.test(settings.limit) || !/^\d+$/.test(settings.offset)) {
-    throw new ReadError('ty와 lim은 양의 정수, ofst는 0 이상의 정수여야 합니다.');
+    throw new ReadError('자원 유형(ty)과 개수(lim)는 1 이상, 건너뛸 개수(ofst)는 0 이상의 정수로 입력하세요.');
   }
   // Source-derived query only: docs/primary-sources.md M2-M6. No CREATE Content-Type.
   url.search = new URLSearchParams({
@@ -149,7 +149,7 @@ export async function discover(settings: MobiusSettings, signal: AbortSignal): P
   const { value, headers } = await getJson(url, signal, mobiusHeaders(settings));
   if (!isRecord(value) || !Array.isArray(value['m2m:uril']) ||
     !value['m2m:uril'].every((uri: unknown): uri is string => typeof uri === 'string')) {
-    throw new ReadError('discovery 응답에 m2m:uril 문자열 배열이 없습니다.');
+    throw new ReadError('자원 찾기 응답 형식이 예상과 달라요. (m2m:uril 필요)');
   }
   const uris = [...new Set(value['m2m:uril'].map((uri) => resourceUrl(settings, uri).pathname))];
   return { uris, partial: headers.get('X-M2M-CTS') === '1', nextOffset: headers.get('X-M2M-CTO'), rsc: headers.get('X-M2M-RSC') };
@@ -163,11 +163,11 @@ export interface LiveResource {
 
 export async function retrieve(settings: MobiusSettings, uri: string, signal: AbortSignal): Promise<LiveResource> {
   const { value, headers } = await getJson(resourceUrl(settings, uri), signal, mobiusHeaders(settings));
-  if (!isRecord(value)) throw new ReadError('자원 응답이 JSON 객체가 아닙니다.');
+  if (!isRecord(value)) throw new ReadError('자원 응답 형식이 예상과 달라요. (JSON 객체 필요)');
   const entries = Object.entries(value);
   const entry = entries[0];
   if (entries.length !== 1 || entry === undefined || !entry[0].includes(':') || !isRecord(entry[1])) {
-    throw new ReadError('자원 응답에 namespaced resource envelope가 없습니다.');
+    throw new ReadError('자원 응답 형식이 예상과 달라요. (namespaced envelope 필요)');
   }
   return { envelope: entry[0], attributes: entry[1], rsc: headers.get('X-M2M-RSC') };
 }

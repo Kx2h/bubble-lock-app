@@ -108,6 +108,10 @@ CORE와 INTEGRATION 기록을 한 파일에 넣어도 같은 순서로 재생합
 
 2026-11-10 통합 데모의 22개 receipt를 [재생 원본](evidence/2026-11-10-integration-demo.jsonl)과 [검증 기록](evidence/2026-11-10-integration-verification.json)에 보관했습니다. Handover ACTIVE, FL COMPLETED, MCP RUN_COMPLETED를 확인했습니다. 현재 산출물 hash는 [release manifest](docs/release-manifest.json)에 있습니다.
 
+## 화면 디자인
+
+화면 디자인 기준은 [DESIGN.md](DESIGN.md)(Calm Console)입니다. 색, 글자, 간격 토큰은 `src/styles.css`, 프로토콜 값의 한국어 표시는 `src/labels.ts`에 있습니다. 2026-11-19 개편의 근거, 문구 대응표, 검증과 캡처는 [개편 기록](evidence/2026-11-19-calm-console/README.md)에 정리했습니다.
+
 ## 이전 시각 검증 자료
 
 2026-10-29 기록은 당시 화면 기준으로 보관합니다.

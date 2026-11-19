@@ -16,7 +16,7 @@ export function resolveRoute(hash: string): {role:'landing'|'operator'|'user';pa
 function PortalRoutes() {
   const [route,setRoute]=useState(()=>resolveRoute(window.location.hash));
   useEffect(()=>{const change=()=>{setRoute(resolveRoute(window.location.hash));window.scrollTo({top:0});};window.addEventListener('hashchange',change);return()=>window.removeEventListener('hashchange',change);},[]);
-  useEffect(()=>{document.title=route.role==='landing'?'BubbleLock · 시작하기':route.role==='user'?'BubbleLock · 사용자 대시보드':'BubbleLock · 운영 대시보드';},[route]);
+  useEffect(()=>{document.title=route.role==='landing'?'BubbleLock':route.role==='user'?'가족 대시보드 - BubbleLock':'운영 대시보드 - BubbleLock';},[route]);
   return route.role==='landing'?<Landing/>:<AuthGate role={route.role}>{route.role==='operator'?<OperatorDashboard page={route.page}/>:<UserDashboard page={route.page}/>}</AuthGate>;
 }
 export function App(){return <AuthProvider><PortalRoutes/></AuthProvider>;}
