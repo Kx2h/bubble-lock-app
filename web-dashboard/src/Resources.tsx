@@ -38,7 +38,7 @@ function Tree({ nodes, parent = null, selected, onSelect }: {
   return <ul className={parent === null ? 'tree' : undefined}>
     {nodes.filter((node) => node.parent === parent).map((node) => <li key={node.uri}>
       <button type="button" aria-pressed={selected === node.uri} onClick={() => onSelect(node.uri)}>
-        <span>{node.name}{node.inferred && <span className="caption muted"> · 경로</span>}</span>
+        <span>{node.name}{node.inferred && <span className="caption muted"> (상위 경로)</span>}</span>
         <span className="caption selection-label">{selected === node.uri ? '선택됨' : ' '}</span>
         <span className="path">{node.uri}</span>
       </button>
@@ -49,15 +49,15 @@ function Tree({ nodes, parent = null, selected, onSelect }: {
 }
 
 const settingFields = [
-  ['baseUrl', 'Mobius HTTP origin', 'http://127.0.0.1:7579'],
-  ['originator', '운영자 Originator · X-M2M-Origin', '등록된 AE originator'],
-  ['aePath', '운영자 AE / 검색할 하위 경로', '/Mobius/operator-ae'],
-  ['acp', '운영자 ACP 참조 · 표시 전용', '/Mobius/operator-acp'],
-  ['rvi', 'Release Version · X-M2M-RVI', '3'],
-  ['ty', '자원 유형 필터 · ty', '28'],
-  ['cnd', 'SDT 정의 필터 · cnd', 'org.onem2m.common.moduleclass.binarySwitch'],
-  ['limit', '페이지 크기 · lim', '100'],
-  ['offset', '페이지 시작 · ofst', '0'],
+  ['baseUrl', 'Mobius 서버 주소', 'http://127.0.0.1:7579'],
+  ['originator', '운영자 식별자 (X-M2M-Origin)', '등록된 AE originator'],
+  ['aePath', '검색 시작 경로 (운영자 AE)', '/Mobius/operator-ae'],
+  ['acp', '접근 정책 참조 (ACP, 표시용)', '/Mobius/operator-acp'],
+  ['rvi', '규격 버전 (X-M2M-RVI)', '3'],
+  ['ty', '자원 유형 (ty)', '28'],
+  ['cnd', '장치 기능 정의 (cnd)', 'org.onem2m.common.moduleclass.binarySwitch'],
+  ['limit', '한 번에 가져올 개수 (lim)', '100'],
+  ['offset', '건너뛸 개수 (ofst)', '0'],
 ] as const;
 
 export function Resources({ refresh }: { readonly refresh: number }) {
@@ -126,72 +126,72 @@ export function Resources({ refresh }: { readonly refresh: number }) {
 
   return <div className="stack">
     <div className="row">
-      <label>자원 데이터 소스
+      <label>데이터 출처
         <select value={mode} onChange={(event) => setMode(event.target.value === 'live' ? 'live' : 'fixture')}>
-          <option value="fixture">모의 · fixture API</option><option value="live">실서버 · Mobius HTTP 조회</option>
+          <option value="fixture">모의 데이터</option><option value="live">실제 서버 (Mobius)</option>
         </select>
       </label>
-      <Badge tone={mode === 'fixture' ? 'warning' : 'info'}>{mode === 'fixture' ? '모의 자원' : '실서버 조회 모드 · 연결 성공과 별개'}</Badge>
+      <Badge tone={mode === 'fixture' ? 'warning' : 'info'}>{mode === 'fixture' ? '모의 데이터' : '실제 서버 조회 모드'}</Badge>
     </div>
     {mode === 'live' && <form className="panel stack" onSubmit={(event) => {
       event.preventDefault(); setSettings({ ...draft }); setRequest((value) => value + 1);
     }}>
-      <h3>운영자 조회 설정</h3>
+      <h3>서버 연결 설정</h3>
       <div className="field-grid">
-        {settingFields.map(([key, label, placeholder]) => <label key={key} className={key === 'cnd' ? 'field-wide' : undefined}>
-          {label}
+        {settingFields.map(([key, title, placeholder]) => <label key={key} className={key === 'cnd' ? 'field-wide' : undefined}>
+          {title}
           <input value={draft[key]} placeholder={placeholder} autoComplete="off"
             inputMode={key === 'baseUrl' ? 'url' : ['ty', 'limit', 'offset'].includes(key) ? 'numeric' : 'text'}
             required={key !== 'acp' && key !== 'cnd'}
             onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} />
         </label>)}
       </div>
-      <p className="small muted">설정은 이 탭의 메모리에만 유지됩니다. 비밀키·토큰을 입력하지 마세요.
-        AE 경로는 discovery 시작점이며 ACP 참조는 운영 맥락입니다. 권한 부여·AE 등록·인증은 수행하지 않습니다.</p>
-      <div className="cluster"><button type="submit">설정 적용 / discovery 조회</button><code>GET · fu=1 · drt=1</code></div>
+      <p className="small muted">설정은 이 탭을 닫으면 사라져요. 주소와 경로만 입력하세요. 비밀키와 토큰은 필요 없어요.
+        이 화면은 자원을 읽기만 해요. 권한 부여, AE 등록, 인증은 서버 설정에서 처리해요.</p>
+      <div className="cluster"><button type="submit" className="primary">자원 찾기</button><code className="caption muted">GET, fu=1, drt=1</code></div>
     </form>}
     {mode === 'live' && <p className="notice">
-      학교 PC의 endpoint, 운영자 AE/ACP, CORS, RVI 및 SDT 등록은 미확인입니다.{' '}
-      <span className="keep-phrase">조회 실패 시</span> 모의 데이터로 대체하지 않습니다. <span className="keep-phrase">검색 결과는</span> ACP와 페이지 범위에 한정되며 전체 inventory가 아닙니다.
+      학교 PC 서버의 주소, 운영자 AE와 ACP, CORS, RVI, SDT 등록은 아직 실제로 확인하기 전이에요.{' '}
+      조회에 실패하면 오류를 그대로 보여 드려요. 모의 데이터로 바꿔 채우지 않아요. 결과에는 접근 권한과 페이지 범위 안에 있는 자원만 담겨요.
     </p>}
     <div className="resource-results stack" aria-busy={status === 'loading'}>
-    {status === 'loading' && <div className="panel loading-placeholder"><p role="status">자원을 조회하고 있습니다…</p>{[1, 2, 3, 4].map((row) => <div className="placeholder-row" aria-hidden="true" key={row} />)}</div>}
-    {status === 'idle' && <p className="notice">운영자 설정을 입력하고 discovery 조회를 실행하세요.</p>}
-    {error !== null && <p className="notice error" role="alert">{error} · 설정과 서버 상태를 확인한 뒤 새로고침하세요.</p>}
-    {status === 'ready' && nodes.length === 0 && <p className="notice">조회된 자원이 없습니다. AE 경로·필터·ACP 범위를 확인하거나 새로고침하세요.</p>}
+    {status === 'loading' && <div className="panel loading-placeholder"><p role="status">자원을 불러오고 있어요…</p>{[1, 2, 3, 4].map((row) => <div className="placeholder-row" aria-hidden="true" key={row} />)}</div>}
+    {status === 'idle' && <p className="notice">서버 연결 설정을 입력하고 자원 찾기를 눌러 주세요.</p>}
+    {error !== null && <p className="notice error" role="alert">{error} 설정을 확인하고 새로고침해 주세요.</p>}
+    {status === 'ready' && nodes.length === 0 && <p className="notice">찾은 자원이 없어요. 검색 시작 경로, 필터, 접근 권한 범위를 확인해 주세요.</p>}
     {discovery !== null && <p className="small muted">
-      이 페이지 {discovery.uris.length}개 · {discovery.partial ? `부분 결과 · 다음 ofst ${discovery.nextOffset ?? '미노출'}` : '완전성 미확인'}
-      {' · '}RSC {discovery.rsc ?? '미노출 (CORS 헤더 노출 확인 필요)'}
+      이번에 가져온 자원 {discovery.uris.length}개, {discovery.partial ? `더 있음 (다음 시작 위치 ${discovery.nextOffset ?? '서버 미제공'})` : '전체 여부는 서버가 알려 주지 않았어요'}
+      {', '}응답 코드 {discovery.rsc ?? '확인 불가 (CORS 헤더 노출 설정 필요)'}
     </p>}
     {nodes.length > 0 && <div className="split">
-      <div className="panel stack"><h3>자원 트리</h3><Tree nodes={nodes} selected={selected} onSelect={setSelected} /></div>
+      <div className="panel stack"><h3>자원 목록</h3><Tree nodes={nodes} selected={selected} onSelect={setSelected} /></div>
       <div className="panel stack" aria-live="polite">
-        <div className="row"><h3>장치 / 자원 상태</h3><Badge tone={mode === 'fixture' ? 'warning' : 'info'}>{mode === 'fixture' ? '모의' : 'HTTP 조회'}</Badge></div>
+        <div className="row"><h3>선택한 자원</h3><Badge tone={mode === 'fixture' ? 'warning' : 'info'}>{mode === 'fixture' ? '모의 데이터' : '실제 서버'}</Badge></div>
         <code>{selected}</code>
         {mode === 'fixture' && fixture !== undefined && <>
           <dl>
-            <dt>state</dt><dd><BooleanState value={fixture.state} /></dd>
-            <dt>health</dt><dd>{fixture.health === 'healthy' ? '정상 · 모의' : fixture.health === 'degraded' ? '주의 · 모의' : '미확인'}</dd>
+            <dt>보호 상태</dt><dd><BooleanState value={fixture.state} /></dd>
+            <dt>장치 상태</dt><dd>{fixture.health === 'healthy' ? '정상 (모의)' : fixture.health === 'degraded' ? '점검 필요 (모의)' : '확인 전'}</dd>
             <dt>장치</dt><dd>{fixture.deviceId ?? '해당 없음'}</dd>
-            <dt>Gateway</dt><dd>{fixture.gatewayId ?? '해당 없음'}</dd>
-            <dt>자원 유형</dt><dd>ty={fixture.ty}</dd>
-            <dt>SDT cnd</dt><dd>{fixture.cnd ?? '해당 없음'}</dd>
+            <dt>수신기 (Gateway)</dt><dd>{fixture.gatewayId ?? '해당 없음'}</dd>
+            <dt>자원 유형</dt><dd><code>ty={fixture.ty}</code></dd>
+            <dt>장치 기능 정의</dt><dd>{fixture.cnd ? <code>{fixture.cnd}</code> : '해당 없음'}</dd>
           </dl>
-          <p className="small muted">fixture snapshot입니다. 실제 장치의 최신 상태를 증명하지 않습니다.</p>
+          <p className="small muted">모의 데이터 스냅숏이에요. 장치의 최신 상태는 실제 서버를 조회해 확인하세요.</p>
         </>}
         {mode === 'live' && <>
-          {detailLoading && <p role="status">선택한 자원을 GET 조회하고 있습니다…</p>}
-          {detailError !== null && <p className="notice error" role="alert">{detailError} · 자원 경로와 서버 상태를 확인한 뒤 다시 선택하거나 새로고침하세요.</p>}
+          {detailLoading && <p role="status">선택한 자원을 불러오고 있어요…</p>}
+          {detailError !== null && <p className="notice error" role="alert">{detailError} 자원 경로를 확인하고 다시 선택해 주세요.</p>}
           {detail !== null && <>
             <dl>
-              <dt>state</dt><dd><BooleanState value={detail.attributes['state']} /></dd>
-              <dt>JSON envelope</dt><dd><code>{detail.envelope}</code></dd>
-              <dt>RSC</dt><dd>{detail.rsc ?? '미노출'}</dd>
-              <dt>운영자 AE</dt><dd>{settings?.aePath}</dd>
-              <dt>ACP 참조</dt><dd>{settings?.acp || '미입력 · 서버 권한 미확인'}</dd>
-              <dt>health</dt><dd>미측정 · GET 성공은 장치 health가 아닙니다.</dd>
+              <dt>보호 상태</dt><dd><BooleanState value={detail.attributes['state']} /></dd>
+              <dt>응답 형식 (envelope)</dt><dd><code>{detail.envelope}</code></dd>
+              <dt>응답 코드 (RSC)</dt><dd>{detail.rsc ?? '확인 불가'}</dd>
+              <dt>검색 시작 경로</dt><dd>{settings?.aePath}</dd>
+              <dt>접근 정책 참조</dt><dd>{settings?.acp || '입력 안 함 (권한은 서버가 판단해요)'}</dd>
+              <dt>장치 상태</dt><dd>측정 전. 성공 응답이 와도 장치가 정상이라는 뜻은 아니에요.</dd>
             </dl>
-            <details><summary>원본 namespaced JSON</summary><pre>{JSON.stringify({ [detail.envelope]: detail.attributes }, null, 2)}</pre></details>
+            <details><summary>원본 JSON 보기</summary><pre>{JSON.stringify({ [detail.envelope]: detail.attributes }, null, 2)}</pre></details>
           </>}
         </>}
       </div>

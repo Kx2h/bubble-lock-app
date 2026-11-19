@@ -40,7 +40,7 @@ export function useEventStream() {
     let source: EventSource | null = null;
     const offline = () => {
       source?.close();
-      publish({ ...current.current, connection: 'offline', error: '브라우저 오프라인 · 마지막 수신 기록을 표시합니다.' });
+      publish({ ...current.current, connection: 'offline', error: '인터넷 연결이 끊겼어요. 마지막으로 받은 기록을 보여 드려요.' });
     };
     const online = () => reconnect();
     window.addEventListener('offline', offline);
@@ -54,10 +54,10 @@ export function useEventStream() {
         if (disposed) return;
         if (!isRecord(value) || value['simulation'] !== true ||
           !Number.isSafeInteger(value['lastSequence']) || typeof value['lastSequence'] !== 'number') {
-          throw new ReadError('SSE source 메타데이터가 계약과 다릅니다.');
+          throw new ReadError('기록 서버의 정보 형식이 예상과 달라요.');
         }
         if (current.current.timeline.lastSequence > value['lastSequence']) {
-          publish({ ...current.current, connection: 'resync', error: '서버 snapshot보다 cursor가 큽니다. 처음부터 재동기화하세요.' });
+          publish({ ...current.current, connection: 'resync', error: '서버 기록이 새로 바뀌었어요. 처음부터 다시 받기를 눌러 주세요.' });
           return;
         }
         source = new EventSource(`/events?lastSequence=${current.current.timeline.lastSequence}`);
@@ -70,18 +70,18 @@ export function useEventStream() {
           const result = validateDashboardEvent(message.data);
           if (!result.valid) {
             source?.close();
-            publish({ ...current.current, connection: 'invalid', error: `이벤트 거부: ${result.error}` });
+            publish({ ...current.current, connection: 'invalid', error: `형식이 맞지 않는 기록을 받아서 수신을 멈췄어요. (${result.error})` });
             return;
           }
           const event = result.event;
           if (message.lastEventId !== String(event.sequence)) {
             source?.close();
-            publish({ ...current.current, connection: 'invalid', error: 'SSE id와 payload sequence가 달라 수신을 중지했습니다.' });
+            publish({ ...current.current, connection: 'invalid', error: '기록 번호가 맞지 않아 수신을 멈췄어요. 다시 연결해 주세요.' });
             return;
           }
           if (event.sequence > current.current.timeline.lastSequence + 1) {
             source?.close();
-            publish({ ...current.current, connection: 'resync', error: 'sequence 누락이 있습니다. 다시 연결하거나 처음부터 재동기화하세요.' });
+            publish({ ...current.current, connection: 'resync', error: '중간 기록이 빠졌어요. 다시 연결하거나 처음부터 다시 받아 주세요.' });
             return;
           }
           const duplicate = event.sequence <= current.current.timeline.lastSequence;
@@ -95,7 +95,7 @@ export function useEventStream() {
           source?.close();
           if (!disposed) publish({
             ...current.current, connection: navigator.onLine ? 'disconnected' : 'offline',
-            error: 'SSE 연결이 끊겼습니다. 마지막 기록은 유지됩니다. 다시 연결해 재개하세요.',
+            error: '실시간 연결이 끊겼어요. 받은 기록은 그대로 있어요. 새로고침하면 이어서 받아요.',
           });
         };
       } catch (error) {

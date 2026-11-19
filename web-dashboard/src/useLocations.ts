@@ -13,7 +13,7 @@ export function useLocations(refresh: number, url = '/api/locations') {
   useEffect(()=>{setSnapshot(null);setError(null);setLoading(true);},[url,refresh]);
   useEffect(()=>{
     if(!snapshot?.readExpiresAt)return;
-    const timer=setTimeout(()=>{setSnapshot(null);setError('위치 조회 승인을 갱신하고 있습니다.');},Math.max(0,Date.parse(snapshot.readExpiresAt)-Date.now()));
+    const timer=setTimeout(()=>{setSnapshot(null);setError('위치 보기 권한을 다시 확인하고 있어요.');},Math.max(0,Date.parse(snapshot.readExpiresAt)-Date.now()));
     return ()=>clearTimeout(timer);
   },[snapshot]);
   useEffect(() => {
@@ -30,7 +30,7 @@ export function useLocations(refresh: number, url = '/api/locations') {
           const protectedFeed=url.startsWith('/api/portal/');
           const expired=cause instanceof ReadError&&[401,403].includes(cause.status??0);
           if(protectedFeed||expired)setSnapshot(null);
-          setError(protectedFeed||expired?'현재 계정과 위치 공유 권한을 확인해 주세요.':'위치 피드 연결을 확인해 주세요. 마지막 수신 위치와 관측 시각을 표시합니다.');
+          setError(protectedFeed||expired?'위치를 보려면 위치 공유 권한이 필요해요. 공유 권한 화면에서 확인해 주세요.':'위치 서버와 연결이 끊겼어요. 마지막으로 받은 위치와 시각을 보여 드려요.');
         }
       } finally {
         if (!disposed) { setLoading(false); setNow(Date.now()); timer = setTimeout(() => void poll(), 4000); }

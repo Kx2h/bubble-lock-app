@@ -18,10 +18,10 @@ export interface PortalSnapshot {
 }
 export interface PortalResponse { mode: 'demo' | 'live'; snapshot: PortalSnapshot }
 function parseResponse(value: unknown): PortalResponse {
-  if (!isRecord(value) || !['demo','live'].includes(String(value['mode'])) || !isRecord(value['snapshot'])) throw new Error('포털 응답 형식을 확인해 주세요.');
+  if (!isRecord(value) || !['demo','live'].includes(String(value['mode'])) || !isRecord(value['snapshot'])) throw new Error('받은 데이터 형식이 예상과 달라요. 잠시 후 다시 시도해 주세요.');
   const snapshot = value['snapshot'];
   if (snapshot['schemaVersion'] !== '1.0.0' || !isRecord(snapshot['principal']) ||
-    !['households','devices','consents','grants','incidents','commandRequests','notifications'].every((key) => Array.isArray(snapshot[key]))) throw new Error('포털 데이터 형식을 확인해 주세요.');
+    !['households','devices','consents','grants','incidents','commandRequests','notifications'].every((key) => Array.isArray(snapshot[key]))) throw new Error('받은 데이터 형식이 예상과 달라요. 잠시 후 다시 시도해 주세요.');
   return value as unknown as PortalResponse;
 }
 export function usePortal(role: PortalRole) {
@@ -40,10 +40,10 @@ export function usePortal(role: PortalRole) {
     async function read() {
       try {
         const response = await fetch(`/api/portal/snapshot?role=${role}`, { signal: controller.signal, credentials: 'same-origin' });
-        if (!response.ok) throw new Error('사용자 포털 연결을 확인해 주세요.');
+        if (!response.ok) throw new Error('서버와 연결이 끊겼어요. 잠시 후 자동으로 다시 연결해요.');
         const next = parseResponse(await response.json());
         if (active) { setData(next); setError(null); }
-      } catch (cause) { if (active) setError(cause instanceof Error ? cause.message : '사용자 정보를 확인해 주세요.'); }
+      } catch (cause) { if (active) setError(cause instanceof Error ? cause.message : '서버와 연결이 끊겼어요. 잠시 후 자동으로 다시 연결해요.'); }
       finally { if (active) timer = setTimeout(() => void read(), 5000); }
     }
     void read();
@@ -59,9 +59,9 @@ export function usePortal(role: PortalRole) {
       const response = await fetch(`/api/portal/${path}`, { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ ...input, role, idempotencyKey }), signal: AbortSignal.timeout(15000) });
       const value: unknown = await response.json();
-      if (!response.ok) throw new Error(isRecord(value) && typeof value['message'] === 'string' ? value['message'] : '입력값과 현재 권한을 확인해 주세요.');
+      if (!response.ok) throw new Error(isRecord(value) && typeof value['message'] === 'string' ? value['message'] : '요청을 처리하지 못했어요. 입력한 내용과 권한을 확인해 주세요.');
       retryKeys.current.delete(intent); setNotice(success); reload(); return true;
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '요청 상태를 확인해 주세요.'); return false; }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : '요청이 서버에 닿지 않았어요. 다시 시도해 주세요.'); return false; }
     finally { setPending(false); }
   }, [role, reload]);
   return { data, snapshot: data?.snapshot, error, pending, notice, action, reload, revision: generation };
