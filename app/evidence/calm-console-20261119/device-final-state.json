@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "installedVersion": "0.5.0",
+  "versionCode": 6,
+  "installedApkSha256": "ee396bcc8266f20d73c12f9fc98149ea1a68b10f838c53c6e2ece715adffee7f",
+  "nondebug": true,
+  "sameExistingQaSigner": true,
+  "testPackageRemovedForUser0": true,
+  "targetAppDataCleared": false,
+  "settingsRestored": true,
+  "nightModeRestored": true,
+  "reverseUnchanged": true,
+  "ignoreOrientationRequest": "ignoreOrientationRequest false for displayId=0",
+  "coldLaunchOverviewVisible": true,
+  "coldLaunchAuthenticatedControlVisible": false,
+  "organizationSigned": false
+}

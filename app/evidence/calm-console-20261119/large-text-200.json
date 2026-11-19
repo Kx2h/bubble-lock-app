@@ -1,0 +1,80 @@
+{
+  "authenticated": true,
+  "loginPerformed": false,
+  "preexistingSessionPreserved": true,
+  "fontScale": 2,
+  "webTextZoom": 200,
+  "toolbarHeightDp": 56,
+  "webViewportWidthDp": 384,
+  "webViewportHeightDp": 722,
+  "nightMode": 16,
+  "webLayout": {
+    "width": 384,
+    "scrollWidth": 384,
+    "rootFont": "34px",
+    "canvas": "rgb(245, 245, 247)"
+  },
+  "appScopedPresentation": {
+    "stylePresent": true,
+    "headers": [
+      {
+        "className": "portal-topbar",
+        "children": [
+          {
+            "left": 16,
+            "right": 302.6111145019531,
+            "fits": true
+          },
+          {
+            "left": 16,
+            "right": 151.9277801513672,
+            "fits": true
+          }
+        ]
+      },
+      {
+        "className": "page-heading",
+        "children": [
+          {
+            "left": 16,
+            "right": 267.3611145019531,
+            "fits": true
+          },
+          {
+            "left": 324,
+            "right": 368,
+            "fits": true
+          }
+        ]
+      }
+    ]
+  },
+  "brandDiagnostics": {
+    "visibleBrands": 1,
+    "words": [
+      {
+        "lines": 1,
+        "whiteSpace": "nowrap",
+        "boxes": [
+          {
+            "x": 76,
+            "y": 27.711111068725586,
+            "width": 207.54446411132812,
+            "height": 46.57777404785156
+          }
+        ]
+      }
+    ]
+  },
+  "capture": "public-landing-no-real-location-or-account-details",
+  "brandWordNotBroken": true,
+  "status": "PASS",
+  "checks": 48,
+  "phase": "layout",
+  "phoneLocked": false,
+  "domainMutationCount": 0,
+  "logoutPerformed": false,
+  "injectedTouchCount": 0,
+  "cookieJarFlushedWithoutExtraction": true,
+  "activityFinishedBeforeInstrumentation": true
+}

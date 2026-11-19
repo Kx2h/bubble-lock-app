@@ -1,0 +1,18 @@
+{
+  "testDebugUnitTest": {
+    "tests": 97,
+    "failures": 0,
+    "errors": 0
+  },
+  "testReleaseUnitTest": {
+    "tests": 88,
+    "failures": 0,
+    "errors": 0
+  },
+  "lint": "No issues found",
+  "releaseGate": "PASS",
+  "packagedChecks": 42,
+  "rootWorkflow": "PASS",
+  "rootStages": 13,
+  "packagedInspectionPassed": true
+}

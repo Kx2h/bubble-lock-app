@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.privacybubble.designqa" android:versionCode="1" android:versionName="2026.11.19">
+  <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="36" />
+  <queries><package android:name="org.privacybubble.app" /></queries>
+  <application android:label="Private Calm Console QA" android:debuggable="true" android:allowBackup="false">
+    <provider android:name=".PrivateQaProvider" android:authorities="org.privacybubble.designqa.private" android:exported="true" android:process=":private" />
+  </application>
+  <instrumentation android:name="org.privacybubble.designqa.PortalDesignInstrumentation" android:targetPackage="org.privacybubble.app" android:functionalTest="true" />
+</manifest>

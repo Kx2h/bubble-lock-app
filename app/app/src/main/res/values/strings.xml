@@ -1,11 +1,18 @@
 <resources>
-    <string name="app_name">Bubble</string>
+    <string name="app_name">BubbleLock</string>
     <string name="nav_location">위치</string><string name="nav_keyrings">키링</string><string name="nav_settings">설정</string>
     <string name="keyring_page_status">%1$d / %2$d 페이지</string>
     <string name="portal_open">웹 서비스 열기</string>
     <string name="portal_close">닫기</string>
     <string name="portal_back">뒤로</string>
-    <string name="portal_home">홈</string>
+    <string name="portal_more">더 보기</string>
+    <string name="portal_dashboard">가족 대시보드</string>
+    <string name="portal_start">시작 화면</string>
+    <string name="portal_service_info">서비스 정보</string>
+    <string name="portal_retry">다시 연결하기</string>
+    <string name="portal_loading_title">가까이서 지키는 프라이버시</string>
+    <string name="portal_loading_message">가족과 키링을 연결하고 있어요.</string>
+    <string name="portal_error_title">잠시 연결이 끊겼어요</string>
     <string name="portal_reload">새로고침</string>
     <string name="portal_logout">로그아웃</string>
     <string name="portal_cancel">취소</string>

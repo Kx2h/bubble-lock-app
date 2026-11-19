@@ -1,0 +1,63 @@
+{
+  "authenticated": true,
+  "loginPerformed": false,
+  "preexistingSessionPreserved": true,
+  "fontScale": 1,
+  "webTextZoom": 100,
+  "toolbarHeightDp": 56,
+  "webViewportWidthDp": 384,
+  "webViewportHeightDp": 722,
+  "nightMode": 32,
+  "webLayout": {
+    "width": 384,
+    "scrollWidth": 384,
+    "rootFont": "17px",
+    "canvas": "rgb(0, 0, 0)"
+  },
+  "appScopedPresentation": {
+    "stylePresent": true,
+    "headers": [
+      {
+        "className": "portal-topbar",
+        "children": [
+          {
+            "left": 16,
+            "right": 173.1777801513672,
+            "fits": true
+          },
+          {
+            "left": 283.6722412109375,
+            "right": 368.0000228881836,
+            "fits": true
+          }
+        ]
+      },
+      {
+        "className": "page-heading",
+        "children": [
+          {
+            "left": 16,
+            "right": 140,
+            "fits": true
+          },
+          {
+            "left": 324,
+            "right": 368,
+            "fits": true
+          }
+        ]
+      }
+    ]
+  },
+  "explicitErrorAndRetryVerified": true,
+  "failureMechanism": "controlled WebViewClient HTTP 503 callback; normal real portal retry",
+  "status": "PASS",
+  "checks": 33,
+  "phase": "recovery",
+  "phoneLocked": false,
+  "domainMutationCount": 0,
+  "logoutPerformed": false,
+  "injectedTouchCount": 1,
+  "cookieJarFlushedWithoutExtraction": true,
+  "activityFinishedBeforeInstrumentation": true
+}

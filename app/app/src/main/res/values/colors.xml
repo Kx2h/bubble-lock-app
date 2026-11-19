@@ -1,9 +1,15 @@
 <resources>
-    <color name="pb_brand">#205C42</color>
-    <color name="pb_background">#F4F6F3</color><color name="pb_surface">#FFFFFF</color>
-    <color name="pb_subtle">#EAF0E9</color><color name="pb_text">#1F3027</color>
-    <color name="pb_muted">#53655A</color><color name="pb_accent">#205C42</color>
-    <color name="pb_on_accent">#FFFFFF</color><color name="pb_border">#D3DED4</color>
-    <color name="pb_warning">#805811</color><color name="pb_danger">#A13138</color>
-    <color name="pb_success">#236241</color>
+    <color name="pb_brand">#0070D1</color>
+    <color name="pb_background">#F5F5F7</color><color name="pb_surface">#FFFFFF</color>
+    <color name="pb_subtle">#F5F5F7</color><color name="pb_text">#1D1D1F</color>
+    <color name="pb_muted">#636366</color><color name="pb_accent">#0070D1</color>
+    <color name="pb_accent_pressed">#0064B7</color><color name="pb_accent_text">#0066CC</color>
+    <color name="pb_accent_soft">#E8F1FB</color>
+    <color name="pb_on_accent">#FFFFFF</color><color name="pb_border">#E0E0E0</color>
+    <color name="pb_control_border">#86868B</color>
+    <color name="pb_warning">#A05A00</color><color name="pb_danger">#C81B3A</color>
+    <color name="pb_success">#18733A</color>
+    <color name="pb_chrome">#000000</color><color name="pb_on_chrome">#FFFFFF</color>
+    <color name="pb_muted_on_chrome">#A1A1A6</color><color name="pb_accent_on_chrome">#53B1FF</color>
+    <color name="pb_warning_on_chrome">#FFB340</color>
 </resources>

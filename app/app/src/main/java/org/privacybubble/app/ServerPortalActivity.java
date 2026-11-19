@@ -2,6 +2,8 @@ package org.privacybubble.app;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -10,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.view.Gravity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,6 +32,7 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +44,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import org.privacybubble.app.portal.ServerPortalPolicy;
 import org.privacybubble.app.ui.AppTheme;
@@ -49,9 +57,15 @@ public final class ServerPortalActivity extends AppCompatActivity {
     private final Handler main = new Handler(Looper.getMainLooper());
     private ServerPortalPolicy policy;
     private WebView portal;
+    private AppTheme theme;
     private LinearProgressIndicator progress;
-    private TextView notice;
-    private MaterialButton back, logout;
+    private TextView notice, toolbarTitle, stateTitle, stateMessage;
+    private LinearLayout statePanel;
+    private MaterialButton back, more, retry;
+    // Only a fixed route survives configuration changes in RAM. No WebView,
+    // location, query string, credentials, or document state is serialized.
+    private String resumeUrl;
+    private String mobileCss = "";
     private boolean resumed, needsReload = true, failed, destroyed, logoutBusy;
     private long logoutDeadline;
     private final Runnable logoutPoll = this::pollLogout;
@@ -62,42 +76,111 @@ public final class ServerPortalActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 33) setRecentsScreenshotEnabled(false);
         try { policy = new ServerPortalPolicy(BuildConfig.SERVER_PORTAL_ORIGIN); }
         catch (IllegalArgumentException invalidProfile) { finish(); return; }
-        AppTheme theme = new AppTheme(this);
+        theme = new AppTheme(this);
+        Object retained = getLastCustomNonConfigurationInstance();
+        String previous = retained instanceof String ? policy.restoreUrl((String) retained) : null;
+        resumeUrl = previous == null ? policy.homeUrl() : previous;
+        try (InputStream source = getAssets().open("portal-mobile.css")) {
+            ByteArrayOutputStream text = new ByteArrayOutputStream();
+            byte[] buffer = new byte[2048]; int count;
+            while ((count = source.read(buffer)) != -1 && text.size() < 32_768) text.write(buffer, 0, count);
+            mobileCss = text.toString(StandardCharsets.UTF_8.name());
+        } catch (IOException unavailable) { /* The server's responsive presentation remains usable. */ }
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        boolean dark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(!dark);
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightNavigationBars(!dark);
+        getWindow().setStatusBarColor(theme.surface);
+        getWindow().setNavigationBarColor(theme.surface);
         LinearLayout screen = theme.column(); screen.setBackgroundColor(theme.background); setContentView(screen);
         ViewCompat.setOnApplyWindowInsetsListener(screen, (view, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
             view.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom)); return insets;
         });
-        LinearLayout heading = new LinearLayout(this); heading.setGravity(Gravity.CENTER_VERTICAL);
-        heading.setPadding(theme.dp(16), theme.dp(8), theme.dp(16), theme.dp(8));
-        LinearLayout brand = theme.column(); brand.addView(theme.heading("BubbleLock", 22));
-        TextView address = theme.text(Uri.parse(policy.origin()).getAuthority(), 13, theme.muted); brand.addView(address);
-        heading.addView(brand, new LinearLayout.LayoutParams(0, -2, 1));
-        heading.addView(theme.button(getString(R.string.portal_close), false, view -> { if (!logoutBusy) finish(); })); screen.addView(heading);
-        LinearLayout navigation = new LinearLayout(this); navigation.setPadding(theme.dp(8), 0, theme.dp(8), theme.dp(8));
-        back = theme.button(getString(R.string.portal_back), false, view -> goBack());
-        MaterialButton home = theme.button(getString(R.string.portal_home), false, view -> load(policy.origin() + "/#/"));
-        MaterialButton reload = theme.button(getString(R.string.portal_reload), false, view -> {
-            if (logoutBusy) return;
-            if (failed || !policy.isInternal(portal.getUrl())) load(policy.homeUrl()); else portal.reload();
-        });
-        logout = theme.button(getString(R.string.portal_logout), false, view -> confirmLogout());
-        for (MaterialButton button : new MaterialButton[]{back, home, reload, logout}) {
-            button.setTextSize(13); button.setPadding(theme.dp(6), theme.dp(8), theme.dp(6), theme.dp(8)); button.setMinHeight(theme.dp(48));
-            navigation.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
-        }
-        screen.addView(navigation);
+        LinearLayout heading = new LinearLayout(this); heading.setTag("portal-toolbar");
+        heading.setGravity(Gravity.CENTER_VERTICAL); heading.setMinimumHeight(theme.dp(56));
+        heading.setPadding(theme.dp(4), theme.dp(4), theme.dp(4), theme.dp(4)); heading.setBackgroundColor(theme.surface);
+        back = iconButton("back", R.string.portal_back, "portal-back", view -> goBack());
+        heading.addView(back, new LinearLayout.LayoutParams(theme.dp(48), theme.dp(48)));
+        toolbarTitle = theme.heading(policy.navigationTitle(resumeUrl), 17); toolbarTitle.setTag("portal-title");
+        toolbarTitle.setMaxLines(2); toolbarTitle.setEllipsize(TextUtils.TruncateAt.END);
+        toolbarTitle.setPadding(theme.dp(8), 0, theme.dp(8), 0);
+        heading.addView(toolbarTitle, new LinearLayout.LayoutParams(0, -2, 1));
+        more = iconButton("more", R.string.portal_more, "portal-menu", view -> openMenu());
+        heading.addView(more, new LinearLayout.LayoutParams(theme.dp(48), theme.dp(48)));
+        screen.addView(heading, new LinearLayout.LayoutParams(-1, -2));
         progress = new LinearProgressIndicator(this); progress.setIndeterminate(true); progress.setIndicatorColor(theme.accent);
-        screen.addView(progress, new LinearLayout.LayoutParams(-1, theme.dp(3)));
-        notice = theme.text("", 14, theme.warning); notice.setPadding(theme.dp(16), theme.dp(10), theme.dp(16), theme.dp(10));
+        progress.setTrackColor(theme.subtle); screen.addView(progress, new LinearLayout.LayoutParams(-1, theme.dp(2)));
+        notice = theme.text("", 15, theme.warning); notice.setPadding(theme.dp(16), theme.dp(10), theme.dp(16), theme.dp(10));
+        notice.setBackgroundColor(theme.subtle);
         notice.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE); notice.setVisibility(View.GONE); screen.addView(notice);
-        portal = new WebView(this); configureWebView(); screen.addView(portal, new LinearLayout.LayoutParams(-1, 0, 1));
+        FrameLayout content = new FrameLayout(this); screen.addView(content, new LinearLayout.LayoutParams(-1, 0, 1));
+        portal = new WebView(this); portal.setBackgroundColor(theme.background); configureWebView();
+        content.addView(portal, new FrameLayout.LayoutParams(-1, -1));
+        android.widget.ScrollView stateScroll = new android.widget.ScrollView(this);
+        stateScroll.setTag("portal-state"); stateScroll.setFillViewport(true); stateScroll.setBackgroundColor(theme.background);
+        statePanel = theme.column(); statePanel.setGravity(Gravity.CENTER);
+        statePanel.setPadding(theme.dp(24), theme.dp(24), theme.dp(24), theme.dp(24));
+        stateTitle = theme.heading(getString(R.string.portal_loading_title), 24); stateTitle.setGravity(Gravity.CENTER);
+        statePanel.addView(stateTitle, new LinearLayout.LayoutParams(-1, -2));
+        stateMessage = theme.text(getString(R.string.portal_loading_message), 17, theme.muted); stateMessage.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams messageParams = new LinearLayout.LayoutParams(-1, -2); messageParams.topMargin = theme.dp(12);
+        statePanel.addView(stateMessage, messageParams);
+        retry = theme.button(getString(R.string.portal_retry), true, view -> load(resumeUrl)); retry.setTag("portal-retry");
+        LinearLayout.LayoutParams retryParams = new LinearLayout.LayoutParams(-2, -2); retryParams.topMargin = theme.dp(24);
+        statePanel.addView(retry, retryParams); retry.setVisibility(View.GONE);
+        stateScroll.addView(statePanel, new android.widget.ScrollView.LayoutParams(-1, -1));
+        content.addView(stateScroll, new FrameLayout.LayoutParams(-1, -1));
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() { goBack(); }
         });
         ViewCompat.requestApplyInsets(screen);
+    }
+
+    private MaterialButton iconButton(String icon, int label, String tag, View.OnClickListener action) {
+        MaterialButton button = theme.button("", false, action);
+        button.setTag(tag); button.setContentDescription(getString(label)); button.setTooltipText(getString(label));
+        button.setIcon(theme.icon(icon, theme.text)); button.setIconTint(ColorStateList.valueOf(theme.text));
+        button.setIconSize(theme.dp(24)); button.setIconPadding(0); button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+        button.setPadding(theme.dp(12), theme.dp(12), theme.dp(12), theme.dp(12));
+        button.setMinWidth(0); button.setMinimumWidth(0); button.setMinHeight(theme.dp(48)); button.setMinimumHeight(theme.dp(48));
+        button.setStrokeWidth(0); button.setBackgroundTintList(ColorStateList.valueOf(theme.surface));
+        return button;
+    }
+
+    private void openMenu() {
+        if (destroyed || logoutBusy) return;
+        String[] actions = {getString(R.string.portal_reload), getString(R.string.portal_dashboard),
+                getString(R.string.portal_start), getString(R.string.portal_service_info),
+                getString(R.string.portal_logout), getString(R.string.portal_close)};
+        new MaterialAlertDialogBuilder(this).setTitle(R.string.portal_more).setItems(actions, (dialog, index) -> {
+            if (index == 0) reloadPage();
+            else if (index == 1) load(policy.homeUrl());
+            else if (index == 2) load(policy.origin() + "/#/");
+            else if (index == 3) new MaterialAlertDialogBuilder(this).setTitle(R.string.portal_service_info)
+                    .setMessage("BubbleLock " + BuildConfig.VERSION_NAME + "\n" + Uri.parse(policy.origin()).getAuthority())
+                    .setPositiveButton(android.R.string.ok, null).show();
+            else if (index == 4) confirmLogout();
+            else if (index == 5) finish();
+        }).show();
+    }
+
+    private void reloadPage() {
+        if (destroyed || logoutBusy) return;
+        if (failed || !policy.isInternal(portal.getUrl())) load(resumeUrl);
+        else { rememberRoute(portal.getUrl()); portal.reload(); }
+    }
+
+    private void rememberRoute(String url) {
+        String route = policy.restoreUrl(url);
+        if (route != null) resumeUrl = route;
+        toolbarTitle.setText(policy.navigationTitle(url));
+    }
+
+    private void setStateVisible(boolean visible) {
+        if (statePanel != null && statePanel.getParent() instanceof View)
+            ((View) statePanel.getParent()).setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -108,6 +191,8 @@ public final class ServerPortalActivity extends AppCompatActivity {
         portal.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
         WebSettings settings = portal.getSettings();
         settings.setJavaScriptEnabled(true); settings.setDomStorageEnabled(true);
+        settings.setUseWideViewPort(true); settings.setLoadWithOverviewMode(true);
+        settings.setTextZoom(ServerPortalPolicy.webTextZoom(getResources().getConfiguration().fontScale));
         settings.setAllowFileAccess(false); settings.setAllowContentAccess(false);
         settings.setAllowFileAccessFromFileURLs(false); settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -133,6 +218,10 @@ public final class ServerPortalActivity extends AppCompatActivity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, String url) { return !policy.isInternal(url); }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString(), scheme = request.getUrl().getScheme();
+                if (!request.isForMainFrame() && policy.isAppStylesheet(url))
+                    return new WebResourceResponse("text/css", "UTF-8", 200, "OK",
+                            java.util.Map.of("Cache-Control", "no-store", "X-Content-Type-Options", "nosniff"),
+                            new ByteArrayInputStream(mobileCss.getBytes(StandardCharsets.UTF_8)));
                 if (request.isForMainFrame() && !policy.isInternal(url)) return blocked();
                 if ("file".equalsIgnoreCase(scheme) || "content".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme)) return blocked();
                 return null;
@@ -140,11 +229,17 @@ public final class ServerPortalActivity extends AppCompatActivity {
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
                 if (destroyed || "about:blank".equals(url)) return;
                 if (!policy.isInternal(url)) { view.stopLoading(); fail(R.string.portal_navigation_blocked); return; }
-                failed = false; notice.setVisibility(View.GONE); progress.setVisibility(View.VISIBLE); updateActions();
+                failed = false; rememberRoute(url); notice.setVisibility(View.GONE); progress.setVisibility(View.VISIBLE); updateActions();
             }
             @Override public void onPageFinished(WebView view, String url) {
                 if (destroyed || "about:blank".equals(url)) return;
-                progress.setVisibility(logoutBusy ? View.VISIBLE : View.INVISIBLE); updateActions();
+                rememberRoute(url); progress.setVisibility(logoutBusy ? View.VISIBLE : View.INVISIBLE);
+                if (!failed && !logoutBusy) setStateVisible(false);
+                applyMobilePresentation();
+                updateActions();
+            }
+            @Override public void doUpdateVisitedHistory(WebView view, String url, boolean reload) {
+                if (!destroyed && policy.isInternal(url)) rememberRoute(url);
             }
             @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) { handler.cancel(); fail(R.string.portal_secure_connection_failed); }
             @Override public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) { request.cancel(); }
@@ -162,20 +257,33 @@ public final class ServerPortalActivity extends AppCompatActivity {
         return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked", Collections.singletonMap("Cache-Control", "no-store"),
                 new ByteArrayInputStream(new byte[0]));
     }
+    private void applyMobilePresentation() {
+        if (destroyed || failed || mobileCss.isEmpty() || !isPortalDocument()) return;
+        String script = "(function(){if(location.origin!==" + org.json.JSONObject.quote(policy.origin())
+                + "||!['/','/index.html'].includes(location.pathname))return false;"
+                + "document.documentElement.classList.add('bubble-android-app');"
+                + "let s=document.getElementById('bubble-android-presentation');"
+                + "if(!s){s=document.createElement('link');s.id='bubble-android-presentation';s.rel='stylesheet';"
+                + "s.href=" + org.json.JSONObject.quote(policy.origin() + "/__bubble_android__/portal-mobile.css")
+                + ";document.head.appendChild(s);}return true;})()";
+        portal.evaluateJavascript(script, null);
+    }
     private void openExternal(String url) {
         try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)); }
         catch (android.content.ActivityNotFoundException unavailable) { showNotice(R.string.portal_external_unavailable); }
     }
     private void load(String url) {
         if (destroyed || logoutBusy || !policy.isInternal(url)) return;
-        failed = false; notice.setVisibility(View.GONE); portal.setVisibility(resumed ? View.VISIBLE : View.INVISIBLE); portal.loadUrl(url); updateActions();
+        failed = false; notice.setVisibility(View.GONE); stateTitle.setText(R.string.portal_loading_title);
+        stateMessage.setText(R.string.portal_loading_message); retry.setVisibility(View.GONE); setStateVisible(true);
+        portal.setVisibility(resumed ? View.VISIBLE : View.INVISIBLE); portal.loadUrl(url); updateActions();
     }
     private void goBack() {
         if (logoutBusy) return;
         if (portal != null && portal.canGoBack()) portal.goBack(); else finish();
     }
     private void updateActions() {
-        back.setEnabled(!logoutBusy); logout.setEnabled(!logoutBusy && isPortalDocument());
+        back.setEnabled(!logoutBusy); more.setEnabled(!logoutBusy);
         if (resumed && !failed && !logoutBusy) portal.setVisibility(View.VISIBLE);
     }
     private boolean isPortalDocument() {
@@ -186,7 +294,9 @@ public final class ServerPortalActivity extends AppCompatActivity {
     private void showNotice(int message) { if (!destroyed) { notice.setText(message); notice.setVisibility(View.VISIBLE); } }
     private void fail(int message) {
         if (destroyed) return;
-        failed = true; portal.setVisibility(View.INVISIBLE); progress.setVisibility(View.INVISIBLE); showNotice(message);
+        failed = true; portal.setVisibility(View.INVISIBLE); progress.setVisibility(View.INVISIBLE); notice.setVisibility(View.GONE);
+        stateTitle.setText(R.string.portal_error_title); stateMessage.setText(message); retry.setVisibility(View.VISIBLE); setStateVisible(true);
+        stateMessage.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
     }
     private void confirmLogout() {
         if (!isPortalDocument() || logoutBusy) return;
@@ -226,6 +336,7 @@ public final class ServerPortalActivity extends AppCompatActivity {
             if (destroyed) return;
             CookieManager.getInstance().flush(); WebStorage.getInstance().deleteAllData();
             portal.clearCache(true); portal.clearHistory(); portal.clearFormData(); logoutBusy = false;
+            resumeUrl = policy.homeUrl();
             if (resumed) load(policy.homeUrl()); else needsReload = true;
             showNotice(R.string.portal_signed_out); updateActions();
         });
@@ -233,19 +344,27 @@ public final class ServerPortalActivity extends AppCompatActivity {
 
     @Override protected void onResume() {
         super.onResume(); resumed = true;
-        if (portal != null) { portal.onResume(); if (needsReload) { needsReload = false; load(policy.homeUrl()); } updateActions(); }
+        if (portal != null) { portal.onResume(); if (needsReload) { needsReload = false; load(resumeUrl); } updateActions(); }
     }
     @Override protected void onPause() {
         resumed = false;
-        if (portal != null) { portal.setVisibility(View.INVISIBLE); portal.onPause(); }
+        if (portal != null) {
+            CookieManager.getInstance().flush();
+            portal.setVisibility(View.INVISIBLE); portal.onPause();
+        }
         super.onPause();
     }
     @Override protected void onStop() {
         if (portal != null) {
+            rememberRoute(portal.getUrl());
             main.removeCallbacks(logoutPoll); logoutBusy = false; needsReload = true;
             portal.stopLoading(); portal.loadUrl("about:blank"); portal.clearHistory();
         }
         super.onStop();
+    }
+    @Override public Object onRetainCustomNonConfigurationInstance() {
+        if (portal != null && !destroyed) rememberRoute(portal.getUrl());
+        return resumeUrl;
     }
     @Override protected void onDestroy() {
         destroyed = true; main.removeCallbacks(logoutPoll);

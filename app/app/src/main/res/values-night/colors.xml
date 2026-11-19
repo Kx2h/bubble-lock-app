@@ -1,8 +1,11 @@
 <resources>
-    <color name="pb_background">#111B16</color><color name="pb_surface">#1A2820</color>
-    <color name="pb_subtle">#26392D</color><color name="pb_text">#EBF2EC</color>
-    <color name="pb_muted">#B8C7BB</color><color name="pb_accent">#A3D8B9</color>
-    <color name="pb_on_accent">#112B1C</color><color name="pb_border">#405848</color>
-    <color name="pb_warning">#F0CD86</color><color name="pb_danger">#FFB5BA</color>
-    <color name="pb_success">#A5DBB8</color>
+    <color name="pb_background">#000000</color><color name="pb_surface">#161617</color>
+    <color name="pb_subtle">#1F1F21</color><color name="pb_text">#F5F5F7</color>
+    <color name="pb_muted">#A1A1A6</color><color name="pb_accent">#0070D1</color>
+    <color name="pb_accent_pressed">#0064B7</color><color name="pb_accent_text">#53B1FF</color>
+    <color name="pb_accent_soft">#290A84FF</color>
+    <color name="pb_on_accent">#FFFFFF</color><color name="pb_border">#2C2C2E</color>
+    <color name="pb_control_border">#6E6E73</color>
+    <color name="pb_warning">#FFB340</color><color name="pb_danger">#FF6B81</color>
+    <color name="pb_success">#5FD68A</color>
 </resources>

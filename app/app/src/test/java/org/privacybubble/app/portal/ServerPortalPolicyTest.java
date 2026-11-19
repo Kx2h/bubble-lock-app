@@ -10,7 +10,7 @@ public final class ServerPortalPolicyTest {
     @Test public void profileNormalizesDnsCaseAndDefaultHttpsPortOnly() {
         ServerPortalPolicy normalized = new ServerPortalPolicy("HTTPS://BubbleLock.IPTime.ORG:443/");
         assertEquals(ORIGIN, normalized.origin());
-        assertEquals(ORIGIN + "/#/user/map", normalized.homeUrl());
+        assertEquals(ORIGIN + "/#/user/overview", normalized.homeUrl());
         assertEquals("https://bubblelock.iptime.org:8443", new ServerPortalPolicy(ORIGIN + ":8443").origin());
     }
 
@@ -70,5 +70,85 @@ public final class ServerPortalPolicyTest {
         String oversized = ORIGIN + "/" + "a".repeat(16_384);
         assertFalse(policy.isInternal(oversized));
         assertFalse(policy.isExternalBrowserCandidate(oversized));
+    }
+
+    @Test public void packagedPresentationMatchesOnlyOneExactSameOriginAsset() {
+        assertTrue(policy.isAppStylesheet(ORIGIN + "/__bubble_android__/portal-mobile.css"));
+        for (String url : new String[]{null, "", "https://example.org/__bubble_android__/portal-mobile.css",
+                ORIGIN + ":8443/__bubble_android__/portal-mobile.css", ORIGIN + "/api/portal/locations",
+                ORIGIN + "/identity/theme.css", ORIGIN + "/__bubble_android__/portal-mobile.css?",
+                ORIGIN + "/__bubble_android__/portal-mobile.css#", ORIGIN + "/__bubble_android__/%70ortal-mobile.css",
+                ORIGIN + "/__bubble_android__/portal-mobile.css/", "file:///__bubble_android__/portal-mobile.css"}) {
+            assertFalse(policy.isAppStylesheet(url));
+        }
+    }
+
+    @Test public void knownProductPagesResumeWithOneCanonicalOriginAndRootPath() {
+        String[][] pages = {
+                {"/", "BubbleLock"},
+                {"/user/overview", "내 대시보드"}, {"/user/map", "키링 위치"},
+                {"/user/devices", "가족과 키링"}, {"/user/privacy", "공유 권한"},
+                {"/user/activity", "알림과 요청"},
+                {"/operator/overview", "한눈에 보기"}, {"/operator/map", "위치 지도"},
+                {"/operator/devices", "장치와 자원"}, {"/operator/commands", "명령 처리"},
+                {"/operator/audit", "활동 기록"}, {"/operator/services", "연결 서비스"},
+                {"/operator/evidence", "개발 현황"}
+        };
+        for (String[] page : pages) {
+            String url = "HTTPS://BUBBLELOCK.IPTIME.ORG:443/index.html#" + page[0];
+            assertEquals(ORIGIN + "/#" + page[0], policy.restoreUrl(url));
+            assertEquals(page[1], policy.navigationTitle(url));
+        }
+        assertEquals(ORIGIN + "/#/", policy.restoreUrl(ORIGIN));
+        assertEquals(ORIGIN + "/#/", policy.restoreUrl(ORIGIN + "/"));
+        assertEquals(ORIGIN + "/#/", policy.restoreUrl(ORIGIN + "/index.html"));
+        ServerPortalPolicy alternate = new ServerPortalPolicy(ORIGIN + ":8443");
+        assertEquals(ORIGIN + ":8443/#/user/map", alternate.restoreUrl(ORIGIN + ":8443/index.html#/user/map"));
+    }
+
+    @Test public void authCredentialsLocationParametersAndUnknownRoutesAreNeverResumeHints() {
+        for (String url : new String[]{null, "", "about:blank", "/#/user/map",
+                "https://example.org/#/user/map", ORIGIN + ":8443/#/user/map",
+                ORIGIN + "/identity/realms/bubble/protocol/openid-connect/auth?state=fixture",
+                ORIGIN + "/api/auth/callback?code=fixture-code&state=fixture-state",
+                ORIGIN + "/api/auth/login?returnTo=%2F%23%2Fuser%2Fmap",
+                ORIGIN + "/?code=fixture-code#/user/map", ORIGIN + "/?#/user/map",
+                ORIGIN + "/index.html?token=fixture#/user/map",
+                ORIGIN + "/index.html#/user/map?lat=37.5&lon=127.0",
+                ORIGIN + "/#/user/map/device-1", ORIGIN + "/#/user/map/",
+                ORIGIN + "/#/user/%6dap", ORIGIN + "/#/user/map%3Flat=37.5",
+                ORIGIN + "/#/user/map#fixture", ORIGIN + "/#/user/../map",
+                ORIGIN + "/#/operator/unknown", ORIGIN + "/#/main",
+                ORIGIN + "/other#/user/map", ORIGIN + "/%69ndex.html#/user/map",
+                ORIGIN + "/index.html/../#/user/map", ORIGIN + "/INDEX.HTML#/user/map"}) {
+            assertNull(url, policy.restoreUrl(url));
+        }
+        // These redirects still work inside the WebView; only their retention is forbidden.
+        assertTrue(policy.isInternal(ORIGIN + "/api/auth/callback?code=fixture-code&state=fixture-state"));
+        assertTrue(policy.isInternal(ORIGIN + "/index.html#/user/map?lat=37.5&lon=127.0"));
+    }
+
+    @Test public void navigationLabelsDoNotReflectRemoteTitlesOrUnknownUrlContent() {
+        assertEquals("로그인", policy.navigationTitle(ORIGIN + "/identity/realms/bubble/login-actions/authenticate?session_code=fixture"));
+        assertEquals("로그인", policy.navigationTitle(ORIGIN + "/api/auth/login?returnTo=fixture"));
+        assertEquals("로그인", policy.navigationTitle(ORIGIN + "/api/auth/callback?code=fixture-code"));
+        for (String url : new String[]{null, "", ORIGIN + "/#/unknown", ORIGIN + "/#/user/map?token=fixture",
+                ORIGIN + "/?token=fixture#/user/map", "https://example.org/identity/realms/bubble",
+                "https://user:fixture@bubblelock.iptime.org/#/user/map"}) {
+            assertEquals("BubbleLock", policy.navigationTitle(url));
+        }
+    }
+
+    @Test public void webTypeTracksSystemFontScaleIncludingLargeAccessibleText() {
+        assertEquals(100, ServerPortalPolicy.webTextZoom(1.0f));
+        assertEquals(130, ServerPortalPolicy.webTextZoom(1.3f));
+        assertEquals(200, ServerPortalPolicy.webTextZoom(2.0f));
+        assertEquals(250, ServerPortalPolicy.webTextZoom(2.5f));
+        assertEquals(80, ServerPortalPolicy.webTextZoom(0.8f));
+        assertEquals(50, ServerPortalPolicy.webTextZoom(0.1f));
+        assertEquals(300, ServerPortalPolicy.webTextZoom(10.0f));
+        for (float value : new float[]{0, -1, Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY}) {
+            assertEquals(100, ServerPortalPolicy.webTextZoom(value));
+        }
     }
 }

@@ -1,0 +1,13 @@
+{
+  "app/app/build.gradle": "8a27b7870d1fa6dca6f193af87831881034511dc4bece60abef5a3f9e4f920f3",
+  "app/app/src/main/java/org/privacybubble/app/ServerPortalActivity.java": "cfdf5e1301da9d0c6016edc5d5aa64ca1feadf3bc2313fecc98196499dd749f5",
+  "app/app/src/main/java/org/privacybubble/app/MainActivity.java": "834a48846f94ed9cb7f78a19435511fe4201a418b4e5aa109accb2aa0961ef1a",
+  "app/app/src/main/java/org/privacybubble/app/ui/AppTheme.java": "43b99c5ce3c127e1857dfcb011bb5b447e07d0ffd336bd70318476b2e3060375",
+  "app/app/src/main/java/org/privacybubble/app/portal/ServerPortalPolicy.java": "62928656e00e9f093b89b4b254e35647e50b3ecccc2d16ed39fcdfdadc4994a7",
+  "app/app/src/main/assets/portal-mobile.css": "4127d1160295d2f71ae1ba8de7b647ce331975f696d4e02bb06e68721817166d",
+  "app/app/src/main/res/values/colors.xml": "0abfcf7127f932b7973eb88bd3755cff5a23b582bfdd1875e670ecaa0cd44f5e",
+  "app/app/src/main/res/values-night/colors.xml": "a30622bcb2a28452dc5c5e585f3e64e17a4893ea7d679359c665f2cd1cdda491",
+  "app/app/src/main/res/values/strings.xml": "ca0f754e98153141d432e23b1e40d0a89e45c8ec0f18016ede4dedd2207321e4",
+  "app/app/src/main/res/values/styles.xml": "cba455a15dad906a208dffff016bef9466af598d250a08df31c9c01158dccbb8",
+  "app/app/src/test/java/org/privacybubble/app/portal/ServerPortalPolicyTest.java": "25721c16c7278073de9a27aca8fcbc36d97a48b16e8fded44b785239dd7a0ff4"
+}

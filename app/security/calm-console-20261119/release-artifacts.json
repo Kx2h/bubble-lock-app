@@ -1,0 +1,16 @@
+{
+  "version": "0.5.0",
+  "versionCode": 6,
+  "profile": "SERVER_PORTAL",
+  "signatureMatchesInstalledBackup": true,
+  "signerSha256": "740d1ad65e9b11f96113bd52c62a592dfd11eabbc364d137f46863b21f2ff914",
+  "apkSha256": "ee396bcc8266f20d73c12f9fc98149ea1a68b10f838c53c6e2ece715adffee7f",
+  "bytes": 94548202,
+  "qaSigning": true,
+  "unsignedApkSha256": "b9018314722e2786e753059248694f77889e080d20f0d71feb9b8642e60e4d31",
+  "firstPartyMobilePresentation": true,
+  "cspCompatiblePackagedStylesheet": true,
+  "aabSha256": "9f91adec898cb7aee05d4182145cd4be063f72e20af7b0df9bd93aba3ef691c7",
+  "publicCertificateOnly": true,
+  "organizationSigning": false
+}

@@ -1,16 +1,27 @@
-# Bubble Android
+# BubbleLock Android
 
 ROLE: APP · DOC-REV: 2.0.0 · RUBRIC: R03, R09, R10, R14, R17
 
-DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.4.1 / versionCode 5
+DOC: PROJECT_IMPLEMENTATION_RUBRIC_PLAN.md · APP: 0.5.0 / versionCode 6
 
-Bubble은 공유가 허용된 키링의 위치 정보를 확인하는 Android 앱입니다. 0.4.1의 Server Portal 프로필은 실행 시 `https://bubblelock.iptime.org/#/user/map`에 직접 연결하며 기존 웹 BFF의 실제 계정 로그인·조회·로그아웃을 사용합니다. 별도의 기본 native 프로필은 `위치 / 키링 / 설정` 화면과 MapLibre 지도·public OIDC client 경로를 유지합니다.
+BubbleLock은 공유가 허용된 키링의 위치 정보를 확인하는 Android 앱입니다. 0.5.0의 Server Portal 프로필은 실행 시 `https://bubblelock.iptime.org/#/user/overview`를 열고 기존 웹 BFF의 계정 로그인·조회·로그아웃을 사용합니다. 2026-11-19 통합 웹의 [Calm Console 디자인](../web-dashboard/DESIGN.md)을 적용했습니다. 기준 웹은 `origin/main`의 `0d8e2f3`이며 통합 커밋은 `faacfc0`입니다. 별도의 기본 native 프로필은 `위치 / 키링 / 설정` 화면과 MapLibre 지도·public OIDC client 경로를 유지합니다.
+
+## 0.5.0 화면 개편과 검증 범위
+
+- 운영 웹의 흰색·검정·파랑, 18dp 카드와 pill 버튼, DayNight 색상·읽기 쉬운 한국어를 native 화면에도 맞췄습니다. 기본 native 화면은 3개 탭을 유지합니다.
+- Server Portal은 최소 56dp 상단바와 뒤로·더보기 버튼을 제공합니다. 새로고침·내 대시보드·시작 화면·서비스 정보·로그아웃·닫기는 더보기로 옮겼습니다. 가족 화면의 `홈 / 위치 / 가족 / 권한 / 알림` 5개 탭과 운영자 탐색은 웹이 담당하며 native 탐색을 중복으로 덧붙이지 않습니다.
+- 로딩·연결 오류는 읽기 쉬운 안내와 재시도 버튼으로 표시합니다. 웹 글씨는 시스템 fontScale을 따르고 좁은 화면의 헤더 줄바꿈을 앱 전용 CSS로 보완합니다. CSS는 같은 origin의 루트·`index.html`에만 적용하며 콘텐츠·권한·좌표를 바꾸거나 native 인증 bridge를 추가하지 않습니다.
+- 화면 복귀에는 허용 목록에 있는 메뉴 경로만 RAM으로 전달합니다. query·인증 callback·임의 fragment·좌표·WebView 문서 상태를 복원용으로 저장하지 않습니다. 이 설명은 Server Portal 경로에 해당합니다.
+
+현재 소스의 JVM 시험은 debug **97개**, release **88개**, release lint는 **0건**이며 release gate와 루트 `npm run verify` **13단계**를 통과했습니다. 최종 0.5.0 QA 서명 APK에서 잠금 해제 상태의 세로·밝은/어두운 화면·200% 글씨·5탭 실제 터치·오류 콜백/재시도 자동 검사 **265개**가 통과했습니다. 가로 회전 시도는 실제 뷰포트가 세로에 머물러 가로 수용 시험에 포함하지 않았습니다. 자동 결과를 전체 수동 접근성 시험으로 합산하지 않습니다. [0.5.0 개편 보고서](docs/CALM-CONSOLE-20261119.md)에 최종 산출물·기기 범위를 기록합니다.
 
 ## 연결된 Server Portal 프로필
 
-운영 서버의 guardian·operator 계정으로 host 로그인·session·snapshot·locations 조회·로그아웃을 확인했습니다. 삼성폰에서는 debug 프로필 45개 assertion과 QA 서명한 최적화 release 프로필 46개 assertion을 통과했습니다. release 시험은 실제 ApplicationInfo의 DEBUG=false와 R8 적용 WebView 경로도 확인했습니다. 이 시험은 로그인과 웹 제품 조회 흐름의 수용 시험이며, 현재 서버의 기기·위치 목록은 0개입니다. 기기 등록·동의·명령 등의 제어 mutation과 실물 좌표는 실행·검증하지 않았습니다.
+2026-11-14의 0.4.1 기록에서는 운영 guardian·operator 계정의 host 로그인·session·snapshot·locations 조회·로그아웃, 삼성폰 debug 45개·QA 서명 최적화 release 46개 assertion이 통과했습니다. 당시 기기·위치 목록은 0개였으며 읽기·로그인 범위의 시험이었습니다. 현재 서버 상태를 뜻하는 수치가 아닙니다.
 
-이 프로필은 승인된 HTTPS leaf를 exact-domain 앱 전용 trust anchor와 SPKI pin으로 사용합니다. 시스템·외부 브라우저 신뢰는 바꾸지 않습니다. BFF의 HttpOnly 세션은 WebView 내부에서만 사용하고 비밀번호·쿠키·token을 native 저장소로 추출하지 않습니다. 뒤로·홈·새로고침·로그아웃을 제공하며, 서버 로그아웃 200 응답 뒤 해당 앱의 웹 쿠키와 저장소를 지워 계정을 전환합니다. 웹 지도는 배포 웹의 Leaflet과 웹 read lease를 사용합니다. native MapLibre·Keystore AAD·독립 lease 구현과는 별도입니다.
+2026-11-16에는 0.4.1 설치 앱의 실제 등록 폼으로 실물 `keyring-A`를 등록하고 Windows BLE Gateway → 운영 HTTPS API → 앱 RSSI 표시를 확인했습니다. 동의·위치 공유 권한의 생성·만료·회수와 시험 사건 정리·로그아웃도 확인했습니다. 좌표는 `null`, 지도 마커는 0개였으며 실물 LED·모터 명령을 실행하지 않았습니다. 당시 휴대폰은 잠긴 상태의 WebView 계측이었습니다. [실물 등록·RSSI 통합 기록](../keyring/evidence/2026-11-16-wsl-esp32-app/README.md)을 0.5.0 디자인 시험과 구분해 보존합니다.
+
+이 프로필은 승인된 HTTPS leaf를 exact-domain 앱 전용 trust anchor와 SPKI pin으로 사용합니다. 시스템·외부 브라우저 신뢰는 바꾸지 않습니다. BFF의 HttpOnly 세션은 WebView 내부에서만 사용하고 비밀번호·쿠키·token을 native 저장소로 추출하지 않습니다. 서버 로그아웃 200 응답 뒤 해당 앱의 웹 쿠키와 저장소를 지워 계정을 전환합니다. 화면을 떠나면 WebView 문서를 비우고 복귀할 때 새로 조회합니다. 웹 지도는 배포 웹의 Leaflet과 웹 read lease를 사용합니다. native MapLibre·Keystore AAD·독립 lease 구현과는 별도입니다.
 
 저장소 `app/`에서 아래 두 입력으로 빌드합니다. native OIDC 및 `oidcTestCa` 프로필과 함께 사용하지 않습니다.
 
@@ -21,7 +32,7 @@ Bubble은 공유가 허용된 키링의 위치 정보를 확인하는 Android �
   :app:assembleDebug :app:assembleRelease
 ```
 
-[Server Portal 설정·세션 경계](deployment/SERVER_PORTAL.md) · [0.4.1 실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md). 증거는 `evidence/server-connect-20261114/`와 `security/server-connect-20261114/`에 구분합니다. 아래 native 화면·로그인 설명은 기본 native 프로필에 해당하며, Android public client 등록은 이 Server Portal 연결의 선행 조건이 아닙니다.
+[Server Portal 설정·세션 경계](deployment/SERVER_PORTAL.md) · [0.5.0 개편 보고서](docs/CALM-CONSOLE-20261119.md) · [2026-11-14 당시 실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md). 이전 증거는 `evidence/server-connect-20261114/`와 `security/server-connect-20261114/`에 보존합니다. 아래 native 화면·로그인 설명은 기본 native 프로필에 해당하며, Android public client 등록은 이 Server Portal 연결의 선행 조건이 아닙니다.
 
 ## 기본 native 화면과 위치의 의미
 
@@ -30,7 +41,7 @@ Bubble은 공유가 허용된 키링의 위치 정보를 확인하는 Android �
 - Portal 계약은 응답의 `readExpiresAt`과 최대 5초를 함께 적용합니다. wall clock과 monotonic clock 중 먼저 만료되는 순간 지도·목록·선택·카메라 상태를 지우며, 지연된 응답이나 네트워크 오류로 표시 권한을 연장하지 않습니다. 로그인 만료·접근 거절·로그아웃도 위치를 지웁니다.
 - Portal 전경 조회는 남은 표시 수명에 맞춰 0.5–2초 간격으로 갱신합니다. 기존 `keyrings-v1`은 30초 간격입니다. 화면 이탈 시 반복 조회를 중지하고 진행 요청을 취소하며, 이전 화면의 응답은 generation 검사를 통과하지 못하면 반영하지 않습니다.
 - 최대 1,000개의 허용된 관측을 처리하고 목록은 25개씩 표시합니다. 이전·다음 컨트롤은 스크롤 영역 밖에 있으며 페이지 변경을 접근성 서비스에 알립니다. 페이지 전환과 갱신에서 카드 View를 재사용합니다.
-- Material DayNight 테마, sp 글자 크기, 텍스트 상태 표시, 48dp 이상 주요 터치 영역을 사용합니다. 갱신 시 기존 카드 View를 재사용해 읽기 위치와 접근성 포커스를 유지하도록 구현했습니다. 높이가 짧은 화면에서는 헤더·탭 구성을 압축하고 각 탭의 스크롤 상태를 복원합니다. 큰 글자·가로 화면·다크 모드의 실제 확인 범위는 기기 기록에서 구분합니다.
+- Calm Console의 Material DayNight 색상, 28sp 화면 제목·19sp 카드 제목·17sp 본문·13sp 보조 글씨와 48dp 이상 주요 터치 영역을 사용합니다. 갱신 시 기존 카드 View를 재사용해 읽기 위치와 접근성 포커스를 유지하도록 구현했습니다. 좁은 화면·큰 글씨에서는 제목과 버튼을 세로로 배치하고, 높이가 짧은 화면에서는 헤더·탭 구성을 압축합니다. 큰 글자·가로 화면·다크 모드의 실제 확인 범위는 버전별 기기 기록에서 구분합니다.
 
 Portal 위치는 중앙 서비스의 권한 검사를 거친 GPS/MEC/릴레이 관측을 읽습니다. 모의 관측에는 `모의`를 표시하고 BLE RSSI만 있는 관측은 신호 기록으로 표시합니다. 좌표·배터리·연결 상태가 없으면 만들어 넣지 않습니다. 기존 `keyrings-v1`은 `IntegrationStore`의 MEC `Location` 이벤트를 읽는 별도 계약입니다. 정보 시각은 실물 센서의 fix 시각을 증명하지 않으며 휴대폰 GPS나 RSSI를 키링 좌표로 바꾸지 않습니다.
 
@@ -75,7 +86,9 @@ export JAVA_TOOL_OPTIONS="-Duser.home=$ANDROID_USER_HOME"
 
 APK는 저장소 기준 `app/app/build/outputs/apk/debug/app-debug.apk`와 `app/app/build/outputs/apk/release/`에 생성됩니다. 서명·배포용 키와 운영 프로필은 별도 배포 입력입니다. 기본 release의 callback 및 시험 화면 분리는 저장소 루트에서 `ANDROID_HOME="$WORKSPACE/.local/android" app/scripts/check-build-isolation.sh`로 확인합니다. 세 로그인 프로필을 고정한 release를 빌드한 뒤에는 같은 명령에 `EXPECT_PRODUCTION_AUTH=1`을 지정해 등록된 callback을 검사합니다.
 
-현재 0.4.1은 debug 92개·release 83개 단위시험, release lint 문제 0건, 포장 검사 42건과 13단계 gate를 통과했습니다. SBOM은 debug 492개·release 417개 구성요소이며 OSV 조회 결과는 0건입니다. 정확한 프로필·APK·기기 시험 범위는 [실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md)와 `security/server-connect-20261114/`에 기록합니다. 기기 release는 workspace QA 서명본이며 운영 배포 서명본과 구분합니다. 기본 미설정 native APK/AAB에는 운영 native IdP/API 입력이 없습니다.
+0.5.0 소스는 debug 97개·release 88개 단위시험, release lint 문제 0건과 release gate·루트 통합 검증을 통과했습니다. 통합 release SBOM은 구성요소 492개·의존성 노드 493개이며, 2026-11-19 21:52:19 KST의 OSV 정확 패키지·버전 417개 조회에서 해당 버전의 알려진 취약점은 0건이었습니다. 정확한 프로필·산출물·기기 시험 범위는 [0.5.0 개편 보고서](docs/CALM-CONSOLE-20261119.md)에 기록합니다. 설치본은 workspace QA 서명본이며 조직의 운영 배포 서명본과 구분합니다. 기본 미설정 native APK/AAB에는 운영 native IdP/API 입력이 없습니다.
+
+2026-11-14의 0.4.1 debug 92개·release 83개 단위시험, lint 0건, 포장 검사 42건과 당시 SBOM·OSV 기록은 [당시 실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md)와 `security/server-connect-20261114/`에 보존합니다.
 
 이전 0.4.0의 85/76개 단위시험·합성 lease/목록 시험과 당시 신뢰 조사 결과는 [통합 기록](docs/DEPLOYMENT-20261114.md), [당시 SBOM·해시](security/deployment-20261114/README.md)에 보존합니다. 현재 릴리스 절차는 [BUILD_GATES](security/BUILD_GATES.md)를 따릅니다.
 
@@ -98,7 +111,7 @@ WSL wrapper는 `install -r`의 최종 로컬 APK 경로도 Windows 경로로 변
 
 versionCode 3에서 이전 APK로 복원할 때는 확인된 백업에 한해 `install -r -d <backup.apk>`가 필요할 수 있습니다. 버전·서명·데이터 호환성을 확인하고, 실패 시 기존 데이터를 보존합니다. 앱·데이터 삭제 후 재설치는 자동 대안으로 사용하지 않습니다.
 
-0.3.0 당시 보안 QA에서는 최적화 release의 workspace QA 서명 사본을 기기에 남겼습니다. 당시 시험용 인증과 instrumentation 패키지 정리·표시 설정 복원, 원본 0.2.0 APK·세션 백업은 [0.3.0 기기·정리 기록](security/RELEASE-0.3.0.md)의 범위입니다. 현재 0.4.1 설치·서명·시험 정리 상태는 [실서버 연결 보고서](docs/SERVER-CONNECTION-20261114.md)를 따릅니다.
+0.3.0 당시 보안 QA에서는 최적화 release의 workspace QA 서명 사본을 기기에 남겼습니다. 당시 시험용 인증과 instrumentation 패키지 정리·표시 설정 복원, 원본 0.2.0 APK·세션 백업은 [0.3.0 기기·정리 기록](security/RELEASE-0.3.0.md)의 범위입니다. 0.4.1의 과거 설치 상태는 [당시 연결 보고서](docs/SERVER-CONNECTION-20261114.md), 0.5.0의 최종 설치·서명·시험 정리는 [현재 개편 보고서](docs/CALM-CONSOLE-20261119.md)에 구분합니다.
 
 ## 소유권을 확인하는 개발 시험 설치·정리 도구
 

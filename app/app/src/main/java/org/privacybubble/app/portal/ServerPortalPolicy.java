@@ -18,7 +18,37 @@ public final class ServerPortalPolicy {
     }
 
     public String origin() { return origin; }
-    public String homeUrl() { return origin + "/#/user/map"; }
+    public String homeUrl() { return origin + "/#/user/overview"; }
+
+    /**
+     * A small, non-sensitive route hint for in-memory resume only. Never retain
+     * an auth redirect, query, arbitrary fragment, document state, or location.
+     * Route membership is not an authorization decision; the BFF owns access.
+     */
+    public String restoreUrl(String url) {
+        URI address = address(url);
+        if (address == null || !origin.equals(origin(address))) return null;
+        String route = pageRoute(address);
+        return route == null ? null : origin + "/#" + route;
+    }
+
+    /** A fixed product label, never the document title or an untrusted URL. */
+    public String navigationTitle(String url) {
+        URI address = address(url);
+        if (address == null || !origin.equals(origin(address))) return "BubbleLock";
+        String path = address.getRawPath();
+        if (path.startsWith("/identity/") || "/api/auth/login".equals(path)
+                || "/api/auth/callback".equals(path)) return "로그인";
+        String route = pageRoute(address);
+        String title = route == null ? null : routeTitle(route);
+        return title == null ? "BubbleLock" : title;
+    }
+
+    /** Follow the system's text preference without using a CSS viewport zoom. */
+    public static int webTextZoom(float fontScale) {
+        if (!Float.isFinite(fontScale) || fontScale <= 0) return 100;
+        return Math.round(Math.max(0.5f, Math.min(3.0f, fontScale)) * 100);
+    }
 
     public boolean isInternal(String url) {
         URI address = address(url);
@@ -36,6 +66,42 @@ public final class ServerPortalPolicy {
         return address != null && origin.equals(origin(address))
                 && "/api/auth/logout".equals(address.getRawPath())
                 && address.getRawQuery() == null && address.getRawFragment() == null;
+    }
+
+    /** One inert packaged stylesheet; never intercept API or identity resources. */
+    public boolean isAppStylesheet(String url) {
+        URI address = address(url);
+        return address != null && origin.equals(origin(address))
+                && "/__bubble_android__/portal-mobile.css".equals(address.getRawPath())
+                && address.getRawQuery() == null && address.getRawFragment() == null;
+    }
+
+    private static String pageRoute(URI address) {
+        String path = address.getRawPath();
+        if (!(path.isEmpty() || "/".equals(path) || "/index.html".equals(path))
+                || address.getRawQuery() != null) return null;
+        String route = address.getRawFragment();
+        if (route == null || route.isEmpty()) route = "/";
+        return routeTitle(route) == null ? null : route;
+    }
+
+    private static String routeTitle(String route) {
+        switch (route) {
+            case "/": return "BubbleLock";
+            case "/user/overview": return "내 대시보드";
+            case "/user/map": return "키링 위치";
+            case "/user/devices": return "가족과 키링";
+            case "/user/privacy": return "공유 권한";
+            case "/user/activity": return "알림과 요청";
+            case "/operator/overview": return "한눈에 보기";
+            case "/operator/map": return "위치 지도";
+            case "/operator/devices": return "장치와 자원";
+            case "/operator/commands": return "명령 처리";
+            case "/operator/audit": return "활동 기록";
+            case "/operator/services": return "연결 서비스";
+            case "/operator/evidence": return "개발 현황";
+            default: return null;
+        }
     }
 
     private static String origin(URI address) {

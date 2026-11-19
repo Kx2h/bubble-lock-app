@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "version": "0.5.0",
+  "versionCode": 6,
+  "scope": "Actual installed optimized Android Server Portal; live guardian; unlocked device",
+  "status": "PASS_FOR_RECORDED_SCOPE",
+  "webDesignCommit": "0d8e2f3",
+  "latestMainLicenseCommit": "8f89ba2",
+  "installedApkSha256": "ee396bcc8266f20d73c12f9fc98149ea1a68b10f838c53c6e2ece715adffee7f",
+  "cases": [
+    {
+      "case": "dark-portrait",
+      "checks": 48,
+      "fontScale": 1,
+      "webTextZoom": 100,
+      "viewportDp": [
+        384,
+        722
+      ],
+      "injectedTouches": 0
+    },
+    {
+      "case": "light-portrait",
+      "checks": 48,
+      "fontScale": 1,
+      "webTextZoom": 100,
+      "viewportDp": [
+        384,
+        722
+      ],
+      "injectedTouches": 0
+    },
+    {
+      "case": "large-text-200",
+      "checks": 48,
+      "fontScale": 2,
+      "webTextZoom": 200,
+      "viewportDp": [
+        384,
+        722
+      ],
+      "injectedTouches": 0
+    },
+    {
+      "case": "family-navigation",
+      "checks": 88,
+      "fontScale": 1,
+      "webTextZoom": 100,
+      "viewportDp": [
+        384,
+        722
+      ],
+      "injectedTouches": 7
+    },
+    {
+      "case": "connection-recovery",
+      "checks": 33,
+      "fontScale": 1,
+      "webTextZoom": 100,
+      "viewportDp": [
+        384,
+        722
+      ],
+      "injectedTouches": 1
+    }
+  ],
+  "checksTotal": 265,
+  "realTouchGestures": 8,
+  "domainMutations": 0,
+  "manualHumanAcceptance": false,
+  "landscapeDeviceVerified": false,
+  "landscapeNote": "Three display-rotation attempts retained a 384x722dp portrait app viewport; excluded from landscape acceptance. Rotation overrides were restored.",
+  "nativeFallbackDeviceVerified": false,
+  "sourceProfile": "SERVER_PORTAL",
+  "operationalServerDeploymentChanged": false,
+  "screenshots": "In-process View.draw renders of the public landing only; not OS screenshots and not coordinate evidence. WebView compositing can differ from the display.",
+  "knownScopeLimits": [
+    "Read-only family workflow; no new device/grant/command mutations",
+    "HTTP error callback injected; real retry uses the production portal, not an actual outage",
+    "No manual TalkBack or different-device/OS/GPU acceptance",
+    "Organization signing remains separate from workspace QA signing"
+  ],
+  "earlierAttemptsPreservedPrivately": [
+    "Initial header word wrap before CSP-compatible app stylesheet fix",
+    "Separate QA process ended before cookie flush; normal Activity termination added",
+    "Serialized JSONArray route comparison corrected to typed values and rendered active route",
+    "Missing-API GET was not a reliable native error fixture; public WebViewClient HTTP503 callback used instead"
+  ]
+}

@@ -15,12 +15,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.graphics.Insets;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -147,6 +149,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private void buildShell() {
         boolean compact = getResources().getConfiguration().screenHeightDp < 480;
+        boolean largeText = getResources().getConfiguration().fontScale > 1.3f;
         root = theme.column(); root.setBackgroundColor(theme.background); setContentView(root);
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
@@ -154,60 +157,87 @@ public final class MainActivity extends AppCompatActivity {
             view.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom)); return insets;
         });
         LinearLayout header = new LinearLayout(this); header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(theme.dp(22), theme.dp(16), theme.dp(22), theme.dp(16));
+        header.setBackgroundColor(theme.chrome);
+        header.setPadding(theme.dp(16), theme.dp(12), theme.dp(16), theme.dp(12));
+        ImageView mark = new ImageView(this); mark.setImageDrawable(theme.icon("bubble", theme.onAccent));
+        mark.setPadding(theme.dp(8), theme.dp(8), theme.dp(8), theme.dp(8));
+        mark.setBackground(theme.shape(theme.accent, Color.TRANSPARENT, 12));
+        mark.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        LinearLayout.LayoutParams markParams = new LinearLayout.LayoutParams(theme.dp(40), theme.dp(40));
+        markParams.setMarginEnd(theme.dp(12)); header.addView(mark, markParams);
         LinearLayout brand = theme.column();
-        TextView wordmark = theme.heading("Bubble", 26); wordmark.setTextColor(theme.accent); brand.addView(wordmark);
-        brand.addView(theme.text("나와 연결된 소중한 일상", 13, theme.muted));
+        TextView wordmark = theme.heading("BubbleLock", 21); wordmark.setTextColor(theme.onChrome); brand.addView(wordmark);
+        if (!largeText) brand.addView(theme.text("가까이서 지키는 프라이버시", 13, theme.mutedOnChrome));
         header.addView(brand, new LinearLayout.LayoutParams(0, -2, 1));
-        connectionPill = theme.text("연결 필요", 13, theme.muted);
-        connectionPill.setPadding(theme.dp(12), theme.dp(8), theme.dp(12), theme.dp(8));
-        connectionPill.setBackground(theme.shape(theme.subtle, Color.TRANSPARENT, 24)); header.addView(connectionPill); header.setVisibility(compact ? View.GONE : View.VISIBLE); root.addView(header);
+        connectionPill = theme.text("연결 필요", 13, theme.mutedOnChrome);
+        connectionPill.setPadding(theme.dp(10), theme.dp(6), theme.dp(10), theme.dp(6));
+        connectionPill.setBackground(theme.shape(0x20FFFFFF, Color.TRANSPARENT, 999));
+        if (largeText) {
+            header.setOrientation(LinearLayout.VERTICAL); header.setGravity(Gravity.START);
+            mark.setVisibility(View.GONE); brand.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+            LinearLayout.LayoutParams pillParams = new LinearLayout.LayoutParams(-2, -2); pillParams.topMargin = theme.dp(8);
+            header.addView(connectionPill, pillParams);
+        } else header.addView(connectionPill);
+        header.setVisibility(compact ? View.GONE : View.VISIBLE); root.addView(header);
         if (!BuildConfig.SERVER_PORTAL_ORIGIN.isEmpty()) {
             MaterialButton portalButton = theme.button(getString(R.string.portal_open), true,
                     view -> startActivity(new Intent(this, ServerPortalActivity.class)));
             LinearLayout.LayoutParams portalParams = new LinearLayout.LayoutParams(-1, -2);
-            portalParams.setMargins(theme.dp(20), theme.dp(8), theme.dp(20), theme.dp(8)); root.addView(portalButton, portalParams);
+            portalParams.setMargins(theme.dp(pageInset()), theme.dp(12), theme.dp(pageInset()), theme.dp(8)); root.addView(portalButton, portalParams);
         }
         progress = new LinearProgressIndicator(this); progress.setIndeterminate(true); progress.setIndicatorColor(theme.accent);
         progress.setTrackColor(theme.subtle); root.addView(progress, new LinearLayout.LayoutParams(-1, theme.dp(3)));
-        banner = theme.text("", 14, theme.warning); banner.setPadding(theme.dp(22), theme.dp(12), theme.dp(22), theme.dp(12));
-        banner.setBackgroundColor(theme.subtle); banner.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE); root.addView(banner);
+        banner = theme.text("", 15, theme.warning); banner.setPadding(theme.dp(16), theme.dp(12), theme.dp(16), theme.dp(12));
+        banner.setBackgroundColor(ColorUtils.setAlphaComponent(theme.warning, 24));
+        banner.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE); root.addView(banner);
         pages = new FrameLayout(this); root.addView(pages, new LinearLayout.LayoutParams(-1, 0, 1));
         buildMapPage(); buildKeyringsPage(); buildSettingsPage();
         View divider = new View(this); divider.setBackgroundColor(theme.border); root.addView(divider, new LinearLayout.LayoutParams(-1, theme.dp(1)));
-        LinearLayout nav = new LinearLayout(this); nav.setPadding(theme.dp(10), theme.dp(8), theme.dp(10), theme.dp(8)); nav.setBackgroundColor(theme.surface);
+        LinearLayout nav = new LinearLayout(this); nav.setPadding(theme.dp(8), theme.dp(8), theme.dp(8), theme.dp(8)); nav.setBackgroundColor(theme.surface);
         String[] names = {getString(R.string.nav_location), getString(R.string.nav_keyrings), getString(R.string.nav_settings)};
         String[] icons = {"map", "keyring", "settings"};
         for (int i=0;i<names.length;i++) {
             final int index=i; MaterialButton item = theme.button(names[i], false, v -> selectTab(index, true));
-            item.setIcon(compact ? null : theme.icon(icons[i], theme.accent)); item.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_TOP);
+            item.setIcon(compact ? null : theme.icon(icons[i], theme.accentText)); item.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_TOP);
             item.setIconSize(theme.dp(23)); item.setIconPadding(theme.dp(5)); item.setTextSize(13);
-            item.setStrokeWidth(0); item.setPadding(theme.dp(6), theme.dp(compact ? 4 : 8), theme.dp(6), theme.dp(compact ? 4 : 8)); item.setMinHeight(theme.dp(compact ? 48 : 64));
-            nav.addView(item, new LinearLayout.LayoutParams(0, -2, 1)); navButtons.add(item);
+            item.setStrokeWidth(0); item.setPadding(theme.dp(4), theme.dp(compact ? 4 : 8), theme.dp(4), theme.dp(compact ? 4 : 8));
+            item.setMinHeight(theme.dp(compact ? 48 : 64)); item.setMinimumHeight(theme.dp(compact ? 48 : 64));
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(0, -2, 1);
+            itemParams.setMarginStart(theme.dp(4)); itemParams.setMarginEnd(theme.dp(4)); nav.addView(item, itemParams); navButtons.add(item);
         }
         root.addView(nav); ViewCompat.requestApplyInsets(root);
     }
+    private int pageInset() {
+        int width = getResources().getConfiguration().screenWidthDp;
+        return Math.max(width >= 600 ? 24 : 16, (width - 960) / 2);
+    }
     private ScrollView page(LinearLayout body) {
         ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
-        scroll.setPadding(theme.dp(20), theme.dp(8), theme.dp(20), theme.dp(24)); scroll.addView(body);
+        scroll.setPadding(theme.dp(pageInset()), theme.dp(24), theme.dp(pageInset()), theme.dp(32)); scroll.addView(body);
         pages.addView(scroll, new FrameLayout.LayoutParams(-1, -1)); return scroll;
     }
     private void buildMapPage() {
         LinearLayout body = theme.column();
+        add(body, theme.text("내 프라이버시", 13, theme.accentText), 0, 8);
+        boolean stack = getResources().getConfiguration().screenWidthDp < 380 || getResources().getConfiguration().fontScale > 1.2f;
         LinearLayout title = new LinearLayout(this); title.setGravity(Gravity.CENTER_VERTICAL);
-        title.addView(theme.heading("키링 위치", 24), new LinearLayout.LayoutParams(0, -2, 1));
+        title.setOrientation(stack ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+        title.addView(theme.heading("키링 위치", 28), new LinearLayout.LayoutParams(stack ? -1 : 0, -2, stack ? 0 : 1));
         refreshButton = theme.button("새로고침", false, v -> fetchLocations());
-        refreshButton.setIcon(theme.icon("refresh", theme.accent)); refreshButton.setIconSize(theme.dp(19));
-        refreshButton.setContentDescription("키링 위치 새로고침"); title.addView(refreshButton); body.addView(title);
-        mapCaption = theme.text("공유된 위치를 한눈에 확인하세요.", 14, theme.muted); add(body, mapCaption, 6, 16);
-        FrameLayout mapFrame = new FrameLayout(this); mapFrame.setBackground(theme.shape(theme.subtle, theme.border, 24)); mapFrame.setClipToOutline(true);
-        mapFrame.addView(map, new FrameLayout.LayoutParams(-1, -1)); body.addView(mapFrame, new LinearLayout.LayoutParams(-1, theme.dp(300)));
+        refreshButton.setTextSize(15); refreshButton.setIcon(theme.icon("refresh", theme.accentText)); refreshButton.setIconSize(theme.dp(19));
+        refreshButton.setContentDescription("키링 위치 새로고침");
+        LinearLayout.LayoutParams refreshParams = new LinearLayout.LayoutParams(stack ? -1 : -2, -2);
+        if (stack) refreshParams.topMargin = theme.dp(12); title.addView(refreshButton, refreshParams); body.addView(title);
+        mapCaption = theme.text("공유된 위치를 한눈에 확인하세요.", 15, theme.muted); add(body, mapCaption, 8, 24);
+        FrameLayout mapFrame = new FrameLayout(this); mapFrame.setBackground(theme.shape(theme.subtle, theme.border, 18)); mapFrame.setClipToOutline(true);
+        int mapHeight = Math.max(220, Math.min(360, getResources().getConfiguration().screenHeightDp / 2));
+        mapFrame.addView(map, new FrameLayout.LayoutParams(-1, -1)); body.addView(mapFrame, new LinearLayout.LayoutParams(-1, theme.dp(mapHeight)));
         MaterialButton center = theme.button("선택한 키링 위치로", false, v -> map.focusSelected()); center.setTag("centerKeyring"); add(body, center, 12, 0);
-        mapDetails = theme.column(); add(body, mapDetails, 18, 0); mapScroll = page(body); mapScroll.setId(R.id.map_page);
+        mapDetails = theme.column(); add(body, mapDetails, 24, 0); mapScroll = page(body); mapScroll.setId(R.id.map_page);
     }
     private void buildKeyringsPage() {
-        LinearLayout body = theme.column(); body.addView(theme.heading("내 키링", 26));
-        listCaption = theme.text("위치가 공유된 키링을 확인할 수 있어요.", 15, theme.muted); add(body, listCaption, 8, 20);
+        LinearLayout body = theme.column(); add(body, theme.text("나와 연결된 일상", 13, theme.accentText), 0, 8); body.addView(theme.heading("내 키링", 28));
+        listCaption = theme.text("위치가 공유된 키링을 확인할 수 있어요.", 17, theme.muted); add(body, listCaption, 8, 24);
         keyringRows = theme.column(); body.addView(keyringRows); keyringScroll = page(body); keyringScroll.setId(R.id.keyring_page);
         pages.removeView(keyringScroll);
         keyringPageContainer=theme.column();
@@ -215,29 +245,29 @@ public final class MainActivity extends AppCompatActivity {
         pages.addView(keyringPageContainer,new FrameLayout.LayoutParams(-1,-1));
     }
     private void buildSettingsPage() {
-        LinearLayout body = theme.column(); body.addView(theme.heading("설정", 26));
-        add(body, theme.text("안전하게 연결하고, 필요한 정보만 확인하세요.", 15, theme.muted), 8, 24);
+        LinearLayout body = theme.column(); add(body, theme.text("내 프라이버시", 13, theme.accentText), 0, 8); body.addView(theme.heading("설정", 28));
+        add(body, theme.text("안전하게 연결하고, 필요한 정보만 확인하세요.", 17, theme.muted), 8, 24);
         LinearLayout account = theme.panel(); account.addView(theme.heading("내 계정", 19));
-        settingsStatus = theme.text("", 16, theme.muted); add(account, settingsStatus, 10, 16);
+        settingsStatus = theme.text("", 17, theme.muted); add(account, settingsStatus, 12, 20);
         accountButton = theme.button("로그인", true, v -> { if (hasSession()) confirmSignOut(); else signIn(); }); account.addView(accountButton); body.addView(account);
         LinearLayout service = theme.panel(); add(service, theme.heading("서비스 연결", 19), 0, 8);
-        add(service, theme.text(VariantFeatures.allowsCustomService() ? "안내받은 서비스 주소를 저장한 후 계정으로 로그인하세요." : "서비스 연결 정보는 서비스 제공자가 관리해요.", 15, theme.muted), 0, 16);
+        add(service, theme.text(VariantFeatures.allowsCustomService() ? "안내받은 서비스 주소를 저장한 후 계정으로 로그인하세요." : "서비스 연결 정보는 서비스 제공자가 관리해요.", 17, theme.muted), 0, 20);
         addressField = new TextInputLayout(this); addressField.setHint("서비스 주소"); addressField.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
         addressField.setBoxCornerRadii(theme.dp(12), theme.dp(12), theme.dp(12), theme.dp(12));
         addressInput = new TextInputEditText(addressField.getContext()); addressInput.setSingleLine(true);
         addressInput.setId(R.id.service_address);
         addressInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         addressInput.setEnabled(VariantFeatures.allowsCustomService());
-        addressInput.setTextSize(16); addressInput.setText(addressDraft); addressInput.setHint("https://service.example.org");
+        addressInput.setTextSize(17); addressInput.setText(addressDraft); addressInput.setHint("https://service.example.org");
         addressInput.setSelection(clamp(addressSelectionStart, addressDraft.length()), clamp(addressSelectionEnd, addressDraft.length()));
         addressField.addView(addressInput); service.addView(addressField); if (VariantFeatures.allowsCustomService()) add(service, theme.button("연결 정보 저장", false, v -> saveConnection()), 16, 0);
-        add(service, theme.button(VariantFeatures.allowsCustomService() ? "서비스 연결 해제" : "이 기기의 데이터 삭제", false, v -> confirmDisconnect()), 10, 0); add(body, service, 18, 0);
+        add(service, theme.button(VariantFeatures.allowsCustomService() ? "서비스 연결 해제" : "이 기기의 데이터 삭제", false, v -> confirmDisconnect()), 12, 0); add(body, service, 24, 0);
         addressField.setHelperText(addressHelper); addressField.setError(addressError);
         LinearLayout privacy = theme.panel(); privacy.addView(theme.heading("위치와 개인정보", 19));
-        add(privacy, theme.text("키링이 공유한 위치만 표시하며 휴대폰의 위치 권한은 사용하지 않아요. 위치가 늦게 도착하거나 정확하지 않을 수 있어요.", 15, theme.muted), 10, 0); add(body, privacy, 18, 0);
+        add(privacy, theme.text("키링이 공유한 위치만 표시하며 휴대폰의 위치 권한은 사용하지 않아요. 위치가 늦게 도착하거나 정확하지 않을 수 있어요.", 17, theme.muted), 12, 0); add(body, privacy, 24, 0);
         add(privacy, theme.button("오픈소스 라이선스", false, v -> showLicenses()), 16, 0);
         VariantFeatures.addSettings(this, body, theme, session, () -> { state.clear(); renderState(); fetchLocations(); });
-        TextView version = theme.text("Bubble · " + BuildConfig.VERSION_NAME, 13, theme.muted); version.setGravity(Gravity.CENTER); add(body, version, 26, 0); settingsScroll = page(body); settingsScroll.setId(R.id.settings_page);
+        TextView version = theme.text("BubbleLock · " + BuildConfig.VERSION_NAME, 13, theme.muted); version.setGravity(Gravity.CENTER); add(body, version, 32, 0); settingsScroll = page(body); settingsScroll.setId(R.id.settings_page);
     }
 
     private void selectTab(int selected, boolean user) {
@@ -246,7 +276,9 @@ public final class MainActivity extends AppCompatActivity {
         keyringPageContainer.setVisibility(tab == 1 ? View.VISIBLE : View.GONE);
         for (int i=0;i<navButtons.size();i++) {
             MaterialButton item = navButtons.get(i); boolean active = i == tab; item.setSelected(active);
-            item.setBackgroundTintList(ColorStateList.valueOf(active ? theme.subtle : theme.surface)); item.setContentDescription(item.getText() + (active ? ", 선택됨" : ""));
+            item.setBackgroundTintList(ColorStateList.valueOf(active ? theme.accentSoft : Color.TRANSPARENT));
+            item.setTextColor(active ? theme.accentText : theme.muted); item.setIconTint(ColorStateList.valueOf(active ? theme.accentText : theme.muted));
+            item.setContentDescription(item.getText() + (active ? ", 선택됨" : ""));
         }
         if (tab != 2 && addressInput != null) {
             addressInput.clearFocus(); InputMethodManager keyboard=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
@@ -274,7 +306,7 @@ public final class MainActivity extends AppCompatActivity {
         }
         progress.setVisibility(state.loading ? View.VISIBLE : View.INVISIBLE);
         String pill = safeBase().isEmpty() || !signedIn ? "연결 필요" : state.loading ? "확인 중" : state.errorCode == 403 ? "접근 제한" : state.error != null ? "연결 끊김" : state.loaded ? "연결됨" : "연결 확인";
-        connectionPill.setText(pill); connectionPill.setTextColor(state.error != null ? theme.warning : signedIn ? theme.accent : theme.muted);
+        connectionPill.setText(pill); connectionPill.setTextColor(state.error != null ? theme.warningOnChrome : signedIn ? theme.accentOnChrome : theme.mutedOnChrome);
         String notice = vaultProblem ? "연결 정보를 안전하게 불러오지 못했어요. 앱을 다시 열어 주세요."
                 : state.errorCode == 401 ? "로그인이 만료됐어요. 다시 로그인해 주세요."
                 : state.errorCode == 403 ? "위치를 확인할 권한이 없어요. 계정의 공유 설정을 확인해 주세요."
@@ -355,7 +387,7 @@ public final class MainActivity extends AppCompatActivity {
             }
             if (keyringRows.getChildAt(index) != card.view) {
                 keyringRows.removeView(card.view);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.bottomMargin = theme.dp(16);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.bottomMargin = theme.dp(24);
                 keyringRows.addView(card.view, index, params);
             }
             card.bind(item, item.id.equals(state.selectedId));
@@ -372,7 +404,7 @@ public final class MainActivity extends AppCompatActivity {
         row.addView(keyringPrevious,previous); row.addView(keyringNext,new LinearLayout.LayoutParams(0,-2,1));
         add(keyringPager,row,12,0);
         LinearLayout.LayoutParams pagerParams=new LinearLayout.LayoutParams(-1,-2);
-        pagerParams.setMargins(theme.dp(20),theme.dp(8),theme.dp(20),theme.dp(8));
+        pagerParams.setMargins(theme.dp(pageInset()),theme.dp(12),theme.dp(pageInset()),theme.dp(8));
         keyringPageContainer.addView(keyringPager,0,pagerParams);
     }
     private void changeKeyringPage(int delta) {
@@ -390,29 +422,36 @@ public final class MainActivity extends AppCompatActivity {
 
     private final class LocationCard {
         final LinearLayout view = theme.panel();
-        final TextView name = theme.heading("", 22), status = badge("", theme.muted);
-        final TextView selection = theme.text("선택한 키링", 13, theme.accent);
-        final TextView summary = theme.text("", 16, theme.text);
+        final TextView name = theme.heading("", 19), status = badge("", theme.muted);
+        final TextView selection = theme.text("선택한 키링", 13, theme.accentText);
+        final TextView summary = theme.text("", 17, theme.text);
         final TextView stale = theme.text("이전 위치 정보예요. 현재 위치와 다를 수 있어요.", 15, theme.warning);
         final InfoField time, accuracy, provider, coordinate, battery, connection, gateway, signal;
         final MaterialButton action;
         final boolean detail;
         String currentId;
         LocationCard(boolean detail) {
-            this.detail = detail; view.addView(name); add(view, selection, 4, 0); add(view, status, 10, 12); view.addView(summary); add(view, stale, 8, 8);
+            this.detail = detail; if (detail) name.setTextSize(24);
+            view.addView(name); add(view, selection, 4, 0);
+            LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(-2, -2); statusParams.topMargin = theme.dp(12); statusParams.bottomMargin = theme.dp(12);
+            view.addView(status, statusParams); view.addView(summary); add(view, stale, 8, 8);
             time = new InfoField(view, "정보 시각"); accuracy = new InfoField(view, "위치 정확도");
             provider = new InfoField(view, "위치 출처"); coordinate = new InfoField(view, "좌표");
             battery = new InfoField(view, "배터리"); connection = new InfoField(view, "키링 연결");
-            gateway = new InfoField(view, "수신 게이트웨이"); signal = new InfoField(view, "근접 신호 기록");
+            gateway = new InfoField(view, "수신기"); signal = new InfoField(view, "근접 신호 기록");
             action = theme.button(detail ? "키링 목록 보기" : "지도에서 보기", false, v -> {
                 if (this.detail) selectTab(1, true); else selectKeyring(currentId, true);
             });
-            add(view, action, 16, 0);
+            add(view, action, 20, 0);
         }
         void bind(KeyringLocation item, boolean selected) {
             currentId = item.id; boolean coordinates = item.hasCoordinates(), fresh = item.isFresh(System.currentTimeMillis());
             boolean denied = "denied".equals(item.status);
-            setText(name, (item.simulation ? "모의 · " : "") + item.name); setText(status, status(item)); status.setTextColor(fresh && !item.simulation ? theme.success : theme.warning);
+            setText(name, (item.simulation ? "모의 · " : "") + item.name); setText(status, status(item));
+            int statusColor = denied ? theme.danger : fresh && !item.simulation ? theme.success : theme.warning;
+            status.setTextColor(statusColor);
+            int tintAlpha = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ? 40 : 24;
+            status.setBackground(theme.shape(ColorUtils.setAlphaComponent(statusColor, tintAlpha), Color.TRANSPARENT, 999));
             selection.setVisibility(!detail && selected ? View.VISIBLE : View.GONE);
             setText(summary, coordinates ? "마지막 위치 정보 " + relative(item.observedAt) : noLocation(item));
             stale.setVisibility(coordinates && !fresh ? View.VISIBLE : View.GONE);
@@ -426,13 +465,16 @@ public final class MainActivity extends AppCompatActivity {
             signal.bind(!denied && item.rssiDbm != null, item.rssiDbm == null ? "" : (item.bleSimulation ? "모의 · " : "") + item.rssiDbm + " dBm · " + relative(item.bleObservedAt));
             action.setVisibility(detail || coordinates ? View.VISIBLE : View.GONE);
             action.setContentDescription(detail ? "키링 목록 보기" : item.name + ", 지도에서 보기");
-            view.setBackground(theme.shape(!detail && selected ? theme.subtle : theme.surface, !detail && selected ? theme.accent : theme.border, 22));
+            view.setBackground(theme.shape(!detail && selected ? theme.accentSoft : theme.surface, !detail && selected ? theme.accentText : theme.border, 18));
         }
     }
     private final class InfoField {
-        final LinearLayout row = theme.column(); final TextView value = theme.text("", 15, theme.text);
+        final LinearLayout row = theme.column(); final TextView value = theme.text("", 17, theme.text);
         InfoField(LinearLayout parent, String label) {
-            row.setPadding(0, theme.dp(7), 0, theme.dp(7)); row.addView(theme.text(label, 13, theme.muted)); add(row, value, 2, 0); parent.addView(row);
+            row.setPadding(theme.dp(12), theme.dp(12), theme.dp(12), theme.dp(12));
+            row.setBackground(theme.shape(theme.subtle, Color.TRANSPARENT, 12));
+            row.addView(theme.text(label, 13, theme.muted)); add(row, value, 4, 0);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.topMargin = theme.dp(8); parent.addView(row, params);
         }
         void bind(boolean visible, String text) {
             setText(value, visible ? text : ""); row.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -447,12 +489,13 @@ public final class MainActivity extends AppCompatActivity {
         else if (state.readLeaseExpired) { title = "위치를 다시 확인해 주세요"; message = "열람 시간이 끝난 위치는 지도와 목록에서 지워져요."; action = "다시 확인"; }
         else if (state.error != null) { title = "지금은 연결할 수 없어요"; message = "인터넷 연결과 서비스 주소를 확인한 뒤 다시 시도해 주세요."; action = "다시 시도"; }
         else { title = "공유된 키링이 아직 없어요"; message = "위치 공유가 허용된 키링이 연결되면 여기에 나타나요."; action = "다시 확인"; }
-        TextView symbol = theme.text("", 32, theme.accent); symbol.setCompoundDrawablesWithIntrinsicBounds(theme.icon("keyring", theme.accent), null, null, null);
-        symbol.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); empty.addView(symbol);
-        add(empty, theme.heading(title, 22), 16, 10); add(empty, theme.text(message, 16, theme.muted), 0, 4);
+        ImageView symbol = new ImageView(this); symbol.setImageDrawable(theme.icon("keyring", theme.accentText));
+        symbol.setPadding(theme.dp(16), theme.dp(16), theme.dp(16), theme.dp(16)); symbol.setBackground(theme.shape(theme.accentSoft, Color.TRANSPARENT, 12));
+        symbol.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO); empty.addView(symbol, new LinearLayout.LayoutParams(theme.dp(56), theme.dp(56)));
+        add(empty, theme.heading(title, 24), 20, 12); add(empty, theme.text(message, 17, theme.muted), 0, 4);
         if (action != null) add(empty, theme.button(action, true, v -> {
             if (safeBase().isEmpty()) selectTab(2, true); else if (!hasSession()) signIn(); else fetchLocations();
-        }), 18, 0); return empty;
+        }), 24, 0); return empty;
     }
 
     private void selectKeyring(String id, boolean switchToMap) {
@@ -540,7 +583,7 @@ public final class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.topMargin=theme.dp(top); params.bottomMargin=theme.dp(bottom); parent.addView(child, params);
     }
     private TextView badge(String text, int color) {
-        TextView badge = theme.text(text, 13, color); badge.setPadding(theme.dp(10), theme.dp(5), theme.dp(10), theme.dp(5)); badge.setBackground(theme.shape(theme.subtle, Color.TRANSPARENT, 20)); return badge;
+        TextView badge = theme.text(text, 13, color); badge.setPadding(theme.dp(12), theme.dp(6), theme.dp(12), theme.dp(6)); badge.setBackground(theme.shape(theme.subtle, Color.TRANSPARENT, 999)); return badge;
     }
     private static int clamp(int value, int length) { return Math.max(0, Math.min(value, length)); }
     private static String status(KeyringLocation item) {
